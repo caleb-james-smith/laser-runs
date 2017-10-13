@@ -282,7 +282,8 @@ def makeTable(runDir, tables, rbxList, runList):
 
 if __name__ == "__main__":
     
-    plotData("rbx14_shunt0_1.root" ,"rbx14_shunt31_1.root", "h96", "SiPM", "run-8/", "sipmPlots/", True)
+    plotData("rbx0_shunt31_pd_1.root" ,     "rbx0_shunt31_pd_2.root",    "h0",  "Pindiode", "CU_40/", "", True)
+    plotData("rbx0_shunt31_uhtr1_1.root" ,  "rbx0_shunt31_uhtr1_2.root", "h12", "SiPM",     "CU_40/", "", True)
     
     #runDir = "run-4/"
     #tables = ["sipm", "pd"]
@@ -304,11 +305,11 @@ if __name__ == "__main__":
     #rbxList = list(i for i in xrange(16,17))
     #makeTable(runDir, tables, rbxList)
 
-    runDir = "run-10/"
-    tables = ["sipm", "pd"]
-    rbxList = [14,18] 
-    runList = list(i for i in xrange(3,29))
-    makeTable(runDir, tables, rbxList, runList)
+    #runDir = "run-10/"
+    #tables = ["sipm", "pd"]
+    #rbxList = [14,18] 
+    #runList = list(i for i in xrange(3,29))
+    #makeTable(runDir, tables, rbxList, runList)
 
     #shunts = True
     
