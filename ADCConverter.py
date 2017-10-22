@@ -66,6 +66,6 @@ if __name__ == "__main__":
     for adc in xrange(257):
         print "%3d : %.2f : %.2f" % (adc, converter.linearize(adc), xbins[adc])
         cleanBins.append(float("%.2f" % xbins[adc]))
-    print cleanBins
+    #print cleanBins
 
 

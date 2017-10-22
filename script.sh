@@ -11,8 +11,25 @@ shunt=31
 host=hcal904daq04
 commands=../uhtrRun.txt
 crate2=63;
+
+rm_pdf=CU_"$cu"/rbx"$rbx"-rm1_"$iteration".pdf
+cu_pdf=CU_"$cu"/rbx"$rbx"-cu-pd0_"$iteration".pdf
+declare -a pdf_files=($rm_pdf $cu_pdf) 
+for f in "${pdf_files[@]}"
+do
+  if [ -e "$f" ]; then
+    printf "Are you sure you want to overwirte this file (y/n)? : "$f" : "
+    read answer
+    if [ $answer != "y" ]; then
+      exit 1
+    fi
+  else
+    echo "This file does not exist: "$f""
+  fi 
+done
+
 if [ $rbx = "0" ]; then
-    crate1=63; uhtr1=1; uhtr2=2; uhtr3=11; pd_ch="h0";
+    crate1=63; uhtr1=1; uhtr2=2; uhtr3=8; pd_ch="h0";
 elif [ $rbx = "1" ]; then
     crate1=61; uhtr1=1; uhtr2=2; uhtr3=8; pd_ch="h72";
 else if [ $rbx = "2" ]; then
@@ -67,12 +84,19 @@ fi
 cd CU_$cu
 
 # write macro for CU
-cu_file=macro_cu.C
-echo "{" > $cu_file
-echo ""$pd_ch"->Draw();" >> $cu_file
-echo "c1->SetLogy();" >> $cu_file
-echo "c1->SaveAs(\"CU.pdf\");" >> $cu_file
-echo "}" >> $cu_file
+declare -a pd_channels=("h0" "h1" "h2" "h3" "h4" "h5")
+pd=0
+for ch in "${pd_channels[@]}"
+do
+  cu_file=macro_pd"$pd".C
+  echo "{" > $cu_file
+  echo ""$ch"->Draw();" >> $cu_file
+  echo ""$ch"->SetTitle(\"CU "$cu" Pindiode Ch. "$pd", Shunt "$shunt", Iteration "$iteration";ADC;counts\");" >> $cu_file
+  echo "c1->SetLogy();" >> $cu_file
+  echo "c1->SaveAs(\"CU_pd"$pd".pdf\");" >> $cu_file
+  echo "}" >> $cu_file
+  pd=$((pd+1))
+done
 
 # write macros for RMs
 declare -a rm_channels=("h12" "h84" "h12" "h84")
@@ -82,7 +106,7 @@ do
   rm_file=macro_rm"$rm".C
   echo "{" > $rm_file
   echo ""$ch"->Draw();" >> $rm_file
-  echo ""$ch"->SetTitle(\"CU "$cu" RM "$rm" Fiber 0 Channel 0, Shunt "$shunt";ADC;counts\");" >> $rm_file
+  echo ""$ch"->SetTitle(\"CU "$cu" RM "$rm" Fib. 0 Ch. 0, Shunt "$shunt", Iteration "$iteration";ADC;counts\");" >> $rm_file
   echo "c1->SetLogy();" >> $rm_file
   echo "c1->SaveAs(\"RM"$rm".pdf\");" >> $rm_file
   echo "}" >> $rm_file
@@ -96,15 +120,19 @@ mv data.root rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root
 uHTRtool.exe -o $host -c $crate2:$uhtr3 -s $commands 
 mv data.root rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root
 
-# Assumes the use of macro_1.C, macro_2.C, and cu_file
+# Use rm macros
 root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm1.C
 root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm2.C
 root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm3.C
 root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm4.C
-root -b -q rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root $cu_file
 
 for rm in `seq 1 4`;
 do
   mv RM"$rm".pdf rbx"$rbx"-rm"$rm"_"$iteration".pdf
 done
-mv CU.pdf rbx"$rbx"-cu_"$iteration".pdf
+# Use cu macros
+for pd in `seq 0 5`;
+do
+  root -b -q rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root macro_pd"$pd".C
+  mv CU_pd"$pd".pdf rbx"$rbx"-cu-pd"$pd"_"$iteration".pdf
+done

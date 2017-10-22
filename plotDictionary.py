@@ -170,49 +170,65 @@ pindiodeDict = [
 
 # Dictionary for Shunt data RBX 1 - 18
 
+default_ch = list("h%d" % i for i in xrange(96,144))
+
 shuntSipms = [
         {'file1':'rbx2_shunt0_1.root',
          'file2':'rbx2_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx3_shunt0_1.root',
          'file2':'rbx3_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx4_shunt0_1.root',
          'file2':'rbx4_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
+         'type':'SiPM'
+        },
+        {'file1':'rbx5_shunt0_1.root',
+         'file2':'rbx5_shunt31_1.root',
+         'ch':default_ch,
+         'type':'SiPM'
+        },
+        {'file1':'rbx6_shunt0_1.root',
+         'file2':'rbx6_shunt31_1.root',
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx7_shunt0_1.root',
          'file2':'rbx7_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx8_shunt0_1.root',
          'file2':'rbx8_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
+         'type':'SiPM'
+        },
+        {'file1':'rbx9_shunt0_1.root',
+         'file2':'rbx9_shunt31_1.root',
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx10_shunt0_1.root',
          'file2':'rbx10_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx11_shunt0_1.root',
          'file2':'rbx11_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
          'type':'SiPM'
         },
         {'file1':'rbx12_shunt0_1.root',
          'file2':'rbx12_shunt31_1.root',
-         'ch':['h96','h120'],
+         'ch':default_ch,
          'type':'SiPM'
         },
         ]
-
 
 shuntPindiodes = [
         {'file1':'rbx2_shunt0_pd.root',
@@ -230,6 +246,16 @@ shuntPindiodes = [
          'ch':['h108','h109'],
          'type':'Pindiode'
         },
+        {'file1':'rbx5_shunt0_pd.root',
+         'file2':'rbx5_shunt31_pd.root',
+         'ch':['h120','h121'],
+         'type':'Pindiode'
+        },
+        {'file1':'rbx6_shunt0_pd.root',
+         'file2':'rbx6_shunt31_pd.root',
+         'ch':['h132','h133'],
+         'type':'Pindiode'
+        },
         {'file1':'rbx7_shunt0_pd.root',
          'file2':'rbx7_shunt31_pd.root',
          'ch':['h0','h1'],
@@ -238,6 +264,11 @@ shuntPindiodes = [
         {'file1':'rbx8_shunt0_pd.root',
          'file2':'rbx8_shunt31_pd.root',
          'ch':['h12','h13'],
+         'type':'Pindiode'
+        },
+        {'file1':'rbx9_shunt0_pd.root',
+         'file2':'rbx9_shunt31_pd.root',
+         'ch':['h24','h25'],
          'type':'Pindiode'
         },
         {'file1':'rbx10_shunt0_pd.root',

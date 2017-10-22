@@ -177,8 +177,8 @@ def plotMax(runDir, dictionary):
     C1.SaveAs(runDir + 'max_adc_' + type + '.pdf')
 
 # Table options are "sipm", "pd", and "pindiodes"
-def makeTable(runDir, tables, rbxList):
-    shuntList = [0,31]
+def makeTable(runDir, tables, rbxList, runList):
+    shuntList = [0]
     pdList = list(i for i in xrange(5))
     sipm_chlist = list("h%d" % i for i in xrange(96,144))
     #tables = ["sipm", "pd"]
@@ -188,10 +188,10 @@ def makeTable(runDir, tables, rbxList):
     for table in tables:
         with open (runDir + table + "_table.txt", 'w') as t:
             if table == "sipm":
-                columns = ["RBX", "CU", "RM", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
+                columns = ["Run", "RBX", "CU", "RM", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
                 RM = 0
             elif table == "pd":
-                columns = ["RBX", "CU", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
+                columns = ["Run", "RBX", "CU", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
             elif table == "pindiodes":
                 columns = ["RBX", "CU", "pd_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
             header = "# " + "".join(entry.ljust(col_width) for entry in columns) + "\n"
@@ -230,73 +230,86 @@ def makeTable(runDir, tables, rbxList):
                                         t.write("".join(entry.ljust(col_width) for entry in row) + "\n")
             else: 
                 # order by (1) rbx, (2) shunt, (3) uHTR 1 or 2
-                for irbx in rbxList:
-                    for ishunt in shuntList:
-                        for iuhtr in [1,2]:
-                            if table == "pd" and iuhtr == 2:
-                                continue    #do not do pd twice
-                            for f in os.listdir(runDir):
-                                # It is important to only include SiPM / PD data in correct table
-                                if table == "sipm": iterFlag = "rbx%d_shunt%d_%d.root" % (irbx, ishunt, iuhtr)
-                                elif table == "pd": iterFlag = "rbx%d_shunt%d_pd.root" % (irbx, ishunt)
-                                if f == iterFlag:
-                                    print "run: %s file: %s" % (runDir, f)
-                                    # RBX, CU and shunt are constant for one file
-                                    rbx = "%02d" % irbx
-                                    shunt = "%d" % ishunt
-                                    cu = mapping.rbxCU[rbx]
-                                    if shunt == "0":    cutoff = 150
-                                    else:               cutoff = 100
-                                    # RM, pindiode/sipm_ch, uHTR, uhtr_ch, max_adc will vary within a file 
-                                    if table == "sipm": chList = mapping.rbxSIPM[rbx][iuhtr-1]
-                                    elif table == "pd": chList = mapping.rbxPD[rbx]
-                                    # Run 4 uses first uHTR for RBX, last RM for this uHTR 
-                                    if runDir == "run-4/" and table == "sipm": chList = sipm_chlist 
-                                    for i, ch in enumerate(chList):
-                                        channel = "%s" % (i % 48)   # sipm (0-47) or pindiode (0-5) channel
-                                        if channel == "0":
-                                            RM += 1
-                                            if RM == 5: RM = 1
-                                        rm = "%s" % RM
-                                        # Run 4 uses special mapping for RMs.  
-                                        if runDir == "run-4/": rm = mapping.rbxRM[rbx] 
-                                        if (rm,channel) in mapping.darkSipms:
-                                            print "mask out channel: RM %s SiPM %s" % (rm, channel)
-                                            continue    # mask out 4 dark channels per RBX
-                                        uhtr_ch = ch.split("h")[1]
-                                        max_adc = str(findMaxADC(runDir + f, ch, False))
-                                        max_fc  = "%.2f" % adcConverter.linearize(max_adc)
-                                        if int(max_adc) > cutoff:   result = "1"
-                                        else:                       result = "0"
-                                        #if int(max_adc) > cutoff:   result = "pass"
-                                        #else:                       result = "fail"
-                                        if table == "sipm":
-                                            row = [rbx, cu, rm, channel, uhtr_ch, shunt, max_adc, max_fc, result]
-                                        if table == "pd":
-                                            row = [rbx, cu, channel, uhtr_ch, shunt, max_adc, max_fc, result]
-                                        t.write("".join(entry.ljust(col_width) for entry in row) + "\n") 
+                for irun in runList:
+                    for irbx in rbxList:
+                        for ishunt in shuntList:
+                            for iuhtr in [1,2]:
+                                if table == "pd" and iuhtr == 2:
+                                    continue    #do not do pd twice
+                                for f in os.listdir(runDir):
+                                    # It is important to only include SiPM / PD data in correct table
+                                    #if table == "sipm": iterFlag = "rbx%d_shunt%d_%d.root" % (irbx, ishunt, iuhtr)
+                                    #elif table == "pd": iterFlag = "rbx%d_shunt%d_pd.root" % (irbx, ishunt)
+                                    if table == "sipm": iterFlag = "rbx%d_shunt%d_uhtr%d_%d.root" % (irbx, ishunt, iuhtr, irun)
+                                    elif table == "pd": iterFlag = "rbx%d_shunt%d_pd_%d.root" % (irbx, ishunt, irun)
+                                    if f == iterFlag:
+                                        print "run: %s file: %s" % (runDir, f)
+                                        # RBX, CU and shunt are constant for one file
+                                        run = "%d" % irun
+                                        rbx = "%02d" % irbx
+                                        shunt = "%d" % ishunt
+                                        cu = mapping.rbxCU[rbx]
+                                        if shunt == "0":    cutoff = 150
+                                        else:               cutoff = 100
+                                        # RM, pindiode/sipm_ch, uHTR, uhtr_ch, max_adc will vary within a file 
+                                        if table == "sipm": chList = mapping.rbxSIPM[rbx][iuhtr-1]
+                                        elif table == "pd": chList = mapping.rbxPD[rbx]
+                                        # Run 4 uses first uHTR for RBX, last RM for this uHTR 
+                                        if runDir == "run-4/" and table == "sipm": chList = sipm_chlist 
+                                        for i, ch in enumerate(chList):
+                                            channel = "%s" % (i % 48)   # sipm (0-47) or pindiode (0-5) channel
+                                            if channel == "0":
+                                                RM += 1
+                                                if RM == 5: RM = 1
+                                            rm = "%s" % RM
+                                            # Run 4 uses special mapping for RMs.  
+                                            if runDir == "run-4/": rm = mapping.rbxRM[rbx] 
+                                            if (rm,channel) in mapping.darkSipms:
+                                                #print "mask out channel: RM %s SiPM %s" % (rm, channel)
+                                                continue    # mask out 4 dark channels per RBX
+                                            uhtr_ch = ch.split("h")[1]
+                                            max_adc = str(findMaxADC(runDir + f, ch, False))
+                                            max_fc  = "%.2f" % adcConverter.linearize(max_adc)
+                                            if int(max_adc) > cutoff:   result = "1"
+                                            else:                       result = "0"
+                                            #if int(max_adc) > cutoff:   result = "pass"
+                                            #else:                       result = "fail"
+                                            if table == "sipm":
+                                                row = [run, rbx, cu, rm, channel, uhtr_ch, shunt, max_adc, max_fc, result]
+                                            if table == "pd":
+                                                row = [run, rbx, cu, channel, uhtr_ch, shunt, max_adc, max_fc, result]
+                                            t.write("".join(entry.ljust(col_width) for entry in row) + "\n") 
 
 if __name__ == "__main__":
     
-    runDir = "run-4/"
-    tables = ["sipm", "pd"]
-    rbxList = list(i for i in xrange(2,13))
-    makeTable(runDir, tables, rbxList)
-
-    runDir = "run-7/"
-    tables = ["pindiodes"]
-    rbxList = list(i for i in xrange(2,7))
-    makeTable(runDir, tables, rbxList)
+    plotData("rbx0_shunt31_pd_1.root" ,     "rbx0_shunt31_pd_2.root",    "h0",  "Pindiode", "CU_40/", "", True)
+    plotData("rbx0_shunt31_uhtr1_1.root" ,  "rbx0_shunt31_uhtr1_2.root", "h12", "SiPM",     "CU_40/", "", True)
     
-    runDir = "run-8/"
-    tables = ["sipm", "pd"]
-    rbxList = list(i for i in xrange(13,19))
-    makeTable(runDir, tables, rbxList)
+    #runDir = "run-4/"
+    #tables = ["sipm", "pd"]
+    #rbxList = list(i for i in xrange(2,13))
+    #makeTable(runDir, tables, rbxList)
 
-    runDir = "run-9/"
-    tables = ["sipm", "pd"]
-    rbxList = list(i for i in xrange(16,17))
-    makeTable(runDir, tables, rbxList)
+    #runDir = "run-7/"
+    #tables = ["pindiodes"]
+    #rbxList = list(i for i in xrange(2,7))
+    #makeTable(runDir, tables, rbxList)
+    #
+    #runDir = "run-8/"
+    #tables = ["sipm", "pd"]
+    #rbxList = list(i for i in xrange(13,19))
+    #makeTable(runDir, tables, rbxList)
+
+    #runDir = "run-9/"
+    #tables = ["sipm", "pd"]
+    #rbxList = list(i for i in xrange(16,17))
+    #makeTable(runDir, tables, rbxList)
+
+    #runDir = "run-10/"
+    #tables = ["sipm", "pd"]
+    #rbxList = [14,18] 
+    #runList = list(i for i in xrange(3,29))
+    #makeTable(runDir, tables, rbxList, runList)
 
     #shunts = True
     
@@ -319,7 +332,4 @@ if __name__ == "__main__":
     #print oldFindMaxADC("run-7/rbx6_shunt31_pd0.root", "h133", True)
     #print oldFindMaxADC("run-4/rbx2_shunt31_1.root", "h111", True)
     
-
-
-
     #makeTable(runDir, tables)
