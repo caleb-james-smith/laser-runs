@@ -1,0 +1,3 @@
+put HE0-[1-4]-biasvoltage[1-48]_f 192*67.0
+put HE0-[1-4]-QIE[1-48]_Gsel 192*31
+put HE0-calib-QIE[1-12]_Gsel 12*31
