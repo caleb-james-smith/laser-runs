@@ -10,6 +10,7 @@ read iteration
 shunt=31
 host=hcal904daq04
 commands=../uhtrRun.txt
+init=../uhtrInit.txt
 crate2=63;
 
 rm_pdf=CU_"$cu"/rbx"$rbx"-rm1_"$iteration".pdf
@@ -113,6 +114,10 @@ do
   rm=$((rm+1))
 done
 
+# initialize links for calibration unit uHTR
+uHTRtool.exe -o $host -c $crate2:$uhtr3 -s $init
+
+# take data from 3 uHTRs
 uHTRtool.exe -o $host -c $crate1:$uhtr1 -s $commands
 mv data.root rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root
 uHTRtool.exe -o $host -c $crate1:$uhtr2 -s $commands 

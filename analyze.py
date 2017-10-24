@@ -282,8 +282,8 @@ def makeTable(runDir, tables, rbxList, runList):
 
 if __name__ == "__main__":
     
-    plotData("rbx0_shunt31_pd_1.root" ,     "rbx0_shunt31_pd_2.root",    "h0",  "Pindiode", "CU_40/", "", True)
-    plotData("rbx0_shunt31_uhtr1_1.root" ,  "rbx0_shunt31_uhtr1_2.root", "h12", "SiPM",     "CU_40/", "", True)
+    #plotData("rbx0_shunt31_pd_1.root" ,     "rbx0_shunt31_pd_2.root",    "h0",  "Pindiode", "CU_40/", "", True)
+    #plotData("rbx0_shunt31_uhtr1_1.root" ,  "rbx0_shunt31_uhtr1_2.root", "h12", "SiPM",     "CU_40/", "", True)
     
     #runDir = "run-4/"
     #tables = ["sipm", "pd"]
@@ -330,7 +330,7 @@ if __name__ == "__main__":
     #print findMaxADC("run-7/rbx6_shunt31_pd0.root", "h132", True)
     #print findMaxADC("run-7/rbx6_shunt31_pd0.root", "h133", True)
     #print oldFindMaxADC("run-7/rbx6_shunt31_pd0.root", "h133", True)
-    #print oldFindMaxADC("run-4/rbx2_shunt31_1.root", "h111", True)
-    
+    print oldFindMaxADC("run-4/rbx2_shunt31_1.root", "h111", True)
+    print findMaxADC("run-4/rbx2_shunt31_1.root", "h111", True)
 
     #makeTable(runDir, tables)
