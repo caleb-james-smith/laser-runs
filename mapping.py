@@ -46,8 +46,9 @@ rbxRM = {
 "18"  : "1",
 }
 
-# RBX : Pindiode Channel List (for input 0 only)
+# RBX : Pindiode Channel List (for channels 0 and 1 only)
 rbxPD = {
+"00"  : ["h0", "h1", "h2", "h3", "h4", "h5"], 
 "01"  : ["h72", "h73"], 
 "02"  : ["h84", "h85"],
 "03"  : ["h96", "h97"],
@@ -77,12 +78,14 @@ def chs(minCh, maxCh):
 
 # Each RBX has 192 channels
 # Each uHTR has 144 channels
+# Here is the mapping for 3 RBXs, 4 uHTRs
 # 0-143   : 0-47  
 # 48-143  : 0-95 
 # 96-143  : 0-143
 
 # RBX : SiPM Channel List. Note that each RBX has two lists for two uHTRs.
 rbxSIPM = {
+"00"  : [chs(12, 59) + chs(84, 131), chs(12, 59) + chs(84, 131)],
 "01"  : [chs(0, 143), chs(0,47)],
 "02"  : [chs(48,143), chs(0,95)],
 "03"  : [chs(96,143), chs(0,143)],
