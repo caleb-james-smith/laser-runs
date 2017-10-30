@@ -10,7 +10,6 @@ read iteration
 shunt=0
 host=hcal904daq04
 commands=../uhtrRun.txt
-init=../uhtrInit.txt
 crate2=63;
 
 rm_pdf=CU_"$cu"/rbx"$rbx"-rm1_"$iteration".pdf
@@ -31,42 +30,60 @@ done
 
 if [ $rbx = "0" ]; then
     crate1=63; uhtr1=1; uhtr2=2; uhtr3=8; pd_ch="h0";
+    init=../uhtrInit0.txt
 elif [ $rbx = "1" ]; then
     crate1=61; uhtr1=1; uhtr2=2; uhtr3=8; pd_ch="h72";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "2" ]; then
     crate1=61; uhtr1=2; uhtr2=3; uhtr3=8; pd_ch="h84";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "3" ]; then
     crate1=61; uhtr1=3; uhtr2=4; uhtr3=8; pd_ch="h96";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "4" ]; then
     crate1=61; uhtr1=5; uhtr2=6; uhtr3=8; pd_ch="h108";
 else if [ $rbx = "5" ]; then
+    init=../uhtrInit1-18.txt
     crate1=61; uhtr1=6; uhtr2=7; uhtr3=8; pd_ch="h120";
 else if [ $rbx = "6" ]; then
     crate1=61; uhtr1=7; uhtr2=8; uhtr3=8; pd_ch="h132";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "7" ]; then
     crate1=61; uhtr1=9; uhtr2=10; uhtr3=9; pd_ch="h0";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "8" ]; then
     crate1=61; uhtr1=10; uhtr2=11; uhtr3=9; pd_ch="h12";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "9" ]; then
     crate1=61; uhtr1=11; uhtr2=12; uhtr3=9; pd_ch="h24";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "10" ]; then
     crate1=62; uhtr1=1; uhtr2=2; uhtr3=9; pd_ch="h36";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "11" ]; then
     crate1=62; uhtr1=2; uhtr2=3; uhtr3=9; pd_ch="h48";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "12" ]; then
     crate1=62; uhtr1=3; uhtr2=4; uhtr3=9; pd_ch="h60";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "13" ]; then
     crate1=62; uhtr1=5; uhtr2=6; uhtr3=9; pd_ch="h72";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "14" ]; then
     crate1=62; uhtr1=6; uhtr2=7; uhtr3=9; pd_ch="h84";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "15" ]; then
     crate1=62; uhtr1=7; uhtr2=8; uhtr3=9; pd_ch="h96";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "16" ]; then
     crate1=62; uhtr1=9; uhtr2=10; uhtr3=9; pd_ch="h108";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "17" ]; then
     crate1=62; uhtr1=10; uhtr2=11; uhtr3=9; pd_ch="h120";
+    init=../uhtrInit1-18.txt
 else if [ $rbx = "18" ]; then
     crate1=62; uhtr1=11; uhtr2=12; uhtr3=9; pd_ch="h132";
+    init=../uhtrInit1-18.txt
 fi fi fi fi fi fi
 fi fi fi fi fi fi
 fi fi fi fi fi fi
@@ -100,7 +117,12 @@ do
 done
 
 # write macros for RMs
-declare -a rm_channels=("h12" "h84" "h12" "h84")
+if [ $rbx = "0" ]; then
+    declare -a rm_channels=("h12" "h84" "h12" "h84")   #RBX0
+else if ! [ $rbx = "0" ]; then
+    declare -a rm_channels=("h96" "h143" "h0" "h47")   #RBX1-18
+fi fi
+
 rm=1
 for ch in "${rm_channels[@]}"
 do
@@ -141,3 +163,10 @@ do
   root -b -q rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root macro_pd"$pd".C
   mv CU_pd"$pd".pdf rbx"$rbx"-cu-pd"$pd"_"$iteration".pdf
 done
+
+
+#Display pin-diodes plots
+num=2
+pdCareAbout=$(($iteration-$num))
+display rbx"$rbx"-cu-pd"$pdCareAbout"_"$iteration".pdf 
+#display rbx"$rbx"-cu-pd0_"$iteration".pdf rbx"$rbx"-cu-pd1_"$iteration".pdf rbx"$rbx"-cu-pd2_"$iteration".pdf rbx"$rbx"-cu-pd3_"$iteration".pdf rbx"$rbx"-cu-pd4_"$iteration".pdf rbx"$rbx"-cu-pd5_"$iteration".pdf
