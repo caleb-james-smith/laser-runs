@@ -1,6 +1,0 @@
-LINK
-INIT
-198
-1
-QUIT
-QUIT
