@@ -7,7 +7,7 @@ read cu
 printf "Please enter Iteration number: "
 read iteration
 
-shunt=31
+shunt=0
 host=hcal904daq04
 commands=../uhtrRun.txt
 init=../uhtrInit.txt
