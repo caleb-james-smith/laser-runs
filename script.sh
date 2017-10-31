@@ -7,7 +7,7 @@ read cu
 printf "Please enter Iteration number: "
 read iteration
 
-shunt=0
+shunt=31
 host=hcal904daq04
 commands=../uhtrRun.txt
 crate2=63;
@@ -46,10 +46,11 @@ else if [ $rbx = "3" ]; then
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "4" ]; then
     crate1=61; uhtr1=5; uhtr2=6; uhtr3=8; pd_ch=108;
+    init=../uhtrInit1-18.txt
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "5" ]; then
-    init=../uhtrInit1-18.txt
     crate1=61; uhtr1=6; uhtr2=7; uhtr3=8; pd_ch=120;
+    init=../uhtrInit1-18.txt
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "6" ]; then
     crate1=61; uhtr1=7; uhtr2=8; uhtr3=8; pd_ch=132;
@@ -163,6 +164,8 @@ do
 done
 
 # initialize links for calibration unit uHTR
+#uHTRtool.exe -o $host -c $crate1:$uhtr1 -s $init
+#uHTRtool.exe -o $host -c $crate1:$uhtr2 -s $init
 uHTRtool.exe -o $host -c $crate2:$uhtr3 -s $init
 
 # take data from 3 uHTRs
