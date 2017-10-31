@@ -30,78 +30,78 @@ done
 
 if [ $rbx = "0" ]; then
     crate1=63; uhtr1=1; uhtr2=2; uhtr3=8; pd_ch=0;
-    init=../uhtrInit0.txt
+    init=../uhtrInit0
     declare -a rm_channels=("h12" "h84" "h12" "h84")
 elif [ $rbx = "1" ]; then
     crate1=61; uhtr1=1; uhtr2=2; uhtr3=8; pd_ch=72;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "2" ]; then
     crate1=61; uhtr1=2; uhtr2=3; uhtr3=8; pd_ch=84;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "3" ]; then
     crate1=61; uhtr1=3; uhtr2=4; uhtr3=8; pd_ch=96;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "4" ]; then
     crate1=61; uhtr1=5; uhtr2=6; uhtr3=8; pd_ch=108;
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "5" ]; then
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     crate1=61; uhtr1=6; uhtr2=7; uhtr3=8; pd_ch=120;
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "6" ]; then
     crate1=61; uhtr1=7; uhtr2=8; uhtr3=8; pd_ch=132;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "7" ]; then
     crate1=61; uhtr1=9; uhtr2=10; uhtr3=9; pd_ch=0;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "8" ]; then
     crate1=61; uhtr1=10; uhtr2=11; uhtr3=9; pd_ch=12;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "9" ]; then
     crate1=61; uhtr1=11; uhtr2=12; uhtr3=9; pd_ch=24;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "10" ]; then
     crate1=62; uhtr1=1; uhtr2=2; uhtr3=9; pd_ch=36;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "11" ]; then
     crate1=62; uhtr1=2; uhtr2=3; uhtr3=9; pd_ch=48;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "12" ]; then
     crate1=62; uhtr1=3; uhtr2=4; uhtr3=9; pd_ch=60;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "13" ]; then
     crate1=62; uhtr1=5; uhtr2=6; uhtr3=9; pd_ch=72;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "14" ]; then
     crate1=62; uhtr1=6; uhtr2=7; uhtr3=9; pd_ch=84;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "15" ]; then
     crate1=62; uhtr1=7; uhtr2=8; uhtr3=9; pd_ch=96;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "16" ]; then
     crate1=62; uhtr1=9; uhtr2=10; uhtr3=9; pd_ch=108;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "17" ]; then
     crate1=62; uhtr1=10; uhtr2=11; uhtr3=9; pd_ch=120;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "18" ]; then
     crate1=62; uhtr1=11; uhtr2=12; uhtr3=9; pd_ch=132;
-    init=../uhtrInit1-18.txt
+    init=../uhtrInit1-18
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 fi fi fi fi fi fi
 fi fi fi fi fi fi
@@ -163,7 +163,9 @@ do
 done
 
 # initialize links for calibration unit uHTR
-uHTRtool.exe -o $host -c $crate2:$uhtr3 -s $init
+uHTRtool.exe -o $host -c $crate1:$uhtr1 -s "$init"_A.txt
+uHTRtool.exe -o $host -c $crate1:$uhtr2 -s "$init"_A.txt
+uHTRtool.exe -o $host -c $crate2:$uhtr3 -s "$init"_B.txt 
 
 # take data from 3 uHTRs
 uHTRtool.exe -o $host -c $crate1:$uhtr1 -s $commands

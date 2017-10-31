@@ -1,0 +1,6 @@
+LINK
+INIT
+235
+1
+QUIT
+QUIT
