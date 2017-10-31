@@ -7,7 +7,7 @@ read cu
 printf "Please enter Iteration number: "
 read iteration
 
-shunt=0
+shunt=31
 host=hcal904daq04
 commands=../uhtrRun.txt
 crate2=63;
@@ -46,10 +46,11 @@ else if [ $rbx = "3" ]; then
     declare -a rm_channels=("h96" "h0" "h48" "h96")
 else if [ $rbx = "4" ]; then
     crate1=61; uhtr1=5; uhtr2=6; uhtr3=8; pd_ch=108;
+    init=../uhtrInit1-18
     declare -a rm_channels=("h0" "h48" "h96" "h0")
 else if [ $rbx = "5" ]; then
-    init=../uhtrInit1-18
     crate1=61; uhtr1=6; uhtr2=7; uhtr3=8; pd_ch=120;
+    init=../uhtrInit1-18
     declare -a rm_channels=("h48" "h96" "h0" "h48")
 else if [ $rbx = "6" ]; then
     crate1=61; uhtr1=7; uhtr2=8; uhtr3=8; pd_ch=132;
