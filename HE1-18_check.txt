@@ -1,0 +1,2 @@
+get HE[1-18]-[1-4]-QIE[1-48]_Gsel_rr
+get HE[1-18]-calib-QIE[1-12]_Gsel_rr
