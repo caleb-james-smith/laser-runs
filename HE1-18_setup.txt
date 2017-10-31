@@ -1,0 +1,2 @@
+put HE[1-18]-[1-4]-QIE[1-48]_Gsel 3456*31
+put HE[1-18]-calib-QIE[1-12]_Gsel 216*31
