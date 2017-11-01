@@ -1,57 +1,70 @@
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1.h>
-#include <TAxis.h>
-#include <TCanvas.h>
-#include <TLegend.h>
-#include <TDirectory.h>
+//#include <TFile.h>
+//#include <TTree.h>
+//#include <TH1.h>
+//#include <TAxis.h>
+//#include <TCanvas.h>
+//#include <TLegend.h>
+//#include <TDirectory.h>
 //Data.....
 //{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
 #include "pd_array.h"
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 #include "sipm_array.h"
 
-#include <string>
-#include <sstream>
+//#include <string>
+//#include <sstream>
 #include <vector>
 #include <cmath>
 #include <iostream>
 #include <fstream>
-#include "TMath.h"
-#include <TGraph.h>
-#include "TLatex.h"
-#include "TColor.h"
+//#include "TMath.h"
+//#include <TGraph.h>
+//#include "TLatex.h"
+//#include "TColor.h"
 
-int NumChan = pd_array.size(); //Need to change this
+int NumChanPD = pd_array.size(); //Need to change this
+int NumChanRM = sipm_array.size(); //Need to change this
 
-TGraph* makePDTGraph(double pd,std::vector<std::vector<double>>& datain){
-  Double_t x[NumChan], y[NumChan];
-  for(unsigned channel = 0; channel < NumChan; ++channel){
-    if(datain[channel][3] == pd){
-      x[channel] = datain[channel][0];
-      y[channel] = datain[channel][6];	
+TGraph* makePDTGraph(int pd,std::vector<std::vector<double>>& datain){
+  Double_t x[NumChanPD], y[NumChanPD];
+  for(unsigned channel = 0; channel < NumChanPD; ++channel){
+    if(datain[channel][0] == 27 || datain[channel][0] == 29){
+      if(datain[channel][3] == pd){
+	x[channel] = datain[channel][0];
+	y[channel] = datain[channel][6];	
+	std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxADC:  "<<y[channel]<<std::endl;
+      }
     }
   }
-  TGraph* gtemp = new TGraph(NumChan,x,y);
+  TGraph* gtemp = new TGraph(NumChanPD,x,y);
+  if(pd == 0){gtemp->SetMarkerColor(kBlack);}
+  if(pd == 1){gtemp->SetMarkerColor(kRed);}
+  if(pd == 2){gtemp->SetMarkerColor(kBlue);}
+  if(pd == 3){gtemp->SetMarkerColor(kGreen+2);}
+  if(pd == 4){gtemp->SetMarkerColor(kOrange);}
+  if(pd == 5){gtemp->SetMarkerColor(kMagenta);}      
   gtemp->SetMarkerStyle(kFullSquare);
   return gtemp;
 }
 
 TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
-  Double_t x[NumChan], y[NumChan];
-  for(unsigned channel = 0; channel < NumChan; ++channel){
+  Double_t x[NumChanRM], y[NumChanRM];
+  for(unsigned channel = 0; channel < NumChanRM; ++channel){
     if(datain[channel][3] == rm){
       x[channel] = datain[channel][0];
       y[channel] = datain[channel][7];	
     }
   }
-  TGraph* gtemp = new TGraph(NumChan,x,y);
+  TGraph* gtemp = new TGraph(NumChanRM,x,y);
   gtemp->SetMarkerStyle(kFullSquare);
   return gtemp;
 }
 
 void CU_Plots(){
-  TCanvas *c0 = new TCanvas("PulseShape_203","",800,800);  
+  std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
+  std::cout<<"Number of RM Channels:   "<<NumChanRM<<std::endl;
+  
+  TCanvas *c0 = new TCanvas("MacADCvsCU","",800,800);  
   TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg0->SetBorderSize(0);
   catLeg0->SetFillStyle(0);
@@ -61,9 +74,9 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* hblank = new TH1F("","",250,0,34);
+  TH1F* hblank = new TH1F("","",250,0,44);
   hblank->SetMinimum(0);
-  hblank->SetMaximum(250);
+  hblank->SetMaximum(251);
   //hblank->GetXaxis()->SetRange(0,100);
   hblank->GetXaxis()->SetTitle("CU");
   hblank->GetYaxis()->SetTitle("ADC");
@@ -77,27 +90,15 @@ void CU_Plots(){
   hblank->SetLabelSize(0.04,"X");
   hblank->SetLabelSize(0.04,"Y");
   hblank->SetStats(false);
-  hblank->SetLineColor(1);
+  hblank->SetLineColor(0);
   hblank->Draw("hist");
 
-  TGraph* graph_pd0 = NULL;
-  TGraph* graph_pd1 = NULL;
-  TGraph* graph_pd2 = NULL;
-  TGraph* graph_pd3 = NULL;
-  TGraph* graph_pd4 = NULL;
-  TGraph* graph_pd5 = NULL;
-  graph_pd0 = makePDTGraph(0,pd_array);
-  graph_pd1 = makePDTGraph(1,pd_array);
-  graph_pd2 = makePDTGraph(2,pd_array);
-  graph_pd3 = makePDTGraph(3,pd_array);
-  graph_pd4 = makePDTGraph(4,pd_array);
-  graph_pd5 = makePDTGraph(5,pd_array);
-  graph_pd0->SetMarkerColor(kBlack);
-  graph_pd1->SetMarkerColor(kRed);
-  graph_pd2->SetMarkerColor(kBlue);
-  graph_pd3->SetMarkerColor(kGreen+2);
-  graph_pd4->SetMarkerColor(kOrange);
-  graph_pd5->SetMarkerColor(kMagenta);      
+  TGraph* graph_pd0 = makePDTGraph(0,pd_array);
+  TGraph* graph_pd1 = makePDTGraph(1,pd_array);
+  TGraph* graph_pd2 = makePDTGraph(2,pd_array);
+  TGraph* graph_pd3 = makePDTGraph(3,pd_array);
+  TGraph* graph_pd4 = makePDTGraph(4,pd_array);
+  TGraph* graph_pd5 = makePDTGraph(5,pd_array);
   graph_pd0->Draw("P same");
   graph_pd1->Draw("P same");
   graph_pd2->Draw("P same");
@@ -153,149 +154,149 @@ void CU_Plots(){
   catLeg0->SetTextSize(0.04);
   catLeg0->Draw();
 
-  TCanvas *c1 = new TCanvas("1D Channels vs PE/MIP/Layer","",800,800);  
-  //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
-  //catLeg1->SetBorderSize(0);
-  //catLeg1->SetFillStyle(0);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* hmip = new TH1F("","",251,0,250);
-  hmip->SetMinimum(0);
-  hmip->SetMaximum(50);
-  //hmip->GetXaxis()->SetRange(0,100);
-  hmip->GetXaxis()->SetTitle("ADC");
-  hmip->GetYaxis()->SetTitle("Channels");
-  hmip->SetTitle("");
-  hmip->SetName("");
-  hmip->SetTitleSize(0.002);
-  hmip->SetTitleSize(0.05,"X");
-  hmip->SetTitleSize(0.05,"Y");
-  hmip->SetTitleOffset(1.0,"X");
-  hmip->SetTitleOffset(1.2,"Y");
-  hmip->SetLabelSize(0.04,"X");
-  hmip->SetLabelSize(0.04,"Y");
-  hmip->SetStats(false);
-  hmip->SetLineColor(1);
-  hmip->Draw("hist");
-
-  for(unsigned channel = 0; channel < NumChan; ++channel){
-    hmip->Fill(pd_array[channel][6]);
-  }
-
-  char entries [100];
-  int ent = hmip->GetEntries();
-  sprintf (entries,"Entries: %d", ent);
-
-  char mean [100];
-  double me = hmip->GetMean();
-  sprintf (mean,"Mean: %0.2lf", me);
-  
-  char stddev [100];
-  double std = hmip->GetStdDev(); 
-  sprintf (stddev,"StdDev: %0.2lf", std);
-  
-  TLatex* Entries = new TLatex(0.92, 0.85, entries);
-  Entries->SetNDC();
-  Entries->SetTextFont(42);
-  Entries->SetTextAlign(31);
-
-  TLatex* Mean = new TLatex(0.92, 0.8, mean);
-  Mean->SetNDC();
-  Mean->SetTextFont(42);
-  Mean->SetTextAlign(31);
-
-  TLatex* StdDev = new TLatex(0.92, 0.75, stddev);
-  StdDev->SetNDC();
-  StdDev->SetTextFont(42);
-  StdDev->SetTextAlign(31);
-
-  CMSPrelim1->Draw();
-  burnIn->Draw();
-  Entries->Draw();
-  Mean->Draw();
-  StdDev->Draw();
-
-  TCanvas *c2 = new TCanvas("PulseShape_203","",800,800);  
-  TLegend* catLeg2 = new TLegend(0.68,0.65,0.96,0.88);
-  catLeg2->SetBorderSize(0);
-  catLeg2->SetFillStyle(0);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h2blank = new TH1F("","",250,0,34);
-  h2blank->SetMinimum(0);
-  h2blank->SetMaximum(250);
-  //h2blank->GetXaxis()->SetRange(0,100);
-  h2blank->GetXaxis()->SetTitle("CU");
-  h2blank->GetYaxis()->SetTitle("ADC");
-  h2blank->SetTitle("");
-  h2blank->SetName("");
-  h2blank->SetTitleSize(0.002);
-  h2blank->SetTitleSize(0.05,"X");
-  h2blank->SetTitleSize(0.05,"Y");
-  h2blank->SetTitleOffset(1.0,"X");
-  h2blank->SetTitleOffset(1.2,"Y");
-  h2blank->SetLabelSize(0.04,"X");
-  h2blank->SetLabelSize(0.04,"Y");
-  h2blank->SetStats(false);
-  h2blank->SetLineColor(1);
-  h2blank->Draw("hist");
-
-  TGraph* graph_rm1 = NULL;
-  TGraph* graph_rm2 = NULL;
-  TGraph* graph_rm3 = NULL;
-  TGraph* graph_rm4 = NULL;
-  graph_rm1 = makeRMTGraph(1,sipm_array);
-  graph_rm2 = makeRMTGraph(2,sipm_array);
-  graph_rm3 = makeRMTGraph(3,sipm_array);
-  graph_rm4 = makeRMTGraph(4,sipm_array);
-  graph_rm1->SetMarkerColor(kRed);
-  graph_rm2->SetMarkerColor(kBlue);
-  graph_rm3->SetMarkerColor(kGreen+2);
-  graph_rm4->SetMarkerColor(kBlack);
-  graph_rm1->Draw("P same");
-  graph_rm2->Draw("P same");
-  graph_rm3->Draw("P same");
-  graph_rm4->Draw("P same");
-  CMSPrelim1->Draw();
-  burnIn->Draw();
-  
-  //Double_t x1[1]={-100},y1[1]={-100};
-  //catLeg2->AddEntry((TObject*)0,"iPhi 5","");
-  TGraph* readOutModule1 = new TGraph(1,x1,y1);
-  readOutModule1->Draw("same P");
-  readOutModule1->SetMarkerColor(kRed);
-  readOutModule1->SetMarkerStyle(kFullSquare);
-  catLeg2->AddEntry(readOutModule1,"RM 1","P");
-  TGraph* readOutModule2 = new TGraph(1,x1,y1);
-  readOutModule2->Draw("same P");
-  readOutModule2->SetMarkerColor(kBlue);
-  readOutModule2->SetMarkerStyle(kFullSquare);
-  catLeg2->AddEntry(readOutModule2,"RM 2","P");
-  TGraph* readOutModule3 = new TGraph(1,x1,y1);
-  readOutModule3->Draw("same P");
-  readOutModule3->SetMarkerColor(kGreen+2);
-  readOutModule3->SetMarkerStyle(kFullSquare);
-  catLeg2->AddEntry(readOutModule3,"RM 3","P");
-  TGraph* readOutModule4 = new TGraph(1,x1,y1);
-  readOutModule4->Draw("same P");
-  readOutModule4->SetMarkerColor(kBlack);
-  readOutModule4->SetMarkerStyle(kFullSquare);
-  catLeg2->AddEntry(readOutModule4,"RM 4","P");
-  
-  catLeg2->SetTextSize(0.04);
-  catLeg2->Draw();  
-  
-  c0->SaveAs("PDvsCU2D.pdf");
-  c1->SaveAs("PDvsCU1D.pdf");
-  c2->SaveAs("RMvsCU2D.pdf");
+  //TCanvas *c1 = new TCanvas("1D PD","",800,800);  
+  ////TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
+  ////catLeg1->SetBorderSize(0);
+  ////catLeg1->SetFillStyle(0);
+  //gPad->SetTopMargin(0.1);
+  //gPad->SetBottomMargin(0.12);
+  //gPad->SetRightMargin(0.05);
+  //gPad->SetLeftMargin(0.14);  
+  ////gPad->SetLogy();
+  //
+  //TH1F* hmip = new TH1F("","",251,0,250);
+  //hmip->SetMinimum(0);
+  //hmip->SetMaximum(30);
+  ////hmip->GetXaxis()->SetRange(0,100);
+  //hmip->GetXaxis()->SetTitle("ADC");
+  //hmip->GetYaxis()->SetTitle("Channels");
+  //hmip->SetTitle("");
+  //hmip->SetName("");
+  //hmip->SetTitleSize(0.002);
+  //hmip->SetTitleSize(0.05,"X");
+  //hmip->SetTitleSize(0.05,"Y");
+  //hmip->SetTitleOffset(1.0,"X");
+  //hmip->SetTitleOffset(1.2,"Y");
+  //hmip->SetLabelSize(0.04,"X");
+  //hmip->SetLabelSize(0.04,"Y");
+  //hmip->SetStats(false);
+  //hmip->SetLineColor(1);
+  //hmip->Draw("hist");
+  //
+  //for(unsigned channel = 0; channel < NumChanPD; ++channel){
+  //  hmip->Fill(pd_array[channel][6]);
+  //}
+  //
+  //char entries [100];
+  //int ent = hmip->GetEntries();
+  //sprintf (entries,"Entries: %d", ent);
+  //
+  //char mean [100];
+  //double me = hmip->GetMean();
+  //sprintf (mean,"Mean: %0.2lf", me);
+  //
+  //char stddev [100];
+  //double std = hmip->GetStdDev(); 
+  //sprintf (stddev,"StdDev: %0.2lf", std);
+  //
+  //TLatex* Entries = new TLatex(0.92, 0.85, entries);
+  //Entries->SetNDC();
+  //Entries->SetTextFont(42);
+  //Entries->SetTextAlign(31);
+  //
+  //TLatex* Mean = new TLatex(0.92, 0.8, mean);
+  //Mean->SetNDC();
+  //Mean->SetTextFont(42);
+  //Mean->SetTextAlign(31);
+  //
+  //TLatex* StdDev = new TLatex(0.92, 0.75, stddev);
+  //StdDev->SetNDC();
+  //StdDev->SetTextFont(42);
+  //StdDev->SetTextAlign(31);
+  //
+  //CMSPrelim1->Draw();
+  //burnIn->Draw();
+  //Entries->Draw();
+  //Mean->Draw();
+  //StdDev->Draw();
+  //
+  //TCanvas *c2 = new TCanvas("CUvsRM","",800,800);  
+  //TLegend* catLeg2 = new TLegend(0.68,0.65,0.96,0.88);
+  //catLeg2->SetBorderSize(0);
+  //catLeg2->SetFillStyle(0);
+  //gPad->SetTopMargin(0.1);
+  //gPad->SetBottomMargin(0.12);
+  //gPad->SetRightMargin(0.05);
+  //gPad->SetLeftMargin(0.14);  
+  ////gPad->SetLogy();
+  //
+  //TH1F* h2blank = new TH1F("","",250,0,44);
+  //h2blank->SetMinimum(0);
+  //h2blank->SetMaximum(251);
+  ////h2blank->GetXaxis()->SetRange(0,100);
+  //h2blank->GetXaxis()->SetTitle("CU");
+  //h2blank->GetYaxis()->SetTitle("ADC");
+  //h2blank->SetTitle("");
+  //h2blank->SetName("");
+  //h2blank->SetTitleSize(0.002);
+  //h2blank->SetTitleSize(0.05,"X");
+  //h2blank->SetTitleSize(0.05,"Y");
+  //h2blank->SetTitleOffset(1.0,"X");
+  //h2blank->SetTitleOffset(1.2,"Y");
+  //h2blank->SetLabelSize(0.04,"X");
+  //h2blank->SetLabelSize(0.04,"Y");
+  //h2blank->SetStats(false);
+  //h2blank->SetLineColor(1);
+  //h2blank->Draw("hist");
+  //
+  //TGraph* graph_rm1 = NULL;
+  //TGraph* graph_rm2 = NULL;
+  //TGraph* graph_rm3 = NULL;
+  //TGraph* graph_rm4 = NULL;
+  //graph_rm1 = makeRMTGraph(1,sipm_array);
+  //graph_rm2 = makeRMTGraph(2,sipm_array);
+  //graph_rm3 = makeRMTGraph(3,sipm_array);
+  //graph_rm4 = makeRMTGraph(4,sipm_array);
+  //graph_rm1->SetMarkerColor(kRed);
+  //graph_rm2->SetMarkerColor(kBlue);
+  //graph_rm3->SetMarkerColor(kGreen+2);
+  //graph_rm4->SetMarkerColor(kBlack);
+  //graph_rm1->Draw("P same");
+  //graph_rm2->Draw("P same");
+  //graph_rm3->Draw("P same");
+  //graph_rm4->Draw("P same");
+  //CMSPrelim1->Draw();
+  //burnIn->Draw();
+  //
+  ////Double_t x1[1]={-100},y1[1]={-100};
+  ////catLeg2->AddEntry((TObject*)0,"iPhi 5","");
+  //TGraph* readOutModule1 = new TGraph(1,x1,y1);
+  //readOutModule1->Draw("same P");
+  //readOutModule1->SetMarkerColor(kRed);
+  //readOutModule1->SetMarkerStyle(kFullSquare);
+  //catLeg2->AddEntry(readOutModule1,"RM 1","P");
+  //TGraph* readOutModule2 = new TGraph(1,x1,y1);
+  //readOutModule2->Draw("same P");
+  //readOutModule2->SetMarkerColor(kBlue);
+  //readOutModule2->SetMarkerStyle(kFullSquare);
+  //catLeg2->AddEntry(readOutModule2,"RM 2","P");
+  //TGraph* readOutModule3 = new TGraph(1,x1,y1);
+  //readOutModule3->Draw("same P");
+  //readOutModule3->SetMarkerColor(kGreen+2);
+  //readOutModule3->SetMarkerStyle(kFullSquare);
+  //catLeg2->AddEntry(readOutModule3,"RM 3","P");
+  //TGraph* readOutModule4 = new TGraph(1,x1,y1);
+  //readOutModule4->Draw("same P");
+  //readOutModule4->SetMarkerColor(kBlack);
+  //readOutModule4->SetMarkerStyle(kFullSquare);
+  //catLeg2->AddEntry(readOutModule4,"RM 4","P");
+  //
+  //catLeg2->SetTextSize(0.04);
+  //catLeg2->Draw();  
+  //
+  //c0->SaveAs("PDvsCU2D.pdf");
+  //c1->SaveAs("PDvsCU1D.pdf");
+  //c2->SaveAs("RMvsCU2D.pdf");
 } 
 
 int main(){
