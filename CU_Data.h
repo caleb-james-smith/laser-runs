@@ -1,6 +1,5 @@
 #include <vector>
 #include <map>
-#include <tuple>
 //using namespace std;
 
 int NumChan = 30;
