@@ -147,11 +147,11 @@ void stabilityPlots() {
     const float maxFC = 400000.0;
 
     TTree *T1 = new TTree("pd_ntup","pd data from ascii file");
-    nlines = T1->ReadFile(Form("%s%s%s",dir.Data(),runDir.Data(),pdfile.Data()),"run:rbx:cu:pdch:uhtrch:shunt:maxadc:maxfc:result");
+    nlines = T1->ReadFile(Form("%s%s%s",dir.Data(),runDir.Data(),pdfile.Data()),"cu:rbx:run:pdch:uhtrch:shunt:maxadc:maxfc:result");
     printf(" found %lld points in pd file\n",nlines);
 
     TTree *T2 = new TTree("sipm_ntup","sipm data from ascii file");
-    nlines = T2->ReadFile(Form("%s%s%s",dir.Data(),runDir.Data(),sipmfile.Data()),"run:rbx:cu:rm:sipmch:uhtrch:shunt:maxadc:maxfc:result");
+    nlines = T2->ReadFile(Form("%s%s%s",dir.Data(),runDir.Data(),sipmfile.Data()),"cu:rbx:run:rm:sipmch:uhtrch:shunt:maxadc:maxfc:result");
     printf(" found %lld points in sipm file\n",nlines);
     
     TCanvas *C0 = new TCanvas("c0","c0");

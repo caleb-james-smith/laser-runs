@@ -77,9 +77,9 @@ def makePlots(runDir, plotDir, dictionary, shunts):
         file1   = d['file1']
         file2   = d['file2']
         chList  = d['ch']
-        type    = d['type']
+        ch_type = d['type']
         for ch in chList:
-            plotData(file1, file2, ch, type, runDir, plotDir, shunts)
+            plotData(file1, file2, ch, ch_type, runDir, plotDir, shunts)
 
 # Return maximum ADC value for a histogram (final nonzero bin)
 # update to accept channel list and return a list of max values...
@@ -130,11 +130,11 @@ def plotMax(runDir, dictionary):
     nBins = maxADC / 16     # Number of bins is 320/16 = 20
     H1 = TH1F("H1", "H1", nBins, 1, maxADC)
     H2 = TH1F("H2", "H2", nBins, 1, maxADC) 
-    for dict in dictionary:
-        file1   = runDir + dict['file1']
-        file2   = runDir + dict['file2']
-        chList  = dict['ch']
-        type    = dict['type']
+    for d in dictionary:
+        file1   = runDir + d['file1']
+        file2   = runDir + d['file2']
+        chList  = d['ch']
+        ch_type    = d['type']
         for ch in chList:
             for f in [file1, file2]:
                 maxBin = findMaxADC(f, ch, False)
@@ -144,10 +144,10 @@ def plotMax(runDir, dictionary):
                 if f == file2:      # H2 and file2 are shunt 31
                     H2.Fill(maxBin)
 
-print "Type: {0}".format(type)
-if type == "SiPM":
-    maxY = 400
-    if type == "Pindiode":
+    print "Type: {0}".format(ch_type)
+    if ch_type == "SiPM":
+        maxY = 400
+    if ch_type == "Pindiode":
         maxY = 20
     # Formatting
     H1.SetLineColor(kRed)
@@ -156,9 +156,9 @@ if type == "SiPM":
     
     H2.SetLineColor(kBlue)
     H2.GetXaxis().SetTitle("Max ADC")
-    H2.GetYaxis().SetTitle("No. " + type)
+    H2.GetYaxis().SetTitle("No. " + ch_type)
     H2.SetAxisRange(0,maxY,"Y")
-    H2.SetTitle("Max ADC Reached for " + type)
+    H2.SetTitle("Max ADC Reached for " + ch_type)
     
     # Make a canvas 
     C1 = TCanvas("c1","c1")
@@ -175,7 +175,7 @@ if type == "SiPM":
     # Save
     C1.Modified()
     C1.Update()
-    C1.SaveAs(runDir + 'max_adc_' + type + '.pdf')
+    C1.SaveAs(runDir + 'max_adc_' + ch_type + '.pdf')
 
 # Table options are "sipm", "pd", and "pindiodes"
 def makeTable(runDir, tables, runList):
@@ -229,6 +229,7 @@ def makeTable(runDir, tables, runList):
                     for irbx in rbxList:
                         for irun in runList:
                             for ishunt in shuntList:
+                                RM = 0
                                 for iuhtr in [1,2]:
                                     if table == "pd" and iuhtr == 2:
                                         continue    #do not do pd twice
@@ -250,30 +251,29 @@ def makeTable(runDir, tables, runList):
                                     else:               cutoff = 100
                                     # RM, pindiode/sipm_ch, uHTR, uhtr_ch, max_adc will vary within a file 
                                     if table == "sipm": 
-                                        rmList = list(i for i in xrange(1,5))
                                         chList = mapping.rbxSIPM[rbx_full][iuhtr-1]
                                     elif table == "pd": 
-                                        rmList = [0]
                                         chList = mapping.rbxPD[rbx_full]
-                                    for RM in rmList:
+                                    for i, channel in enumerate(chList):
+                                        rm_ch = str(i % 48)
+                                        pd_ch = str(i % 6)
+                                        if rm_ch == "0":
+                                            RM += 1
                                         rm = "%d" % RM
-                                        for i, channel in enumerate(chList):
-                                            rm_ch = str(i % 48)
-                                            pd_ch = str(i % 6)
-                                            uhtr_ch = channel.split("h")[-1]
-                                            max_adc = str(findMaxADC(f, channel, False))
-                                            max_fc  = "%.2f" % adcConverter.linearize(max_adc)
-                                            #if (rm, module_channel) in mapping.darkSipms:
-                                            #    #print "mask out channel: RM %s SiPM %s" % (rm, module_channel)
-                                            #    continue    # mask out 4 dark channels per RBX
-                                            if int(max_adc) > cutoff:   result = "1"
-                                            else:                       result = "0"
-                                            if table == "sipm":
-                                                row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_fc, result]
-                                            if table == "pd":
-                                                row = [cu, rbx, run, pd_ch, uhtr_ch, shunt, max_adc, max_fc, result]
-                                            array_string += "{" + ", ".join(row) + "},\n"
-                                            t.write("".join(entry.ljust(col_width) for entry in row) + "\n") 
+                                        uhtr_ch = channel.split("h")[-1]
+                                        max_adc = str(findMaxADC(f, channel, False))
+                                        max_fc  = "%.2f" % adcConverter.linearize(max_adc)
+                                        if (rm, rm_ch) in mapping.darkSipms:
+                                            print "mask out channel: RM %s SiPM %s" % (rm, rm_ch)
+                                            continue    # mask out 4 dark channels per RBX
+                                        if int(max_adc) > cutoff:   result = "1"
+                                        else:                       result = "0"
+                                        if table == "sipm":
+                                            row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_fc, result]
+                                        if table == "pd":
+                                            row = [cu, rbx, run, pd_ch, uhtr_ch, shunt, max_adc, max_fc, result]
+                                        array_string += "{" + ", ".join(row) + "},\n"
+                                        t.write("".join(entry.ljust(col_width) for entry in row) + "\n") 
                 # end of array
                 if array_string[-2:] == ",\n":
                     array_string = array_string[:-2] + "\n"
