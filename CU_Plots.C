@@ -20,13 +20,14 @@
 #include "TLatex.h"
 #include "TColor.h"
 
-TGraph* makePEHisto(double iphi,double depth ,std::vector<std::vector<double>>& datain){
+TGraph* makePDTGraph(double iphi,double depth ,std::vector<std::vector<double>>& datain){
+  int NumChan = pd_array.size(); //Need to change this
   Double_t x[NumChan], y[NumChan];
   for(unsigned channel = 0; channel < NumChan; ++channel){
     if(datain[channel][1] == iphi){
       if(datain[channel][2] == depth){
 	x[channel] = datain[channel][0];
-	y[channel] = datain[channel][3];	
+	y[channel] = datain[channel][7];	
       }
     }
   }
@@ -36,12 +37,6 @@ TGraph* makePEHisto(double iphi,double depth ,std::vector<std::vector<double>>& 
 }
 
 void CU_Plots(){
-  for(int i = 0; i <NumChan; i++){
-    dataStuff[i][3]      = inputdata[i];
-    antonData[i][3] = antonInputData[i];
-    Data2015[i][3]  = InputData2015[i];
-  }
-
   TCanvas *c0 = new TCanvas("PulseShape_203","",800,800);  
   TLegend* catLeg0 = new TLegend(0.75,0.45,0.96,0.88);
   catLeg0->SetBorderSize(0);
@@ -71,27 +66,10 @@ void CU_Plots(){
   hblank->SetLineColor(1);
   hblank->Draw("hist");
 
-  double Lighten = 1.0; 
-  
-  Int_t color1 = TColor::GetFreeColorIndex();
-  TColor *depth1color = new TColor(color1, Lighten*110./255, Lighten*160./255, Lighten*206./255, "Depth1Blue",   1.0);
-  Int_t color2 = TColor::GetFreeColorIndex();
-  TColor *depth2color = new TColor(color2, Lighten*253./255, Lighten*181./255,  Lighten*10./255, "Depth2Orange" ,1.0);
-  Int_t color3 = TColor::GetFreeColorIndex();
-  TColor *depth3color = new TColor(color3, Lighten*162./255, Lighten*221./255, Lighten*125./255, "Depth3Green" , 1.0);
-  Int_t color4 = TColor::GetFreeColorIndex();
-  TColor *depth4color = new TColor(color4, Lighten*247./255,  Lighten*52./255, Lighten*111./255, "Depth4Pink" ,  1.0);
-  Int_t color5 = TColor::GetFreeColorIndex();
-  TColor *depth5color = new TColor(color5, Lighten*255./255, Lighten*255./255, Lighten*126./255, "Depth5Yellow" ,1.0);
-  Int_t color6 = TColor::GetFreeColorIndex();
-  TColor *depth6color = new TColor(color6, Lighten*213./255, Lighten*161./255, Lighten*125./255, "Depth6Brown"  ,1.0);
-  Int_t color7 = TColor::GetFreeColorIndex();
-  TColor *depth7color = new TColor(color7, Lighten*197./255, Lighten*197./255, Lighten*197./255, "Depth7Grey" ,  1.0);
-
   for(unsigned phi = 1; phi < 12; ++phi){
     for(unsigned depth1 = 2; depth1 < 7; ++depth1){
       TGraph* phi_depth1 = NULL;
-      phi_depth1 = makePEHisto(phi,depth1,dataStuff);
+      phi_depth1 = makePDTGraph(phi,depth1,dataStuff);
       if(depth1 == 2){phi_depth1->SetMarkerColor(kBlack);}
       if(depth1 == 3){phi_depth1->SetMarkerColor(kRed);}
       if(depth1 == 4){phi_depth1->SetMarkerColor(kBlue);}
@@ -116,72 +94,62 @@ void CU_Plots(){
   CMSPrelim1->Draw();
   testbeam->Draw();
   
-  Double_t x1[1],y1[1];
-  catLeg0->AddEntry((TObject*)0,"iPhi 5","");
-  TGraph* phi5depth2 = new TGraph(1,x1,y1);
-  phi5depth2->Draw("same P");
-  phi5depth2->SetMarkerColor(kBlack);
-  phi5depth2->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth2,"Depth 2","P");
-  TGraph* phi5depth3 = new TGraph(1,x1,y1);
-  phi5depth3->Draw("same P");
-  phi5depth3->SetMarkerColor(kRed);
-  phi5depth3->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth3,"Depth 3","P");
-  TGraph* phi5depth4 = new TGraph(1,x1,y1);
-  phi5depth4->Draw("same P");
-  phi5depth4->SetMarkerColor(kBlue);
-  phi5depth4->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth4,"Depth 4","P");
-  TGraph* phi5depth5 = new TGraph(1,x1,y1);
-  phi5depth5->Draw("same P");
-  phi5depth5->SetMarkerColor(kGreen+2);
-  phi5depth5->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth5,"Depth 5","P");
-  TGraph* phi5depth6 = new TGraph(1,x1,y1);
-  phi5depth6->Draw("same P");
-  phi5depth6->SetMarkerColor(kOrange);
-  phi5depth6->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth6,"Depth 6","P");
-
-  catLeg0->AddEntry((TObject*)0, "", "");
-  
-  catLeg0->AddEntry((TObject*)0,"iPhi 6","");
-  TGraph* phi6depth2 = new TGraph(1,x1,y1);
-  phi6depth2->Draw("same P");
-  phi6depth2->SetMarkerColor(kBlack);
-  phi6depth2->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth2,"Depth 2","P");
-  TGraph* phi6depth3 = new TGraph(1,x1,y1);
-  phi6depth3->Draw("same P");
-  phi6depth3->SetMarkerColor(kRed);
-  phi6depth3->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth3,"Depth 3","P");
-  TGraph* phi6depth4 = new TGraph(1,x1,y1);
-  phi6depth4->Draw("same P");
-  phi6depth4->SetMarkerColor(kBlue);
-  phi6depth4->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth4,"Depth 4","P");
-  TGraph* phi6depth5 = new TGraph(1,x1,y1);
-  phi6depth5->Draw("same P");
-  phi6depth5->SetMarkerColor(kGreen+2);
-  phi6depth5->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth5,"Depth 5","P");
-  TGraph* phi6depth6 = new TGraph(1,x1,y1);
-  phi6depth6->Draw("same P");
-  phi6depth6->SetMarkerColor(kOrange);
-  phi6depth6->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth6,"Depth 6","P");
-  //TGraph* phi5 = new TGraph(1,x1,y1);
-  //phi5->Draw("same P");
-  //phi5->SetMarkerColor(kBlack);
-  //phi5->SetMarkerStyle(kFullCircle);
-  //catLeg0->AddEntry(phi5,"Phi 5","P");
-  //TGraph* phi6 = new TGraph(1,x1,y1);
-  //phi6->Draw("same P");
-  //phi6->SetMarkerColor(kBlack);
-  //phi6->SetMarkerStyle(kFullSquare);
-  //catLeg0->AddEntry(phi6,"Phi 6","P");
+  //Double_t x1[1],y1[1];
+  //catLeg0->AddEntry((TObject*)0,"iPhi 5","");
+  //TGraph* phi5depth2 = new TGraph(1,x1,y1);
+  //phi5depth2->Draw("same P");
+  //phi5depth2->SetMarkerColor(kBlack);
+  //phi5depth2->SetMarkerStyle(kFullCircle);
+  //catLeg0->AddEntry(phi5depth2,"Depth 2","P");
+  //TGraph* phi5depth3 = new TGraph(1,x1,y1);
+  //phi5depth3->Draw("same P");
+  //phi5depth3->SetMarkerColor(kRed);
+  //phi5depth3->SetMarkerStyle(kFullCircle);
+  //catLeg0->AddEntry(phi5depth3,"Depth 3","P");
+  //TGraph* phi5depth4 = new TGraph(1,x1,y1);
+  //phi5depth4->Draw("same P");
+  //phi5depth4->SetMarkerColor(kBlue);
+  //phi5depth4->SetMarkerStyle(kFullCircle);
+  //catLeg0->AddEntry(phi5depth4,"Depth 4","P");
+  //TGraph* phi5depth5 = new TGraph(1,x1,y1);
+  //phi5depth5->Draw("same P");
+  //phi5depth5->SetMarkerColor(kGreen+2);
+  //phi5depth5->SetMarkerStyle(kFullCircle);
+  //catLeg0->AddEntry(phi5depth5,"Depth 5","P");
+  //TGraph* phi5depth6 = new TGraph(1,x1,y1);
+  //phi5depth6->Draw("same P");
+  //phi5depth6->SetMarkerColor(kOrange);
+  //phi5depth6->SetMarkerStyle(kFullCircle);
+  //catLeg0->AddEntry(phi5depth6,"Depth 6","P");
+  //
+  //catLeg0->AddEntry((TObject*)0, "", "");
+  //
+  //catLeg0->AddEntry((TObject*)0,"iPhi 6","");
+  //TGraph* phi6depth2 = new TGraph(1,x1,y1);
+  //phi6depth2->Draw("same P");
+  //phi6depth2->SetMarkerColor(kBlack);
+  //phi6depth2->SetMarkerStyle(kFullSquare);
+  //catLeg0->AddEntry(phi6depth2,"Depth 2","P");
+  //TGraph* phi6depth3 = new TGraph(1,x1,y1);
+  //phi6depth3->Draw("same P");
+  //phi6depth3->SetMarkerColor(kRed);
+  //phi6depth3->SetMarkerStyle(kFullSquare);
+  //catLeg0->AddEntry(phi6depth3,"Depth 3","P");
+  //TGraph* phi6depth4 = new TGraph(1,x1,y1);
+  //phi6depth4->Draw("same P");
+  //phi6depth4->SetMarkerColor(kBlue);
+  //phi6depth4->SetMarkerStyle(kFullSquare);
+  //catLeg0->AddEntry(phi6depth4,"Depth 4","P");
+  //TGraph* phi6depth5 = new TGraph(1,x1,y1);
+  //phi6depth5->Draw("same P");
+  //phi6depth5->SetMarkerColor(kGreen+2);
+  //phi6depth5->SetMarkerStyle(kFullSquare);
+  //catLeg0->AddEntry(phi6depth5,"Depth 5","P");
+  //TGraph* phi6depth6 = new TGraph(1,x1,y1);
+  //phi6depth6->Draw("same P");
+  //phi6depth6->SetMarkerColor(kOrange);
+  //phi6depth6->SetMarkerStyle(kFullSquare);
+  //catLeg0->AddEntry(phi6depth6,"Depth 6","P");
   
   catLeg0->SetTextSize(0.04);
   //catLeg0->AddEntry(hblank,"current 203","l");
@@ -216,9 +184,9 @@ void CU_Plots(){
   hmip->SetLineColor(1);
   hmip->Draw("hist");
 
-  for(unsigned channel = 0; channel < NumChan; ++channel){
-    hmip->Fill(dataStuff[channel][3]);
-  }
+  //for(unsigned channel = 0; channel < NumChan; ++channel){
+  //  hmip->Fill(dataStuff[channel][3]);
+  //}
 
   char entries [100];
   int ent = hmip->GetEntries();
@@ -253,8 +221,8 @@ void CU_Plots(){
   Mean->Draw();
   StdDev->Draw();
   
-  c0->SaveAs("PEvsEta.pdf");
-  c1->SaveAs("ChannelvsPE.pdf");
+  //c0->SaveAs("PEvsEta.pdf");
+  //c1->SaveAs("ChannelvsPE.pdf");
   
 } 
 //

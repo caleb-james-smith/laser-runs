@@ -1,6 +1,6 @@
 #include <vector>
-
-// CU             RBX            Run            pd_ch          uhtr_ch        shunt          max_adc        max_fc         result         
+// {0 ,1  ,2  ,3    ,4      ,5    ,6      ,7     ,8
+// {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}         
 std::vector< std::vector<double>> pd_array = {
 {1, 0, 1, 0, 0, 31, 0, -0.05000, 0},
 {1, 0, 1, 1, 1, 31, 0, -0.05000, 0},
