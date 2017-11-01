@@ -263,9 +263,20 @@ def makeTable(runDir, tables, runList):
                                         uhtr_ch = channel.split("h")[-1]
                                         max_adc = str(findMaxADC(f, channel, False))
                                         max_fc  = "%.2f" % adcConverter.linearize(max_adc)
+                                        # mask pin-diodes that do not have light
+                                        if table == "pd":
+                                            # runs 1, 2, and 3 are pin-diode chs 0, 1
+                                            if irun < 4:
+                                                if i > 1:
+                                                    continue 
+                                            # runs 4, 5, 6, and 7 are pin-diode chs 2, 3, 4, and 5
+                                            if irun > 3:
+                                                if i != irun-2:
+                                                    continue
+                                        # mask out 4 dark channels per RBX
                                         if (rm, rm_ch) in mapping.darkSipms:
-                                            print "mask out channel: RM %s SiPM %s" % (rm, rm_ch)
-                                            continue    # mask out 4 dark channels per RBX
+                                            #print "mask out channel: RM %s SiPM %s" % (rm, rm_ch)
+                                            continue    
                                         if int(max_adc) > cutoff:   result = "1"
                                         else:                       result = "0"
                                         if table == "sipm":
