@@ -24,7 +24,7 @@ int NumChan = pd_array.size(); //Need to change this
 TGraph* makePDTGraph(double pd,std::vector<std::vector<double>>& datain){
   Double_t x[NumChan], y[NumChan];
   for(unsigned channel = 0; channel < NumChan; ++channel){
-    if(datain[channel][2] == pd+2){
+    if(datain[channel][3] == pd){
       x[channel] = datain[channel][0];
       y[channel] = datain[channel][6];	
     }

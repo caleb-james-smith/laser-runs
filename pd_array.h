@@ -1,7 +1,7 @@
 #include <vector>
 
 // {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
-std::vector< std::vector<double> > cuData = {
+std::vector< std::vector<double> > pd_array = {
 {1, 0, 1, 0, 0, 31, 0, -0.05, 0},
 {1, 0, 1, 1, 1, 31, 0, -0.05, 0},
 {1, 0, 1, 2, 2, 31, 0, -0.05, 0},
