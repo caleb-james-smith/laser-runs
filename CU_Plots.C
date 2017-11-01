@@ -5,8 +5,9 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TDirectory.h>
-//pulse shape vectors
-#include "CU_Data.h"
+//Data.....
+//#include "CU_Data.h"
+#include "pd_array.h" 
 
 #include <string>
 #include <sstream>
