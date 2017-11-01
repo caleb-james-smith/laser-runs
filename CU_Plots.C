@@ -5,8 +5,8 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TDirectory.h>
-//pulse shape vectors
-#include "CU_Data.h"
+//Data.....
+#include "pd_array.h" 
 
 #include <string>
 #include <sstream>
@@ -19,14 +19,14 @@
 #include "TLatex.h"
 #include "TColor.h"
 
-TGraph* makePEHisto(double iphi,double depth ,std::vector<std::vector<double>>& datain){
+int NumChan = pd_array.size(); //Need to change this
+
+TGraph* makePDTGraph(double pd,std::vector<std::vector<double>>& datain){
   Double_t x[NumChan], y[NumChan];
   for(unsigned channel = 0; channel < NumChan; ++channel){
-    if(datain[channel][1] == iphi){
-      if(datain[channel][2] == depth){
-	x[channel] = datain[channel][0];
-	y[channel] = datain[channel][3];	
-      }
+    if(datain[channel][2] == pd+2){
+      x[channel] = datain[channel][0];
+      y[channel] = datain[channel][6];	
     }
   }
   TGraph* gtemp = new TGraph(NumChan,x,y);
@@ -35,14 +35,8 @@ TGraph* makePEHisto(double iphi,double depth ,std::vector<std::vector<double>>& 
 }
 
 void CU_Plots(){
-  for(int i = 0; i <NumChan; i++){
-    dataStuff[i][3]      = inputdata[i];
-    antonData[i][3] = antonInputData[i];
-    Data2015[i][3]  = InputData2015[i];
-  }
-
   TCanvas *c0 = new TCanvas("PulseShape_203","",800,800);  
-  TLegend* catLeg0 = new TLegend(0.75,0.45,0.96,0.88);
+  TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg0->SetBorderSize(0);
   catLeg0->SetFillStyle(0);
   gPad->SetTopMargin(0.1);
@@ -51,12 +45,12 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* hblank = new TH1F("","",250,16.1,22.9);
-  hblank->SetMinimum(2);
-  hblank->SetMaximum(6);
+  TH1F* hblank = new TH1F("","",250,0,34);
+  hblank->SetMinimum(0);
+  hblank->SetMaximum(250);
   //hblank->GetXaxis()->SetRange(0,100);
-  hblank->GetXaxis()->SetTitle("i#eta");
-  hblank->GetYaxis()->SetTitle("photoelectrons / MIP / layer");
+  hblank->GetXaxis()->SetTitle("CU");
+  hblank->GetYaxis()->SetTitle("ADC");
   hblank->SetTitle("");
   hblank->SetName("");
   hblank->SetTitleSize(0.002);
@@ -70,120 +64,77 @@ void CU_Plots(){
   hblank->SetLineColor(1);
   hblank->Draw("hist");
 
-  double Lighten = 1.0; 
-  
-  Int_t color1 = TColor::GetFreeColorIndex();
-  TColor *depth1color = new TColor(color1, Lighten*110./255, Lighten*160./255, Lighten*206./255, "Depth1Blue",   1.0);
-  Int_t color2 = TColor::GetFreeColorIndex();
-  TColor *depth2color = new TColor(color2, Lighten*253./255, Lighten*181./255,  Lighten*10./255, "Depth2Orange" ,1.0);
-  Int_t color3 = TColor::GetFreeColorIndex();
-  TColor *depth3color = new TColor(color3, Lighten*162./255, Lighten*221./255, Lighten*125./255, "Depth3Green" , 1.0);
-  Int_t color4 = TColor::GetFreeColorIndex();
-  TColor *depth4color = new TColor(color4, Lighten*247./255,  Lighten*52./255, Lighten*111./255, "Depth4Pink" ,  1.0);
-  Int_t color5 = TColor::GetFreeColorIndex();
-  TColor *depth5color = new TColor(color5, Lighten*255./255, Lighten*255./255, Lighten*126./255, "Depth5Yellow" ,1.0);
-  Int_t color6 = TColor::GetFreeColorIndex();
-  TColor *depth6color = new TColor(color6, Lighten*213./255, Lighten*161./255, Lighten*125./255, "Depth6Brown"  ,1.0);
-  Int_t color7 = TColor::GetFreeColorIndex();
-  TColor *depth7color = new TColor(color7, Lighten*197./255, Lighten*197./255, Lighten*197./255, "Depth7Grey" ,  1.0);
-
-  for(unsigned phi = 1; phi < 12; ++phi){
-    for(unsigned depth1 = 2; depth1 < 7; ++depth1){
-      TGraph* phi_depth1 = NULL;
-      phi_depth1 = makePEHisto(phi,depth1,dataStuff);
-      if(depth1 == 2){phi_depth1->SetMarkerColor(kBlack);}
-      if(depth1 == 3){phi_depth1->SetMarkerColor(kRed);}
-      if(depth1 == 4){phi_depth1->SetMarkerColor(kBlue);}
-      if(depth1 == 5){phi_depth1->SetMarkerColor(kGreen+2);}
-      if(depth1 == 6){phi_depth1->SetMarkerColor(kOrange);}      
-      if(phi == 5){phi_depth1->SetMarkerStyle(kFullCircle);}
-      //std::cout<<depth1<<endl;
-      phi_depth1->Draw("P same");
-      //catLeg0->AddEntry(phi_depth1,"Depth");
-    }
-  }
+  TGraph* graph_pd0 = NULL;
+  TGraph* graph_pd1 = NULL;
+  TGraph* graph_pd2 = NULL;
+  TGraph* graph_pd3 = NULL;
+  TGraph* graph_pd4 = NULL;
+  TGraph* graph_pd5 = NULL;
+  graph_pd0 = makePDTGraph(0,pd_array);
+  graph_pd1 = makePDTGraph(1,pd_array);
+  graph_pd2 = makePDTGraph(2,pd_array);
+  graph_pd3 = makePDTGraph(3,pd_array);
+  graph_pd4 = makePDTGraph(4,pd_array);
+  graph_pd5 = makePDTGraph(5,pd_array);
+  graph_pd0->SetMarkerColor(kBlack);
+  graph_pd1->SetMarkerColor(kRed);
+  graph_pd2->SetMarkerColor(kBlue);
+  graph_pd3->SetMarkerColor(kGreen+2);
+  graph_pd4->SetMarkerColor(kOrange);
+  graph_pd5->SetMarkerColor(kMagenta);      
+  graph_pd0->Draw("P same");
+  graph_pd1->Draw("P same");
+  graph_pd2->Draw("P same");
+  graph_pd3->Draw("P same");
+  graph_pd4->Draw("P same");
+  graph_pd5->Draw("P same");
 
   TLatex* CMSPrelim1 = new TLatex(0.14, 0.91, "CMS #scale[0.9]{#font[52]{Preliminary}}");
   CMSPrelim1->SetNDC();
   CMSPrelim1->SetTextFont(62);
 
-  TLatex* testbeam = new TLatex(0.95, 0.91, "Testbeam 2017");
-  testbeam->SetNDC();
-  testbeam->SetTextFont(42);
-  testbeam->SetTextAlign(31);
+  TLatex* burnIn = new TLatex(0.95, 0.91, "904 Burn In 2017");
+  burnIn->SetNDC();
+  burnIn->SetTextFont(42);
+  burnIn->SetTextAlign(31);
 
   CMSPrelim1->Draw();
-  testbeam->Draw();
+  burnIn->Draw();
   
-  Double_t x1[1],y1[1];
-  catLeg0->AddEntry((TObject*)0,"iPhi 5","");
-  TGraph* phi5depth2 = new TGraph(1,x1,y1);
-  phi5depth2->Draw("same P");
-  phi5depth2->SetMarkerColor(kBlack);
-  phi5depth2->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth2,"Depth 2","P");
-  TGraph* phi5depth3 = new TGraph(1,x1,y1);
-  phi5depth3->Draw("same P");
-  phi5depth3->SetMarkerColor(kRed);
-  phi5depth3->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth3,"Depth 3","P");
-  TGraph* phi5depth4 = new TGraph(1,x1,y1);
-  phi5depth4->Draw("same P");
-  phi5depth4->SetMarkerColor(kBlue);
-  phi5depth4->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth4,"Depth 4","P");
-  TGraph* phi5depth5 = new TGraph(1,x1,y1);
-  phi5depth5->Draw("same P");
-  phi5depth5->SetMarkerColor(kGreen+2);
-  phi5depth5->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth5,"Depth 5","P");
-  TGraph* phi5depth6 = new TGraph(1,x1,y1);
-  phi5depth6->Draw("same P");
-  phi5depth6->SetMarkerColor(kOrange);
-  phi5depth6->SetMarkerStyle(kFullCircle);
-  catLeg0->AddEntry(phi5depth6,"Depth 6","P");
-
-  catLeg0->AddEntry((TObject*)0, "", "");
-  
-  catLeg0->AddEntry((TObject*)0,"iPhi 6","");
-  TGraph* phi6depth2 = new TGraph(1,x1,y1);
-  phi6depth2->Draw("same P");
-  phi6depth2->SetMarkerColor(kBlack);
-  phi6depth2->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth2,"Depth 2","P");
-  TGraph* phi6depth3 = new TGraph(1,x1,y1);
-  phi6depth3->Draw("same P");
-  phi6depth3->SetMarkerColor(kRed);
-  phi6depth3->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth3,"Depth 3","P");
-  TGraph* phi6depth4 = new TGraph(1,x1,y1);
-  phi6depth4->Draw("same P");
-  phi6depth4->SetMarkerColor(kBlue);
-  phi6depth4->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth4,"Depth 4","P");
-  TGraph* phi6depth5 = new TGraph(1,x1,y1);
-  phi6depth5->Draw("same P");
-  phi6depth5->SetMarkerColor(kGreen+2);
-  phi6depth5->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth5,"Depth 5","P");
-  TGraph* phi6depth6 = new TGraph(1,x1,y1);
-  phi6depth6->Draw("same P");
-  phi6depth6->SetMarkerColor(kOrange);
-  phi6depth6->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(phi6depth6,"Depth 6","P");
-  //TGraph* phi5 = new TGraph(1,x1,y1);
-  //phi5->Draw("same P");
-  //phi5->SetMarkerColor(kBlack);
-  //phi5->SetMarkerStyle(kFullCircle);
-  //catLeg0->AddEntry(phi5,"Phi 5","P");
-  //TGraph* phi6 = new TGraph(1,x1,y1);
-  //phi6->Draw("same P");
-  //phi6->SetMarkerColor(kBlack);
-  //phi6->SetMarkerStyle(kFullSquare);
-  //catLeg0->AddEntry(phi6,"Phi 6","P");
+  Double_t x1[1]={-100},y1[1]={-100};
+  //catLeg0->AddEntry((TObject*)0,"iPhi 5","");
+  TGraph* pinDiode0 = new TGraph(1,x1,y1);
+  pinDiode0->Draw("same P");
+  pinDiode0->SetMarkerColor(kBlack);
+  pinDiode0->SetMarkerStyle(kFullSquare);
+  catLeg0->AddEntry(pinDiode0,"Pin-Diode 0","P");
+  TGraph* pinDiode1 = new TGraph(1,x1,y1);
+  pinDiode1->Draw("same P");
+  pinDiode1->SetMarkerColor(kRed);
+  pinDiode1->SetMarkerStyle(kFullSquare);
+  catLeg0->AddEntry(pinDiode1,"Pin-Diode 1","P");
+  TGraph* pinDiode2 = new TGraph(1,x1,y1);
+  pinDiode2->Draw("same P");
+  pinDiode2->SetMarkerColor(kBlue);
+  pinDiode2->SetMarkerStyle(kFullSquare);
+  catLeg0->AddEntry(pinDiode2,"Pin-Diode 2","P");
+  TGraph* pinDiode3 = new TGraph(1,x1,y1);
+  pinDiode3->Draw("same P");
+  pinDiode3->SetMarkerColor(kGreen+2);
+  pinDiode3->SetMarkerStyle(kFullSquare);
+  catLeg0->AddEntry(pinDiode3,"Pin-Diode 3","P");
+  TGraph* pinDiode4 = new TGraph(1,x1,y1);
+  pinDiode4->Draw("same P");
+  pinDiode4->SetMarkerColor(kOrange);
+  pinDiode4->SetMarkerStyle(kFullSquare);
+  catLeg0->AddEntry(pinDiode4,"Pin-Diode 4","P");
+  TGraph* pinDiode5 = new TGraph(1,x1,y1);
+  pinDiode5->Draw("same P");
+  pinDiode5->SetMarkerColor(kMagenta);
+  pinDiode5->SetMarkerStyle(kFullSquare);
+  catLeg0->AddEntry(pinDiode5,"Pin-Diode 5","P");
   
   catLeg0->SetTextSize(0.04);
-  //catLeg0->AddEntry(hblank,"current 203","l");
   catLeg0->Draw();
 
   TCanvas *c1 = new TCanvas("1D Channels vs PE/MIP/Layer","",800,800);  
@@ -196,11 +147,11 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* hmip = new TH1F("","",20,-0.5,9.5);
+  TH1F* hmip = new TH1F("","",251,0,250);
   hmip->SetMinimum(0);
-  hmip->SetMaximum(13);
+  hmip->SetMaximum(50);
   //hmip->GetXaxis()->SetRange(0,100);
-  hmip->GetXaxis()->SetTitle("photoelectrons / MIP / layer");
+  hmip->GetXaxis()->SetTitle("ADC");
   hmip->GetYaxis()->SetTitle("Channels");
   hmip->SetTitle("");
   hmip->SetName("");
@@ -216,7 +167,7 @@ void CU_Plots(){
   hmip->Draw("hist");
 
   for(unsigned channel = 0; channel < NumChan; ++channel){
-    hmip->Fill(dataStuff[channel][3]);
+    hmip->Fill(pd_array[channel][6]);
   }
 
   char entries [100];
@@ -247,16 +198,16 @@ void CU_Plots(){
   StdDev->SetTextAlign(31);
 
   CMSPrelim1->Draw();
-  testbeam->Draw();
+  burnIn->Draw();
   Entries->Draw();
   Mean->Draw();
   StdDev->Draw();
   
-  c0->SaveAs("PEvsEta.pdf");
-  c1->SaveAs("ChannelvsPE.pdf");
+  c0->SaveAs("PDvsCU2D.pdf");
+  c1->SaveAs("PDvsCU1D.pdf");
   
 } 
-//
-//int main(){
-//  TestBeamMipPlots();
-//}
+
+int main(){
+  CU_Plots();
+}
