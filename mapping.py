@@ -46,28 +46,6 @@ rbxRM = {
 "18"  : "1",
 }
 
-# RBX : Pindiode Channel List (for channels 0 and 1 only)
-rbxPD = {
-"00"  : ["h0", "h1", "h2", "h3", "h4", "h5"], 
-"01"  : ["h72", "h73"], 
-"02"  : ["h84", "h85"],
-"03"  : ["h96", "h97"],
-"04"  : ["h108", "h109"],
-"05"  : ["h120", "h121"],
-"06"  : ["h132", "h133"],
-"07"  : ["h0", "h1"],
-"08"  : ["h12", "h13"],
-"09"  : ["h24", "h25"],
-"10"  : ["h36", "h37"],
-"11"  : ["h48", "h49"],
-"12"  : ["h60", "h61"],
-"13"  : ["h72", "h73"],
-"14"  : ["h84", "h85"],
-"15"  : ["h96", "h97"],
-"16"  : ["h108", "h109"],
-"17"  : ["h120", "h121"],
-"18"  : ["h132", "h133"],
-}
 
 def rbxPindiodes(rbx):
     pd0 = int(rbxPD[rbx][0].split('h')[1])
@@ -75,6 +53,30 @@ def rbxPindiodes(rbx):
 
 def chs(minCh, maxCh):
     return list('h' + str(i) for i in xrange(minCh, maxCh + 1))
+
+
+# RBX : Pindiode Channel List (for channels 0 and 1 only)
+rbxPD = {
+"00"  : chs(0,5), 
+"01"  : chs(72,77), 
+"02"  : chs(84,89),
+"03"  : chs(96,101), 
+"04"  : chs(108,113),
+"05"  : chs(120,125),
+"06"  : chs(132,137),
+"07"  : chs(0,5),
+"08"  : chs(12,17),
+"09"  : chs(24,29),
+"10"  : chs(36,41),
+"11"  : chs(48,53),
+"12"  : chs(60,65),
+"13"  : chs(72,77), 
+"14"  : chs(84,89),
+"15"  : chs(96,101), 
+"16"  : chs(108,113),
+"17"  : chs(120,125),
+"18"  : chs(132,137)
+}
 
 # Each RBX has 192 channels
 # Each uHTR has 144 channels

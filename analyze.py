@@ -192,16 +192,22 @@ def makeTable(runDir, tables, runList):
     col_width = 15
     adcConverter = ADCConverter()
     for table in tables:
-        with open (runDir + table + "_array.txt", 'w') as a:
+        with open (runDir + table + "_array.h", 'w') as a:
             with open (runDir + table + "_table.txt", 'w') as t:
                 if table == "sipm":
                     columns = ["CU", "RBX", "Run", "RM", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
                 elif table == "pd":
                     columns = ["CU", "RBX", "Run", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
-                header = "# " + "".join(entry.ljust(col_width) for entry in columns) + "\n"
-                a.write(header)
-                a.write("{\n")
-                t.write(header)
+                
+                header_table = "".join(entry.ljust(col_width) for entry in columns) + "\n"
+                header_array = "{" + ",".join(columns) + "}\n"
+                
+                t.write("# " + header_table)
+                
+                array_string = ""
+                a.write("#include <vector>\n\n")
+                a.write("// " + header_array)
+                array_string += "std::vector< std::vector<double> > cuData = {\n"
                 
                 # Example Files
                 # new_cu_data/CU_15/rbx0_shunt31_pd_1.root
@@ -248,30 +254,31 @@ def makeTable(runDir, tables, runList):
                                         chList = mapping.rbxSIPM[rbx_full][iuhtr-1]
                                     elif table == "pd": 
                                         rmList = [0]
-                                        if irun < 4:
-                                            chList = mapping.chs(0,1)
-                                        else:
-                                            chList = mapping.chs(irun-2, irun-2)
+                                        chList = mapping.rbxPD[rbx_full]
                                     for RM in rmList:
                                         rm = "%d" % RM
                                         for i, channel in enumerate(chList):
-                                            module_ch = str(i % 48)
+                                            rm_ch = str(i % 48)
+                                            pd_ch = str(i % 6)
                                             uhtr_ch = channel.split("h")[-1]
                                             max_adc = str(findMaxADC(f, channel, False))
-                                            max_fc  = "%.5f" % adcConverter.linearize(max_adc)
+                                            max_fc  = "%.2f" % adcConverter.linearize(max_adc)
                                             #if (rm, module_channel) in mapping.darkSipms:
                                             #    #print "mask out channel: RM %s SiPM %s" % (rm, module_channel)
                                             #    continue    # mask out 4 dark channels per RBX
                                             if int(max_adc) > cutoff:   result = "1"
                                             else:                       result = "0"
                                             if table == "sipm":
-                                                row = [cu, rbx, run, rm, module_ch, uhtr_ch, shunt, max_adc, max_fc, result]
+                                                row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_fc, result]
                                             if table == "pd":
-                                                row = [cu, rbx, run, module_ch, uhtr_ch, shunt, max_adc, max_fc, result]
-                                            a.write("{" + ", ".join(row) + "},\n") 
+                                                row = [cu, rbx, run, pd_ch, uhtr_ch, shunt, max_adc, max_fc, result]
+                                            array_string += "{" + ", ".join(row) + "},\n"
                                             t.write("".join(entry.ljust(col_width) for entry in row) + "\n") 
                 # end of array
-                a.write("}\n")
+                if array_string[-2:] == ",\n":
+                    array_string = array_string[:-2] + "\n"
+                array_string += "};\n"
+                a.write(array_string)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
