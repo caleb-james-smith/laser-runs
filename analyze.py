@@ -189,7 +189,7 @@ def makeTable(runDir, tables, runList):
     cuList.sort()
     shuntList = [0,31]
     pdList = list(i for i in xrange(6))
-    col_width = 15
+    col_width = 10
     adcConverter = ADCConverter()
     for table in tables:
         with open (runDir + table + "_array.h", 'w') as a:
@@ -207,7 +207,7 @@ def makeTable(runDir, tables, runList):
                 array_string = ""
                 a.write("#include <vector>\n\n")
                 a.write("// " + header_array)
-                array_string += "std::vector< std::vector<double> > cuData = {\n"
+                array_string += "std::vector< std::vector<double> > %s_array = {\n" % table
                 
                 # Example Files
                 # new_cu_data/CU_15/rbx0_shunt31_pd_1.root
