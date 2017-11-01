@@ -6,7 +6,10 @@
 #include <TLegend.h>
 #include <TDirectory.h>
 //Data.....
-#include "pd_array.h" 
+//{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
+#include "pd_array.h"
+//{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
+#include "sipm_array.h"
 
 #include <string>
 #include <sstream>
@@ -27,6 +30,19 @@ TGraph* makePDTGraph(double pd,std::vector<std::vector<double>>& datain){
     if(datain[channel][3] == pd){
       x[channel] = datain[channel][0];
       y[channel] = datain[channel][6];	
+    }
+  }
+  TGraph* gtemp = new TGraph(NumChan,x,y);
+  gtemp->SetMarkerStyle(kFullSquare);
+  return gtemp;
+}
+
+TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
+  Double_t x[NumChan], y[NumChan];
+  for(unsigned channel = 0; channel < NumChan; ++channel){
+    if(datain[channel][3] == rm){
+      x[channel] = datain[channel][0];
+      y[channel] = datain[channel][7];	
     }
   }
   TGraph* gtemp = new TGraph(NumChan,x,y);
@@ -202,10 +218,84 @@ void CU_Plots(){
   Entries->Draw();
   Mean->Draw();
   StdDev->Draw();
+
+  TCanvas *c2 = new TCanvas("PulseShape_203","",800,800);  
+  TLegend* catLeg2 = new TLegend(0.68,0.65,0.96,0.88);
+  catLeg2->SetBorderSize(0);
+  catLeg2->SetFillStyle(0);
+  gPad->SetTopMargin(0.1);
+  gPad->SetBottomMargin(0.12);
+  gPad->SetRightMargin(0.05);
+  gPad->SetLeftMargin(0.14);  
+  //gPad->SetLogy();
+  
+  TH1F* h2blank = new TH1F("","",250,0,34);
+  h2blank->SetMinimum(0);
+  h2blank->SetMaximum(250);
+  //h2blank->GetXaxis()->SetRange(0,100);
+  h2blank->GetXaxis()->SetTitle("CU");
+  h2blank->GetYaxis()->SetTitle("ADC");
+  h2blank->SetTitle("");
+  h2blank->SetName("");
+  h2blank->SetTitleSize(0.002);
+  h2blank->SetTitleSize(0.05,"X");
+  h2blank->SetTitleSize(0.05,"Y");
+  h2blank->SetTitleOffset(1.0,"X");
+  h2blank->SetTitleOffset(1.2,"Y");
+  h2blank->SetLabelSize(0.04,"X");
+  h2blank->SetLabelSize(0.04,"Y");
+  h2blank->SetStats(false);
+  h2blank->SetLineColor(1);
+  h2blank->Draw("hist");
+
+  TGraph* graph_rm1 = NULL;
+  TGraph* graph_rm2 = NULL;
+  TGraph* graph_rm3 = NULL;
+  TGraph* graph_rm4 = NULL;
+  graph_rm1 = makeRMTGraph(1,sipm_array);
+  graph_rm2 = makeRMTGraph(2,sipm_array);
+  graph_rm3 = makeRMTGraph(3,sipm_array);
+  graph_rm4 = makeRMTGraph(4,sipm_array);
+  graph_rm1->SetMarkerColor(kRed);
+  graph_rm2->SetMarkerColor(kBlue);
+  graph_rm3->SetMarkerColor(kGreen+2);
+  graph_rm4->SetMarkerColor(kBlack);
+  graph_rm1->Draw("P same");
+  graph_rm2->Draw("P same");
+  graph_rm3->Draw("P same");
+  graph_rm4->Draw("P same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  
+  //Double_t x1[1]={-100},y1[1]={-100};
+  //catLeg2->AddEntry((TObject*)0,"iPhi 5","");
+  TGraph* readOutModule1 = new TGraph(1,x1,y1);
+  readOutModule1->Draw("same P");
+  readOutModule1->SetMarkerColor(kRed);
+  readOutModule1->SetMarkerStyle(kFullSquare);
+  catLeg2->AddEntry(readOutModule1,"RM 1","P");
+  TGraph* readOutModule2 = new TGraph(1,x1,y1);
+  readOutModule2->Draw("same P");
+  readOutModule2->SetMarkerColor(kBlue);
+  readOutModule2->SetMarkerStyle(kFullSquare);
+  catLeg2->AddEntry(readOutModule2,"RM 2","P");
+  TGraph* readOutModule3 = new TGraph(1,x1,y1);
+  readOutModule3->Draw("same P");
+  readOutModule3->SetMarkerColor(kGreen+2);
+  readOutModule3->SetMarkerStyle(kFullSquare);
+  catLeg2->AddEntry(readOutModule3,"RM 3","P");
+  TGraph* readOutModule4 = new TGraph(1,x1,y1);
+  readOutModule4->Draw("same P");
+  readOutModule4->SetMarkerColor(kBlack);
+  readOutModule4->SetMarkerStyle(kFullSquare);
+  catLeg2->AddEntry(readOutModule4,"RM 4","P");
+  
+  catLeg2->SetTextSize(0.04);
+  catLeg2->Draw();  
   
   c0->SaveAs("PDvsCU2D.pdf");
   c1->SaveAs("PDvsCU1D.pdf");
-  
+  c2->SaveAs("RMvsCU2D.pdf");
 } 
 
 int main(){
