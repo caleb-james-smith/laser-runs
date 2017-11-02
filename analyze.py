@@ -187,7 +187,7 @@ def makeTable(runDir, tables, runList):
             cu = int(directory.split("CU_")[-1])
             cuList.append(cu)
     cuList.sort()
-    shuntList = [0,31]
+    shuntList = [31]
     pdList = list(i for i in xrange(6))
     col_width = 10
     adcConverter = ADCConverter()
