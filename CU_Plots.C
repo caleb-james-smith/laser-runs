@@ -1,27 +1,27 @@
-//#include <TFile.h>
-//#include <TTree.h>
+#include <TFile.h>
+#include <TTree.h>
 #include <TH1.h>
-//#include <TAxis.h>
+#include <TAxis.h>
 #include <TCanvas.h>
 #include <TLegend.h>
-//#include <TDirectory.h>
+#include <TDirectory.h>
 //Data.....
 //{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
 #include "pd_array.h"
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 #include "sipm_array.h"
 
-//#include <string>
-//#include <sstream>
+#include <string>
+#include <sstream>
 #include <vector>
 #include <cmath>
 #include <iostream>
 #include <fstream>
-//#include "TMath.h"
+#include "TMath.h"
 #include <TGraph.h>
 #include "TMultiGraph.h"
 #include "TLatex.h"
-//#include "TColor.h"
+#include "TColor.h"
 
 int NumChanPD = pd_array.size(); //Need to change this
 int NumChanRM = sipm_array.size(); //Need to change this
@@ -31,8 +31,8 @@ TGraph* makePDTGraph(int pd,std::vector<std::vector<double>>& datain){
   for(unsigned channel = 0; channel < NumChanPD; ++channel){
     if(datain[channel][3] == pd){
       x[channel] = datain[channel][0];
-      y[channel] = datain[channel][6];	
-      //std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxADC:  "<<y[channel]<<std::endl;
+      y[channel] = datain[channel][7];	
+      //std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
     }
     else{
       x[channel] = -100;
@@ -55,8 +55,8 @@ TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
   for(unsigned channel = 0; channel < NumChanRM; ++channel){
     if(datain[channel][3] == rm){
       x[channel] = datain[channel][0];
-      y[channel] = datain[channel][7];	
-      //std::cout<<"RM:  "<<rm<<"  CU:  "<<x[channel]<<"  MaxADC:  "<<y[channel]<<std::endl;
+      y[channel] = datain[channel][8];	
+      //std::cout<<"RM:  "<<rm<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
     }
     else{
       x[channel] = -100;
@@ -76,7 +76,7 @@ void CU_Plots(){
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
   std::cout<<"Number of RM Channels:   "<<NumChanRM<<std::endl;
   
-  TCanvas *c0 = new TCanvas("MacADCvsCU","",800,800);  
+  TCanvas *c0 = new TCanvas("MacfCvsCU","",800,800);  
   TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg0->SetBorderSize(0);
   catLeg0->SetFillStyle(0);
@@ -88,10 +88,10 @@ void CU_Plots(){
   
   TH1F* hblank = new TH1F("","",250,0,65);
   hblank->SetMinimum(0);
-  hblank->SetMaximum(300);
+  hblank->SetMaximum(200000);
   //hblank->GetXaxis()->SetRange(0,100);
   hblank->GetXaxis()->SetTitle("CU");
-  hblank->GetYaxis()->SetTitle("Max ADC");
+  hblank->GetYaxis()->SetTitle("Max Charge [fC]");
   hblank->SetTitle("");
   hblank->SetName("");
   hblank->SetTitleSize(0.002);
@@ -181,11 +181,11 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* hmip = new TH1F("","",62,0,250);
+  TH1F* hmip = new TH1F("","",62,0,350000);
   hmip->SetMinimum(0);
   hmip->SetMaximum(35);
   //hmip->GetXaxis()->SetRange(0,100);
-  hmip->GetXaxis()->SetTitle("Max ADC");
+  hmip->GetXaxis()->SetTitle("Max Charge [fC]");
   hmip->GetYaxis()->SetTitle("Channels");
   hmip->SetTitle("");
   hmip->SetName("");
@@ -201,7 +201,7 @@ void CU_Plots(){
   hmip->Draw("hist");
   
   for(unsigned channel = 0; channel < NumChanPD; ++channel){
-    hmip->Fill(pd_array[channel][6]);
+    hmip->Fill(pd_array[channel][7]);
   }
   
   char entries [100];
@@ -250,10 +250,10 @@ void CU_Plots(){
   
   TH1F* h2blank = new TH1F("","",250,0,65);
   h2blank->SetMinimum(0);
-  h2blank->SetMaximum(275);
+  h2blank->SetMaximum(350000);
   //h2blank->GetXaxis()->SetRange(0,100);
   h2blank->GetXaxis()->SetTitle("CU");
-  h2blank->GetYaxis()->SetTitle("Max ADC");
+  h2blank->GetYaxis()->SetTitle("Max Charge [fC]");
   h2blank->SetTitle("");
   h2blank->SetName("");
   h2blank->SetTitleSize(0.002);
@@ -267,18 +267,10 @@ void CU_Plots(){
   h2blank->SetLineColor(1);
   h2blank->Draw("hist");
   
-  //TGraph* graph_rm1 = NULL;
-  //TGraph* graph_rm2 = NULL;
-  //TGraph* graph_rm3 = NULL;
-  //TGraph* graph_rm4 = NULL;
   TGraph* graph_rm1 = makeRMTGraph(1,sipm_array);
   TGraph* graph_rm2 = makeRMTGraph(2,sipm_array);
   TGraph* graph_rm3 = makeRMTGraph(3,sipm_array);
   TGraph* graph_rm4 = makeRMTGraph(4,sipm_array);
-  //graph_rm1->SetMarkerColor(kRed);
-  //graph_rm2->SetMarkerColor(kBlue);
-  //graph_rm3->SetMarkerColor(kGreen+2);
-  //graph_rm4->SetMarkerColor(kBlack);
   graph_rm1->Draw("P same");
   graph_rm2->Draw("P same");
   graph_rm3->Draw("P same");
@@ -328,11 +320,11 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* h3 = new TH1F("","",62,0,250);
+  TH1F* h3 = new TH1F("","",62,0,350000);
   h3->SetMinimum(0);
   h3->SetMaximum(1000);
   //h3->GetXaxis()->SetRange(0,100);
-  h3->GetXaxis()->SetTitle("Max ADC");
+  h3->GetXaxis()->SetTitle("Max Charge [fC]");
   h3->GetYaxis()->SetTitle("Channels");
   h3->SetTitle("");
   h3->SetName("");
@@ -348,7 +340,7 @@ void CU_Plots(){
   h3->Draw("hist");
   
   for(unsigned channel = 0; channel < NumChanRM; ++channel){
-    h3->Fill(sipm_array[channel][7]);
+    h3->Fill(sipm_array[channel][8]);
   }
   
   char entries3 [100];
