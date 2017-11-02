@@ -11,7 +11,7 @@
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 #include "sipm_array.h"
 
-#include <string>
+#include "string"
 #include <sstream>
 #include <vector>
 #include <cmath>
@@ -50,6 +50,23 @@ TGraph* makePDTGraph(int pd,std::vector<std::vector<double>>& datain){
   return gtemp;
 }
 
+TProfile* makePDTProfile(int pd,std::vector<std::vector<double>>& datain,const char* name){
+  TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
+  for(unsigned channel = 0; channel < NumChanPD; ++channel){
+    if(datain[channel][3] == pd){
+      gtemp->Fill(datain[channel][0],datain[channel][7]);
+      //std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
+    }
+  }
+  if(pd == 0){gtemp->SetLineColor(kBlack);}
+  if(pd == 1){gtemp->SetLineColor(kRed);}
+  if(pd == 2){gtemp->SetLineColor(kBlue);}
+  if(pd == 3){gtemp->SetLineColor(kGreen+2);}
+  if(pd == 4){gtemp->SetLineColor(kOrange);}
+  if(pd == 5){gtemp->SetLineColor(kMagenta);}      
+  return gtemp;
+}
+
 TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
   Double_t x[NumChanRM], y[NumChanRM];
   for(unsigned channel = 0; channel < NumChanRM; ++channel){
@@ -72,6 +89,21 @@ TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
   return gtemp;
 }
 
+TProfile* makeRMTProfile(double rm,std::vector<std::vector<double>>& datain,const char*  name){
+  TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
+  for(unsigned channel = 0; channel < NumChanRM; ++channel){
+    if(datain[channel][3] == rm){
+      gtemp->Fill(datain[channel][0],datain[channel][8]);
+      //std::cout<<"RM:  "<<rm<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
+    }
+  }
+  if(rm == 1){gtemp->SetLineColor(kRed);};
+  if(rm == 2){gtemp->SetLineColor(kBlue);};
+  if(rm == 3){gtemp->SetLineColor(kGreen+2);};
+  if(rm == 4){gtemp->SetLineColor(kBlack);};
+  return gtemp;
+}
+
 void CU_Plots(){
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
   std::cout<<"Number of RM Channels:   "<<NumChanRM<<std::endl;
@@ -86,9 +118,9 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* hblank = new TH1F("","",250,0,65);
+  TH1F* hblank = new TH1F("","",250,0,70);
   hblank->SetMinimum(0);
-  hblank->SetMaximum(200000);
+  hblank->SetMaximum(120000);
   //hblank->GetXaxis()->SetRange(0,100);
   hblank->GetXaxis()->SetTitle("CU");
   hblank->GetYaxis()->SetTitle("Max Charge [fC]");
@@ -104,29 +136,35 @@ void CU_Plots(){
   hblank->SetStats(false);
   hblank->SetLineColor(0);
   hblank->Draw("hist");
-
-  TGraph* graph_pd0 = makePDTGraph(0,pd_array);
-  TGraph* graph_pd1 = makePDTGraph(1,pd_array);
-  TGraph* graph_pd2 = makePDTGraph(2,pd_array);
-  TGraph* graph_pd3 = makePDTGraph(3,pd_array);
-  TGraph* graph_pd4 = makePDTGraph(4,pd_array);
-  TGraph* graph_pd5 = makePDTGraph(5,pd_array);
+  
+  //TGraph* graph_pd0 = makePDTGraph(0,pd_array);
+  //TGraph* graph_pd1 = makePDTGraph(1,pd_array);
+  //TGraph* graph_pd2 = makePDTGraph(2,pd_array);
+  //TGraph* graph_pd3 = makePDTGraph(3,pd_array);
+  //TGraph* graph_pd4 = makePDTGraph(4,pd_array);
+  //TGraph* graph_pd5 = makePDTGraph(5,pd_array);
+  TProfile* graph_pd0 = makePDTProfile(0,pd_array,"pd0");
+  TProfile* graph_pd1 = makePDTProfile(1,pd_array,"pd1");
+  TProfile* graph_pd2 = makePDTProfile(2,pd_array,"pd2");
+  TProfile* graph_pd3 = makePDTProfile(3,pd_array,"pd3");
+  TProfile* graph_pd4 = makePDTProfile(4,pd_array,"pd4");
+  TProfile* graph_pd5 = makePDTProfile(5,pd_array,"pd5");
   graph_pd0->Draw("P same");
   graph_pd1->Draw("P same");
   graph_pd2->Draw("P same");
   graph_pd3->Draw("P same");
   graph_pd4->Draw("P same");
   graph_pd5->Draw("P same");
-
+  
   TLatex* CMSPrelim1 = new TLatex(0.14, 0.91, "CMS #scale[0.9]{#font[52]{Preliminary}}");
   CMSPrelim1->SetNDC();
   CMSPrelim1->SetTextFont(62);
-
+  
   TLatex* burnIn = new TLatex(0.95, 0.91, "904 Burn In 2017");
   burnIn->SetNDC();
   burnIn->SetTextFont(42);
   burnIn->SetTextAlign(31);
-
+  
   TLatex* PinDiode = new TLatex(0.14, 0.96, "Pin-Diodes");
   PinDiode->SetNDC();
   PinDiode->SetTextFont(42);
@@ -170,7 +208,7 @@ void CU_Plots(){
   
   catLeg0->SetTextSize(0.04);
   catLeg0->Draw();
-
+  
   TCanvas *c1 = new TCanvas("1D PD","",800,800);  
   //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
   //catLeg1->SetBorderSize(0);
@@ -183,7 +221,7 @@ void CU_Plots(){
   
   TH1F* hmip = new TH1F("","",62,0,350000);
   hmip->SetMinimum(0);
-  hmip->SetMaximum(35);
+  hmip->SetMaximum(50);
   //hmip->GetXaxis()->SetRange(0,100);
   hmip->GetXaxis()->SetTitle("Max Charge [fC]");
   hmip->GetYaxis()->SetTitle("Channels");
@@ -248,7 +286,7 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* h2blank = new TH1F("","",250,0,65);
+  TH1F* h2blank = new TH1F("","",250,0,70);
   h2blank->SetMinimum(0);
   h2blank->SetMaximum(350000);
   //h2blank->GetXaxis()->SetRange(0,100);
@@ -267,15 +305,19 @@ void CU_Plots(){
   h2blank->SetLineColor(1);
   h2blank->Draw("hist");
   
-  TGraph* graph_rm1 = makeRMTGraph(1,sipm_array);
-  TGraph* graph_rm2 = makeRMTGraph(2,sipm_array);
-  TGraph* graph_rm3 = makeRMTGraph(3,sipm_array);
-  TGraph* graph_rm4 = makeRMTGraph(4,sipm_array);
+  //TGraph* graph_rm1 = makeRMTGraph(1,sipm_array);
+  //TGraph* graph_rm2 = makeRMTGraph(2,sipm_array);
+  //TGraph* graph_rm3 = makeRMTGraph(3,sipm_array);
+  //TGraph* graph_rm4 = makeRMTGraph(4,sipm_array);
+  TProfile* graph_rm1 = makeRMTProfile(1,sipm_array,"rm1");
+  TProfile* graph_rm2 = makeRMTProfile(2,sipm_array,"rm2");
+  TProfile* graph_rm3 = makeRMTProfile(3,sipm_array,"rm3");
+  TProfile* graph_rm4 = makeRMTProfile(4,sipm_array,"rm4");
   graph_rm1->Draw("P same");
   graph_rm2->Draw("P same");
   graph_rm3->Draw("P same");
   graph_rm4->Draw("P same");
-
+  
   TLatex* RM = new TLatex(0.14, 0.96, "Silicon Photomultiplier");
   RM->SetNDC();
   RM->SetTextFont(42);
@@ -309,7 +351,7 @@ void CU_Plots(){
   
   catLeg2->SetTextSize(0.04);
   catLeg2->Draw();  
-
+  
   TCanvas *c3 = new TCanvas("1D RM","",800,800);  
   //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
   //catLeg1->SetBorderSize(0);
