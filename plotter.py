@@ -8,6 +8,8 @@ from argparse import ArgumentParser
 def getData(data_dir):
     sipm_file = "sipm_table.txt"
     pd_file = "pd_table.txt"
+    dictionaries = [ { "file" : sipm_file, "tag" : "sipm", "element" : "rm" },
+                     { "file" : pd_file,   "tag" : "pd",   "element" : "pd" } ]
     data = {}
     
     data["sipm"] = []
@@ -27,36 +29,26 @@ def getData(data_dir):
     data["pd_megatile"] = []
     
     # sipm array: {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
-    f = sipm_file
-    with open(data_dir + f) as df:
-        for line in df:
-            if line[0] == "#":
-                continue
-            s = line.split()
-            d = float(s[-2])
-            rm = int(s[3])
-            rm_name = "rm%d" % rm
-            data["sipm"].append(d)
-            data[rm_name].append(d)
-    
     # pd array: {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
-    f = pd_file
-    with open(data_dir + f) as df:
-        for line in df:
-            if line[0] == "#":
-                continue
-            s = line.split()
-            d = float(s[-2])
-            pd_ch = int(s[3])
-            pd_name = "pd%d" % pd_ch
-            data["pd"].append(d)
-            data[pd_name].append(d)
-            if pd_ch < 2:
-                # quartz fiber pin-diodes
-                data["pd_quartz"].append(d)
-            else:
-                # megatile pin-diodes
-                data["pd_megatile"].append(d)
+    for dictionary in dictionaries:
+        f = dictionary["file"]
+        tag = dictionary["tag"]
+        element = dictionary["element"]
+        fc_position = -2
+        element_position = 3
+        with open(data_dir + f) as df:
+            for line in df:
+                if line[0] == "#":
+                    continue
+                s = line.split()
+                d = float(s[fc_position])
+                element_value = int(s[element_position])
+                element_name = "%s%d" % (element, element_value)
+                data[tag].append(d)
+                data[element_name].append(d)
+   
+    data["pd_quartz"] = data["pd0"] + data["pd0"]
+    data["pd_megatile"] = data["pd2"] + data["pd3"] + data["pd4"] + data["pd5"]
 
     return data
 
@@ -89,11 +81,13 @@ def plotHisto(data, plot_dir, info):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--plot_dir", "-p", default="plots", help="directory containing plots")
-    parser.add_argument("--data_dir", "-d", default="data",  help="directory containing data")
+    parser.add_argument("--data_dir", "-d", default="data",  help="directory containing data tables")
+    parser.add_argument("--plot_dir", "-p", default="plots", help="directory to save plots")
+    
     options = parser.parse_args()
     plot_dir = options.plot_dir
     data_dir = options.data_dir
+    
     if plot_dir[-1] != "/":
         plot_dir += "/"
     if data_dir[-1] != "/":
@@ -161,6 +155,26 @@ if __name__ == "__main__":
     pdInfo["xstat"] = 60000
     pdInfo["ystat"] = 7.5
     
+    pd0Info = {}
+    pd0Info["name"] = "pd0"
+    pd0Info["title"] = "Max Charge for Quartz Fiber Pin-Diode Channel 0"
+    pd0Info["xtitle"] = "Maximum fC"
+    pd0Info["ytitle"] = "Number of Channels"
+    pd0Info["units"] = "fC"
+    pd0Info["nbins"] = 20
+    pd0Info["xstat"] = 15000
+    pd0Info["ystat"] = 5
+    
+    pd1Info = {}
+    pd1Info["name"] = "pd1"
+    pd1Info["title"] = "Max Charge for Quartz Fiber Pin-Diode Channel 1"
+    pd1Info["xtitle"] = "Maximum fC"
+    pd1Info["ytitle"] = "Number of Channels"
+    pd1Info["units"] = "fC"
+    pd1Info["nbins"] = 20
+    pd1Info["xstat"] = 10000
+    pd1Info["ystat"] = 5
+    
     pdQuartzInfo = {}
     pdQuartzInfo["name"] = "pd_quartz"
     pdQuartzInfo["title"] = "Max Charge for Quartz Fiber Pin-Diode Channels 0 and 1"
@@ -168,7 +182,7 @@ if __name__ == "__main__":
     pdQuartzInfo["ytitle"] = "Number of Channels"
     pdQuartzInfo["units"] = "fC"
     pdQuartzInfo["nbins"] = 30
-    pdQuartzInfo["xstat"] = 10000
+    pdQuartzInfo["xstat"] = 15000
     pdQuartzInfo["ystat"] = 5
     
     pdMegatileInfo = {}
@@ -187,6 +201,8 @@ if __name__ == "__main__":
     plotHisto(data, plot_dir, rm3Info)
     plotHisto(data, plot_dir, rm4Info)
     plotHisto(data, plot_dir, pdInfo)
+    plotHisto(data, plot_dir, pd0Info)
+    plotHisto(data, plot_dir, pd1Info)
     plotHisto(data, plot_dir, pdQuartzInfo)
     plotHisto(data, plot_dir, pdMegatileInfo)
 
