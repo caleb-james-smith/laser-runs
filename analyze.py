@@ -182,6 +182,7 @@ def makeTable(runDir, tables, runList):
     if runDir[-1] != "/":
         runDir += "/"
     cuList = []
+    cuBadChannels = {}
     for directory in os.listdir(runDir):
         if "CU" in directory:
             cu = int(directory.split("CU_")[-1])
@@ -192,6 +193,7 @@ def makeTable(runDir, tables, runList):
     col_width = 10
     adcConverter = ADCConverter()
     for table in tables:
+        print "Proccessing {0} table".format(table)
         with open (runDir + table + "_array.h", 'w') as a:
             with open (runDir + table + "_table.txt", 'w') as t:
                 if table == "sipm":
@@ -203,9 +205,11 @@ def makeTable(runDir, tables, runList):
                 header_array = "{" + ",".join(columns) + "}\n"
                 
                 t.write("# " + header_table)
+                #print header_table
                 
                 array_string = ""
-                a.write("#include <vector>\n\n")
+                a.write("#include <vector>\n")
+                a.write("std::cout << \"Beginning to include {0} data\" << std::endl;\n\n".format(table))
                 a.write("// " + header_array)
                 array_string += "std::vector< std::vector<double> > %s_array = {\n" % table
                 
@@ -219,6 +223,7 @@ def makeTable(runDir, tables, runList):
                     print "Processing CU {0}".format(icu) 
                     # get RBX list from file names
                     rbxList = []
+                    bad_channels = 0
                     for data_file in os.listdir(runDir + "CU_" + str(icu)):
                         if "rbx" in data_file and ".root" in data_file:
                             data_file = data_file.split("rbx")[-1]
@@ -240,7 +245,7 @@ def makeTable(runDir, tables, runList):
                                     elif table == "pd": f = "%sCU_%d/rbx%d_shunt%d_pd_%d.root" % (runDir, icu, irbx, ishunt, irun)
                                     if not os.path.isfile(f):
                                         continue # skip files that do not exist
-                                    print "file: %s" % (f)
+                                    #print "file: %s" % (f)
                                     # RBX, CU and shunt are constant for one file
                                     cu = "%d" % icu
                                     run = "%d" % irun
@@ -248,7 +253,7 @@ def makeTable(runDir, tables, runList):
                                     rbx = "%d" % irbx
                                     shunt = "%d" % ishunt
                                     if shunt == "0":    cutoff = 150
-                                    else:               cutoff = 100
+                                    else:               cutoff = 125
                                     # RM, pindiode/sipm_ch, uHTR, uhtr_ch, max_adc will vary within a file 
                                     if table == "sipm": 
                                         chList = mapping.rbxSIPM[rbx_full][iuhtr-1]
@@ -277,19 +282,31 @@ def makeTable(runDir, tables, runList):
                                         if (rm, rm_ch) in mapping.darkSipms:
                                             #print "mask out channel: RM %s SiPM %s" % (rm, rm_ch)
                                             continue    
-                                        if int(max_adc) > cutoff:   result = "1"
-                                        else:                       result = "0"
+                                        if int(max_adc) >= cutoff:
+                                            result = "1"
+                                        else:
+                                            result = "0"
+                                            bad_channels += 1
                                         if table == "sipm":
                                             row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_fc, result]
                                         if table == "pd":
                                             row = [cu, rbx, run, pd_ch, uhtr_ch, shunt, max_adc, max_fc, result]
                                         array_string += "{" + ", ".join(row) + "},\n"
-                                        t.write("".join(entry.ljust(col_width) for entry in row) + "\n") 
+                                        row_string =  "".join(entry.ljust(col_width) for entry in row)
+                                        t.write(row_string + "\n") 
+                                        #if result == "0":
+                                        #    print row_string
+                    # calibration unit lopp
+                    cuBadChannels[icu] = bad_channels
                 # end of array
                 if array_string[-2:] == ",\n":
                     array_string = array_string[:-2] + "\n"
                 array_string += "};\n"
                 a.write(array_string)
+                a.write("std::cout << \"Completed including {0} data\" << std::endl;\n\n".format(table))
+        # table loop
+        for c in sorted(cuBadChannels):
+            print "CU {0} : {1} bad {2} channels".format(c, cuBadChannels[c], table)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
