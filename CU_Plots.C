@@ -19,9 +19,11 @@
 
 //Data.....
 //{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
-#include "pd_array_test.h"
+//#include "pd_array_test.h"
+#include "passed_cu_data/pd_array.h"
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
-#include "sipm_array_test.h"
+//#include "sipm_array_test.h"
+#include "passed_cu_data/sipm_array.h"
 
 TLatex* Entries(double x, double y, TH1* hist){
   char entries [100];
@@ -53,6 +55,30 @@ TLatex* StdDev(double x, double y, TH1* hist){
   latex->SetTextAlign(31);
   return latex;
 }
+TCanvas* Canvas(const char* name,int length,int width){
+  TCanvas* c = new TCanvas(name,name,length,width);  
+  gPad->SetTopMargin(0.1);
+  gPad->SetBottomMargin(0.12);
+  gPad->SetRightMargin(0.05);
+  gPad->SetLeftMargin(0.14);  
+  return c;
+}
+TH1F* Blank(const char* name,double num,double low,double high){
+  TH1F* blank = new TH1F(name,name,num,low,high);
+  //blank->GetXaxis()->SetRange(0,100);
+  blank->SetTitle("");
+  blank->SetName("");
+  blank->SetTitleSize(0.002);
+  blank->SetTitleSize(0.05,"X");
+  blank->SetTitleSize(0.05,"Y");
+  blank->SetTitleOffset(1.0,"X");
+  blank->SetTitleOffset(1.2,"Y");
+  blank->SetLabelSize(0.04,"X");
+  blank->SetLabelSize(0.04,"Y");
+  blank->SetStats(false);
+  blank->SetLineColor(0);  
+  return blank;
+}
 
 void CU_Plots(){
   int NumChanPD = pd_array.size();
@@ -80,7 +106,7 @@ void CU_Plots(){
   TH1F* PD4_dist   = new TH1F("PD4","PD4",62,0,350000/convert);
   TH1F* PD5_dist   = new TH1F("PD5","PD5",62,0,350000/convert);
   TH1F* PD2_3_4_5_dist   = new TH1F("PD 2 3 4 5","PD 2 3 4 5",62,0,350000/convert);
-  std::cout<<"Running over Pid-Diode Channels"<<std::endl;
+  std::cout<<"Running over Pin-Diode Channels"<<std::endl;
   char process[100];
   for(unsigned channel = 0; channel < NumChanPD; ++channel){    
     sprintf(process,"Processing Channel: %i/%i",channel,NumChanPD);
@@ -126,7 +152,7 @@ void CU_Plots(){
     }
     allPD_dist->Fill(pd_array[channel][7]/convert);
   }
-  sprintf(process,"Done with Pid-Diode Channels: %i/%i",NumChanPD,NumChanPD);
+  sprintf(process,"Done with Pin-Diode Channels: %i/%i",NumChanPD,NumChanPD);
   std::cout<<process<<std::endl;
   TGraph* graph_pd0 = new TGraph(NumChanPD,xPD0,yPD0);
   TGraph* graph_pd1 = new TGraph(NumChanPD,xPD1,yPD1);
@@ -226,46 +252,72 @@ void CU_Plots(){
   RM->SetNDC();
   RM->SetTextFont(42);
 
+  TLatex* EntriesAllRM = Entries(0.92,0.85,allRM_dist);
+  TLatex* MeanAllRM    = Mean(0.92, 0.8,allRM_dist);
+  TLatex* StdDevAllRM  = StdDev(0.92, 0.75,allRM_dist); 
+  TLatex* EntriesAllPD = Entries(0.92,0.85,allPD_dist);
+  TLatex* MeanAllPD    = Mean(0.92, 0.8,allPD_dist);
+  TLatex* StdDevAllPD  = StdDev(0.92, 0.75,allPD_dist); 
+  TLatex* EntriesPD0   = Entries(0.92,0.85,PD0_dist);
+  TLatex* MeanPD0      = Mean(0.92, 0.8,PD0_dist);
+  TLatex* StdDevPD0    = StdDev(0.92, 0.75,PD0_dist); 
+  TLatex* EntriesPD1   = Entries(0.92,0.85,PD1_dist);
+  TLatex* MeanPD1      = Mean(0.92, 0.8,PD1_dist);
+  TLatex* StdDevPD1    = StdDev(0.92, 0.75,PD1_dist); 
+  TLatex* EntriesPD2   = Entries(0.92,0.85,PD2_dist);
+  TLatex* MeanPD2      = Mean(0.92, 0.8,PD2_dist);
+  TLatex* StdDevPD2    = StdDev(0.92, 0.75,PD2_dist); 
+  TLatex* EntriesPD3   = Entries(0.92,0.85,PD3_dist);
+  TLatex* MeanPD3      = Mean(0.92, 0.8,PD3_dist);
+  TLatex* StdDevPD3    = StdDev(0.92, 0.75,PD3_dist); 
+  TLatex* EntriesPD4   = Entries(0.92,0.85,PD4_dist);
+  TLatex* MeanPD4      = Mean(0.92, 0.8,PD4_dist);
+  TLatex* StdDevPD4    = StdDev(0.92, 0.75,PD4_dist); 
+  TLatex* EntriesPD5   = Entries(0.92,0.85,PD5_dist);
+  TLatex* MeanPD5      = Mean(0.92, 0.8,PD5_dist);
+  TLatex* StdDevPD5    = StdDev(0.92, 0.75,PD5_dist); 
+  TLatex* EntriesPD2_3_4_5   = Entries(0.92,0.85,PD2_3_4_5_dist);
+  TLatex* MeanPD2_3_4_5      = Mean(0.92, 0.8,PD2_3_4_5_dist);
+  TLatex* StdDevPD2_3_4_5    = StdDev(0.92, 0.75,PD2_3_4_5_dist); 
+  TLatex* EntriesRM1   = Entries(0.92,0.85,RM1_dist);
+  TLatex* MeanRM1      = Mean(0.92, 0.8,RM1_dist);
+  TLatex* StdDevRM1    = StdDev(0.92, 0.75,RM1_dist); 
+  TLatex* EntriesRM2   = Entries(0.92,0.85,RM2_dist);
+  TLatex* MeanRM2      = Mean(0.92, 0.8,RM2_dist);
+  TLatex* StdDevRM2    = StdDev(0.92, 0.75,RM2_dist); 
+  TLatex* EntriesRM3   = Entries(0.92,0.85,RM3_dist);
+  TLatex* MeanRM3      = Mean(0.92, 0.8,RM3_dist);
+  TLatex* StdDevRM3    = StdDev(0.92, 0.75,RM3_dist); 
+  TLatex* EntriesRM4   = Entries(0.92,0.85,RM4_dist);
+  TLatex* MeanRM4      = Mean(0.92, 0.8,RM4_dist);
+  TLatex* StdDevRM4    = StdDev(0.92, 0.75,RM4_dist); 
+
   //----------------------------------------------------------------------
   //Plotting
   //----------------------------------------------------------------------
   std::cout<<"Plotting"<<std::endl;
-  TCanvas *c0 = new TCanvas("MaxpCvsCU","",800,800);  
   TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
+  TCanvas *c0 = Canvas("MaxpCvsCU",800,800);  
   catLeg0->SetBorderSize(0);
   catLeg0->SetFillStyle(0);
   catLeg0->SetTextSize(0.04);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h0blank = new TH1F("Blank0","",250,0,70);
+  TH1F* h0blank = Blank("Blank0",250,0,70);
   h0blank->SetMinimum(0);
   h0blank->SetMaximum(120000/convert);
-  //h0blank->GetXaxis()->SetRange(0,100);
   h0blank->GetXaxis()->SetTitle("CU");
   h0blank->GetYaxis()->SetTitle("Max Charge [pC]");
-  h0blank->SetTitle("");
-  h0blank->SetName("");
-  h0blank->SetTitleSize(0.002);
-  h0blank->SetTitleSize(0.05,"X");
-  h0blank->SetTitleSize(0.05,"Y");
-  h0blank->SetTitleOffset(1.0,"X");
-  h0blank->SetTitleOffset(1.2,"Y");
-  h0blank->SetLabelSize(0.04,"X");
-  h0blank->SetLabelSize(0.04,"Y");
-  h0blank->SetStats(false);
-  h0blank->SetLineColor(0);
-  h0blank->Draw("hist");
-  
+  h0blank->Draw("hist");  
   graph_pd0->Draw("P same");
   graph_pd1->Draw("P same");
   graph_pd2->Draw("P same");
   graph_pd3->Draw("P same");
   graph_pd4->Draw("P same");
   graph_pd5->Draw("P same");
+  catLeg0->Draw();  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  catLeg0->Draw();  
   catLeg0->AddEntry(graph_pd0,"Pin-Diode 0","P");
   catLeg0->AddEntry(graph_pd1,"Pin-Diode 1","P");
   catLeg0->AddEntry(graph_pd2,"Pin-Diode 2","P");
@@ -273,173 +325,80 @@ void CU_Plots(){
   catLeg0->AddEntry(graph_pd4,"Pin-Diode 4","P");
   catLeg0->AddEntry(graph_pd5,"Pin-Diode 5","P");
 
-  catLeg0->Draw();  
-  CMSPrelim1->Draw();
-  burnIn->Draw();
-  PinDiode->Draw();
-
-  TCanvas *c1 = new TCanvas("1D PD","",800,800);
-  //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
-  //catLeg1->SetBorderSize(0);
-  //catLeg1->SetFillStyle(0);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h1blank = new TH1F("Blank1","",62,0,350000/convert);
+  TCanvas *c1 = Canvas("1D PD",800,800);
+  TH1F* h1blank = Blank("Blank1",62,0,350000/convert);
   h1blank->SetMinimum(0);
   h1blank->SetMaximum(50);
-  //h1blank->GetXaxis()->SetRange(0,100);
   h1blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h1blank->GetYaxis()->SetTitle("Channels");
-  h1blank->SetTitle("");
-  h1blank->SetName("");
-  h1blank->SetTitleSize(0.002);
-  h1blank->SetTitleSize(0.05,"X");
-  h1blank->SetTitleSize(0.05,"Y");
-  h1blank->SetTitleOffset(1.0,"X");
-  h1blank->SetTitleOffset(1.2,"Y");
-  h1blank->SetLabelSize(0.04,"X");
-  h1blank->SetLabelSize(0.04,"Y");
-  h1blank->SetStats(false);
-  h1blank->SetLineColor(1);
-  h1blank->Draw("hist");
-
-  TLatex* Entries1 = Entries(0.92,0.85,allPD_dist);
-  TLatex* Mean1    = Mean(0.92, 0.8,allPD_dist);
-  TLatex* StdDev1  = StdDev(0.92, 0.75,allPD_dist); 
-  
+  h1blank->Draw("hist");  
   allPD_dist->Draw("same");
   CMSPrelim1->Draw();
   burnIn->Draw();
-  Entries1->Draw();
-  Mean1->Draw();
-  StdDev1->Draw();
   PinDiode->Draw();
+  EntriesAllPD->Draw();
+  MeanAllPD->Draw();
+  StdDevAllPD->Draw();
   
-  TCanvas *c2 = new TCanvas("CUvsRM","",800,800);  
+  TCanvas *c2 = Canvas("CUvsRM",800,800);  
   TLegend* catLeg2 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg2->SetBorderSize(0);
   catLeg2->SetFillStyle(0);
   catLeg2->SetTextSize(0.04);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h2blank = new TH1F("Blank2","",250,0,70);
+  TH1F* h2blank = Blank("Blank2",250,0,70);
   h2blank->SetMinimum(0);
   h2blank->SetMaximum(350000/convert);
-  //h2blank->GetXaxis()->SetRange(0,100);
   h2blank->GetXaxis()->SetTitle("CU");
   h2blank->GetYaxis()->SetTitle("Max Charge [pC]");
-  h2blank->SetTitle("");
-  h2blank->SetName("");
-  h2blank->SetTitleSize(0.002);
-  h2blank->SetTitleSize(0.05,"X");
-  h2blank->SetTitleSize(0.05,"Y");
-  h2blank->SetTitleOffset(1.0,"X");
-  h2blank->SetTitleOffset(1.2,"Y");
-  h2blank->SetLabelSize(0.04,"X");
-  h2blank->SetLabelSize(0.04,"Y");
-  h2blank->SetStats(false);
-  h2blank->SetLineColor(1);
   h2blank->Draw("hist");
-  
   graph_rm1->Draw("P same");
   graph_rm2->Draw("P same");
   graph_rm3->Draw("P same");
   graph_rm4->Draw("P same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
+  catLeg2->Draw();  
   catLeg2->AddEntry(graph_rm1,"RM 1","P");
   catLeg2->AddEntry(graph_rm2,"RM 2","P");
   catLeg2->AddEntry(graph_rm3,"RM 3","P");
   catLeg2->AddEntry(graph_rm4,"RM 4","P");
 
-  catLeg2->Draw();  
-  CMSPrelim1->Draw();
-  burnIn->Draw();
-  RM->Draw();
-
-  TCanvas *c3 = new TCanvas("1D RM","",800,800);  
-  //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
-  //catLeg1->SetBorderSize(0);
-  //catLeg1->SetFillStyle(0);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h3blank = new TH1F("Blank3","",62,0,350000/convert);
+  TCanvas *c3 = Canvas("1D RM",800,800);  
+  TH1F* h3blank = Blank("Blank3",62,0,350000/convert);
   h3blank->SetMinimum(0);
   h3blank->SetMaximum(1000);
-  //h3blank->GetXaxis()->SetRange(0,100);
   h3blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h3blank->GetYaxis()->SetTitle("Channels");
-  h3blank->SetTitle("");
-  h3blank->SetName("");
-  h3blank->SetTitleSize(0.002);
-  h3blank->SetTitleSize(0.05,"X");
-  h3blank->SetTitleSize(0.05,"Y");
-  h3blank->SetTitleOffset(1.0,"X");
-  h3blank->SetTitleOffset(1.2,"Y");
-  h3blank->SetLabelSize(0.04,"X");
-  h3blank->SetLabelSize(0.04,"Y");
-  h3blank->SetStats(false);
-  h3blank->SetLineColor(1);
-  h3blank->Draw("hist");
-  
-  TLatex* Entries3 = Entries(0.92,0.85,allRM_dist);
-  TLatex* Mean3    = Mean(0.92, 0.8,allRM_dist);
-  TLatex* StdDev3  = StdDev(0.92, 0.75,allRM_dist); 
-
+  h3blank->Draw("hist");  
   allRM_dist->Draw("same");
   CMSPrelim1->Draw();
   burnIn->Draw();
-  Entries3->Draw();
-  Mean3->Draw();
-  StdDev3->Draw();
   RM->Draw();
+  EntriesAllRM->Draw();
+  MeanAllRM->Draw();
+  StdDevAllRM->Draw();
 
-  TCanvas *c4 = new TCanvas("MaxpCvsCU 0,1, RM1-4","",800,800);  
+  TCanvas *c4 = Canvas("MaxpCvsCU 0,1, RM1-4",800,800);  
   TLegend* catLeg4 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg4->SetBorderSize(0);
   catLeg4->SetFillStyle(0);
   catLeg4->SetTextSize(0.04);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h4blank = new TH1F("Blank4","",250,0,50);
+  TH1F* h4blank = Blank("Blank4",250,0,50);
   h4blank->SetMinimum(0);
   h4blank->SetMaximum(350000/convert);
-  //h4blank->GetXaxis()->SetRange(0,100);
   h4blank->GetXaxis()->SetTitle("CU");
   h4blank->GetYaxis()->SetTitle("Max Charge [pC]");
-  h4blank->SetTitle("");
-  h4blank->SetName("");
-  h4blank->SetTitleSize(0.002);
-  h4blank->SetTitleSize(0.05,"X");
-  h4blank->SetTitleSize(0.05,"Y");
-  h4blank->SetTitleOffset(1.0,"X");
-  h4blank->SetTitleOffset(1.2,"Y");
-  h4blank->SetLabelSize(0.04,"X");
-  h4blank->SetLabelSize(0.04,"Y");
-  h4blank->SetStats(false);
-  h4blank->SetLineColor(0);
-  h4blank->Draw("hist");
-  
+  h4blank->Draw("hist");  
   graph_pd0->Draw("P same");
   graph_pd1->Draw("P same");
   graph_rm1->Draw("P same");
   graph_rm2->Draw("P same");
   graph_rm3->Draw("P same");
   graph_rm4->Draw("P same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  catLeg4->Draw();
   catLeg4->AddEntry(graph_pd0,"Pin-Diode 0","P");
   catLeg4->AddEntry(graph_pd1,"Pin-Diode 1","P");
   catLeg4->AddEntry(graph_rm1,"RM 1","P");
@@ -447,98 +406,205 @@ void CU_Plots(){
   catLeg4->AddEntry(graph_rm3,"RM 3","P");
   catLeg4->AddEntry(graph_rm4,"RM 4","P");
 
-  catLeg4->Draw();  
-  CMSPrelim1->Draw();
-  burnIn->Draw();
-
-  TCanvas *c5 = new TCanvas("Profile: MaxpCvsCU 0,1, RM1-4","",800,800);  
+  TCanvas *c5 = Canvas("Profile: MaxpCvsCU 0,1, RM1-4",800,800);  
   TLegend* catLeg5 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg5->SetBorderSize(0);
   catLeg5->SetFillStyle(0);
   catLeg5->SetTextSize(0.04);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* h5blank = new TH1F("Blank5","",250,0,50);
+  TH1F* h5blank = Blank("Blank5",250,0,50);
   h5blank->SetMinimum(0);
   h5blank->SetMaximum(350000/convert);
-  //h5blank->GetXaxis()->SetRange(0,100);
   h5blank->GetXaxis()->SetTitle("CU");
   h5blank->GetYaxis()->SetTitle("Max Charge [pC]");
-  h5blank->SetTitle("");
-  h5blank->SetName("");
-  h5blank->SetTitleSize(0.002);
-  h5blank->SetTitleSize(0.05,"X");
-  h5blank->SetTitleSize(0.05,"Y");
-  h5blank->SetTitleOffset(1.0,"X");
-  h5blank->SetTitleOffset(1.2,"Y");
-  h5blank->SetLabelSize(0.04,"X");
-  h5blank->SetLabelSize(0.04,"Y");
-  h5blank->SetStats(false);
-  h5blank->SetLineColor(0);
-  h5blank->Draw("hist");
-  
+  h5blank->Draw("hist");  
   profile_pd0->Draw("P same");
   profile_pd1->Draw("P same");
   profile_rm1->Draw("P same");
   profile_rm2->Draw("P same");
   profile_rm3->Draw("P same");
   profile_rm4->Draw("P same");
-  catLeg5->AddEntry(profile_pd0,"Pin-Diode 0","P");
-  catLeg5->AddEntry(profile_pd1,"Pin-Diode 1","P");
-  catLeg5->AddEntry(profile_rm1,"RM 1","P");
-  catLeg5->AddEntry(profile_rm2,"RM 2","P");
-  catLeg5->AddEntry(profile_rm3,"RM 3","P");
-  catLeg5->AddEntry(profile_rm4,"RM 4","P");
-
-  catLeg4->Draw();  
   CMSPrelim1->Draw();
   burnIn->Draw();
+  catLeg5->Draw();
+  catLeg5->AddEntry(profile_pd0,"Pin-Diode 0","L");
+  catLeg5->AddEntry(profile_pd1,"Pin-Diode 1","L");
+  catLeg5->AddEntry(profile_rm1,"RM 1","L");
+  catLeg5->AddEntry(profile_rm2,"RM 2","L");
+  catLeg5->AddEntry(profile_rm3,"RM 3","L");
+  catLeg5->AddEntry(profile_rm4,"RM 4","L");
 
-  TCanvas *d5  = new TCanvas("1D PD0","",800,800);
-  PD0_dist->Draw();  
-  TCanvas *d6  = new TCanvas("1D PD1","",800,800);
-  PD1_dist->Draw();  
-  TCanvas *d7  = new TCanvas("1D PD2","",800,800);
-  PD2_dist->Draw();  
-  TCanvas *d8  = new TCanvas("1D PD3","",800,800);
-  PD3_dist->Draw();  
-  TCanvas *d9  = new TCanvas("1D PD4","",800,800);
-  PD4_dist->Draw();  
-  TCanvas *d10  = new TCanvas("1D PD5","",800,800);
-  PD5_dist->Draw();  
-  TCanvas *d11 = new TCanvas("1D PD2 3 4 5","",800,800);
-  PD2_3_4_5_dist->Draw();
-  TCanvas *d12 = new TCanvas("1D RM1","",800,800);
-  RM1_dist->Draw();
-  TCanvas *d13 = new TCanvas("1D RM2","",800,800);
-  RM2_dist->Draw();
-  TCanvas *d14 = new TCanvas("1D RM3","",800,800);
-  RM3_dist->Draw();
-  TCanvas *d15 = new TCanvas("1D RM4","",800,800);
-  RM4_dist->Draw();
+  TCanvas *c6  = Canvas("1D PD0",800,800);
+  TH1F* h6blank = Blank("Blank6",250,0,350000/convert);
+  h6blank->SetMinimum(0);
+  h6blank->SetMaximum(50);
+  h6blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h6blank->GetYaxis()->SetTitle("Channels");
+  h6blank->Draw();
+  PD0_dist->Draw("same");  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD0->Draw();
+  MeanPD0->Draw();
+  StdDevPD0->Draw();
+  TCanvas *c7  = Canvas("1D PD1",800,800);
+  TH1F* h7blank = Blank("Blank7",250,0,350000/convert);
+  h7blank->SetMinimum(0);
+  h7blank->SetMaximum(50);
+  h7blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h7blank->GetYaxis()->SetTitle("Channels");
+  h7blank->Draw();
+  PD1_dist->Draw("same");  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD1->Draw();
+  MeanPD1->Draw();
+  StdDevPD1->Draw();
+  TCanvas *c8  = Canvas("1D PD2",800,800);
+  TH1F* h8blank = Blank("Blank8",250,0,350000/convert);
+  h8blank->SetMinimum(0);
+  h8blank->SetMaximum(50);
+  h8blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h8blank->GetYaxis()->SetTitle("Channels");
+  h8blank->Draw();
+  PD2_dist->Draw("same");  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD2->Draw();
+  MeanPD2->Draw();
+  StdDevPD2->Draw();
+  TCanvas *c9  = Canvas("1D PD3",800,800);
+  TH1F* h9blank = Blank("Blank9",250,0,350000/convert);
+  h9blank->SetMinimum(0);
+  h9blank->SetMaximum(50);
+  h9blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h9blank->GetYaxis()->SetTitle("Channels");
+  h9blank->Draw();
+  PD3_dist->Draw("same");  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD3->Draw();
+  MeanPD3->Draw();
+  StdDevPD3->Draw();
+  TCanvas *c10  = Canvas("1D PD4",800,800);
+  TH1F* h10blank = Blank("Blank10",250,0,350000/convert);
+  h10blank->SetMinimum(0);
+  h10blank->SetMaximum(50);
+  h10blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h10blank->GetYaxis()->SetTitle("Channels");
+  h10blank->Draw();
+  PD4_dist->Draw("same");  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD4->Draw();
+  MeanPD4->Draw();
+  StdDevPD4->Draw();
+  TCanvas *c11  = Canvas("1D PD5",800,800);
+  TH1F* h11blank = Blank("Blank11",250,0,350000/convert);
+  h11blank->SetMinimum(0);
+  h11blank->SetMaximum(50);
+  h11blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h11blank->GetYaxis()->SetTitle("Channels");
+  h11blank->Draw();
+  PD5_dist->Draw("same");  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD5->Draw();
+  MeanPD5->Draw();
+  StdDevPD5->Draw();
+  TCanvas *c12 = Canvas("1D PD2 3 4 5",800,800);
+  TH1F* h12blank = Blank("Blank12",250,0,350000/convert);
+  h12blank->SetMinimum(0);
+  h12blank->SetMaximum(50);
+  h12blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h12blank->GetYaxis()->SetTitle("Channels");
+  h12blank->Draw();
+  PD2_3_4_5_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  PinDiode->Draw();
+  EntriesPD2_3_4_5->Draw();
+  MeanPD2_3_4_5->Draw();
+  StdDevPD2_3_4_5->Draw();
+  TCanvas *c13 = Canvas("1D RM1",800,800);
+  TH1F* h13blank = Blank("Blank13",250,0,350000/convert);
+  h13blank->SetMinimum(0);
+  h13blank->SetMaximum(50);
+  h13blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h13blank->GetYaxis()->SetTitle("Channels");
+  h13blank->Draw();
+  RM1_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
+  EntriesRM1->Draw();
+  MeanRM1->Draw();
+  StdDevRM1->Draw();
+  TCanvas *c14 = Canvas("1D RM2",800,800);
+  TH1F* h14blank = Blank("Blank14",250,0,350000/convert);
+  h14blank->SetMinimum(0);
+  h14blank->SetMaximum(50);
+  h14blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h14blank->GetYaxis()->SetTitle("Channels");
+  h14blank->Draw();
+  RM2_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
+  EntriesRM2->Draw();
+  MeanRM2->Draw();
+  StdDevRM2->Draw();
+  TCanvas *c15 = Canvas("1D RM3",800,800);
+  TH1F* h15blank = Blank("Blank15",250,0,350000/convert);
+  h15blank->SetMinimum(0);
+  h15blank->SetMaximum(50);
+  h15blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h15blank->GetYaxis()->SetTitle("Channels");
+  h15blank->Draw();
+  RM3_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
+  EntriesRM3->Draw();
+  MeanRM3->Draw();
+  StdDevRM3->Draw();
+  TCanvas *c16 = Canvas("1D RM4",800,800);
+  TH1F* h16blank = Blank("Blank16",250,0,350000/convert);
+  h16blank->SetMinimum(0);
+  h16blank->SetMaximum(50);
+  h16blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h16blank->GetYaxis()->SetTitle("Channels");
+  h16blank->Draw();
+  RM4_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
+  EntriesRM4->Draw();
+  MeanRM4->Draw();
+  StdDevRM4->Draw();
 
   c0->SaveAs("PDAllvsCU2D.pdf");
   c1->SaveAs("PDAll_1D.pdf");
   c2->SaveAs("RMAllvsCU2D.pdf");
   c3->SaveAs("RMAll_1D.pdf");
   c4->SaveAs("RM_PDvsCU2D.pdf");
-  c5->SaveAs("profile_RM_PDvsCU2D.pdf");
-  
-  d5->SaveAs("PD0_1D.pdf");
-  d6->SaveAs("PD1_1D.pdf");
-  d7->SaveAs("PD2_1D.pdf");
-  d8->SaveAs("PD3_1D.pdf");
-  d9->SaveAs("PD4_1D.pdf");
-  d10->SaveAs("PD5_1D.pdf");
-  d11->SaveAs("PD2_3_4_5_1D.pdf");
-  d12->SaveAs("RM1_1D.pdf");
-  d13->SaveAs("RM2_1D.pdf");
-  d14->SaveAs("RM3_1D.pdf");
-  d15->SaveAs("RM4_1D.pdf");
+  c5->SaveAs("profile_RM_PDvsCU2D.pdf");  
+  c6->SaveAs("PD0_1D.pdf");
+  c7->SaveAs("PD1_1D.pdf");
+  c8->SaveAs("PD2_1D.pdf");
+  c9->SaveAs("PD3_1D.pdf");
+  c10->SaveAs("PD4_1D.pdf");
+  c11->SaveAs("PD5_1D.pdf");
+  c12->SaveAs("PD2_3_4_5_1D.pdf");
+  c13->SaveAs("RM1_1D.pdf");
+  c14->SaveAs("RM2_1D.pdf");
+  c15->SaveAs("RM3_1D.pdf");
+  c16->SaveAs("RM4_1D.pdf");
 } 
 
 int main(){
