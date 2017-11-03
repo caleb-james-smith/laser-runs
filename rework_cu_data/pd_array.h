@@ -1,5 +1,4 @@
 #include <vector>
-std::cout << "Beginning to include pd data" << std::endl;
 
 // {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 std::vector< std::vector<double> > pd_array = {
@@ -74,5 +73,3 @@ std::vector< std::vector<double> > pd_array = {
 {44, 0, 6, 4, 4, 31, 214, 84933.60, 1},
 {44, 0, 7, 5, 5, 31, 213, 81759.20, 1}
 };
-std::cout << "Completed including pd data" << std::endl;
-

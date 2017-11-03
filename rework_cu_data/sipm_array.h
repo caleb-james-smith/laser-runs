@@ -1,5 +1,4 @@
 #include <vector>
-std::cout << "Beginning to include sipm data" << std::endl;
 
 // {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 std::vector< std::vector<double> > sipm_array = {
@@ -2448,5 +2447,3 @@ std::vector< std::vector<double> > sipm_array = {
 {30, 0, 3, 4, 46, 130, 31, 230, 143872.00, 1},
 {30, 0, 3, 4, 47, 131, 31, 232, 156569.60, 1}
 };
-std::cout << "Completed including sipm data" << std::endl;
-

@@ -208,8 +208,7 @@ def makeTable(runDir, tables, runList):
                 #print header_table
                 
                 array_string = ""
-                a.write("#include <vector>\n")
-                a.write("std::cout << \"Beginning to include {0} data\" << std::endl;\n\n".format(table))
+                a.write("#include <vector>\n\n")
                 a.write("// " + header_array)
                 array_string += "std::vector< std::vector<double> > %s_array = {\n" % table
                 
@@ -303,7 +302,6 @@ def makeTable(runDir, tables, runList):
                     array_string = array_string[:-2] + "\n"
                 array_string += "};\n"
                 a.write(array_string)
-                a.write("std::cout << \"Completed including {0} data\" << std::endl;\n\n".format(table))
         # table loop
         for c in sorted(cuBadChannels):
             print "CU {0} : {1} bad {2} channels".format(c, cuBadChannels[c], table)
