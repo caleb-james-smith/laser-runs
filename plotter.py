@@ -41,6 +41,10 @@ def getData(data_dir):
                 if line[0] == "#":
                     continue
                 s = line.split()
+                if int(s[-1]) == 0:
+                    # skip data that does not pass
+                    print line
+                    continue
                 d = float(s[fc_position])
                 element_value = int(s[element_position])
                 element_name = "%s%d" % (element, element_value)
