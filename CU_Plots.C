@@ -53,7 +53,7 @@ TGraph* makePDTGraph(int pd,std::vector<std::vector<double>>& datain){
 TProfile* makePDTProfile(int pd,std::vector<std::vector<double>>& datain,const char* name){
   TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
   for(unsigned channel = 0; channel < NumChanPD; ++channel){
-    if(datain[channel][3] == pd){
+    if(datain[channel][3] == pd && datain[channel][8] == 1){
       gtemp->Fill(datain[channel][0],datain[channel][7]);
       //std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
     }
@@ -92,7 +92,7 @@ TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
 TProfile* makeRMTProfile(double rm,std::vector<std::vector<double>>& datain,const char*  name){
   TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
   for(unsigned channel = 0; channel < NumChanRM; ++channel){
-    if(datain[channel][3] == rm){
+    if(datain[channel][3] == rm && datain[channel][9] == 1){
       gtemp->Fill(datain[channel][0],datain[channel][8]);
       //std::cout<<"RM:  "<<rm<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
     }
@@ -137,18 +137,18 @@ void CU_Plots(){
   hblank->SetLineColor(0);
   hblank->Draw("hist");
   
-  //TGraph* graph_pd0 = makePDTGraph(0,pd_array);
-  //TGraph* graph_pd1 = makePDTGraph(1,pd_array);
-  //TGraph* graph_pd2 = makePDTGraph(2,pd_array);
-  //TGraph* graph_pd3 = makePDTGraph(3,pd_array);
-  //TGraph* graph_pd4 = makePDTGraph(4,pd_array);
-  //TGraph* graph_pd5 = makePDTGraph(5,pd_array);
-  TProfile* graph_pd0 = makePDTProfile(0,pd_array,"pd0");
-  TProfile* graph_pd1 = makePDTProfile(1,pd_array,"pd1");
-  TProfile* graph_pd2 = makePDTProfile(2,pd_array,"pd2");
-  TProfile* graph_pd3 = makePDTProfile(3,pd_array,"pd3");
-  TProfile* graph_pd4 = makePDTProfile(4,pd_array,"pd4");
-  TProfile* graph_pd5 = makePDTProfile(5,pd_array,"pd5");
+  TGraph* graph_pd0 = makePDTGraph(0,pd_array);
+  TGraph* graph_pd1 = makePDTGraph(1,pd_array);
+  TGraph* graph_pd2 = makePDTGraph(2,pd_array);
+  TGraph* graph_pd3 = makePDTGraph(3,pd_array);
+  TGraph* graph_pd4 = makePDTGraph(4,pd_array);
+  TGraph* graph_pd5 = makePDTGraph(5,pd_array);
+  //TProfile* graph_pd0 = makePDTProfile(0,pd_array,"pd0");
+  //TProfile* graph_pd1 = makePDTProfile(1,pd_array,"pd1");
+  //TProfile* graph_pd2 = makePDTProfile(2,pd_array,"pd2");
+  //TProfile* graph_pd3 = makePDTProfile(3,pd_array,"pd3");
+  //TProfile* graph_pd4 = makePDTProfile(4,pd_array,"pd4");
+  //TProfile* graph_pd5 = makePDTProfile(5,pd_array,"pd5");
   graph_pd0->Draw("P same");
   graph_pd1->Draw("P same");
   graph_pd2->Draw("P same");
@@ -239,7 +239,9 @@ void CU_Plots(){
   hmip->Draw("hist");
   
   for(unsigned channel = 0; channel < NumChanPD; ++channel){
-    hmip->Fill(pd_array[channel][7]);
+    if(pd_array[channel][8]==1){
+      hmip->Fill(pd_array[channel][7]);
+    }
   }
   
   char entries [100];
@@ -305,14 +307,14 @@ void CU_Plots(){
   h2blank->SetLineColor(1);
   h2blank->Draw("hist");
   
-  //TGraph* graph_rm1 = makeRMTGraph(1,sipm_array);
-  //TGraph* graph_rm2 = makeRMTGraph(2,sipm_array);
-  //TGraph* graph_rm3 = makeRMTGraph(3,sipm_array);
-  //TGraph* graph_rm4 = makeRMTGraph(4,sipm_array);
-  TProfile* graph_rm1 = makeRMTProfile(1,sipm_array,"rm1");
-  TProfile* graph_rm2 = makeRMTProfile(2,sipm_array,"rm2");
-  TProfile* graph_rm3 = makeRMTProfile(3,sipm_array,"rm3");
-  TProfile* graph_rm4 = makeRMTProfile(4,sipm_array,"rm4");
+  TGraph* graph_rm1 = makeRMTGraph(1,sipm_array);
+  TGraph* graph_rm2 = makeRMTGraph(2,sipm_array);
+  TGraph* graph_rm3 = makeRMTGraph(3,sipm_array);
+  TGraph* graph_rm4 = makeRMTGraph(4,sipm_array);
+  //TProfile* graph_rm1 = makeRMTProfile(1,sipm_array,"rm1");
+  //TProfile* graph_rm2 = makeRMTProfile(2,sipm_array,"rm2");
+  //TProfile* graph_rm3 = makeRMTProfile(3,sipm_array,"rm3");
+  //TProfile* graph_rm4 = makeRMTProfile(4,sipm_array,"rm4");
   graph_rm1->Draw("P same");
   graph_rm2->Draw("P same");
   graph_rm3->Draw("P same");
@@ -382,7 +384,9 @@ void CU_Plots(){
   h3->Draw("hist");
   
   for(unsigned channel = 0; channel < NumChanRM; ++channel){
-    h3->Fill(sipm_array[channel][8]);
+    if(sipm_array[channel][9]==1){
+      h3->Fill(sipm_array[channel][8]);
+    }
   }
   
   char entries3 [100];
