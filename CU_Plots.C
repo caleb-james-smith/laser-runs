@@ -23,9 +23,41 @@
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 #include "sipm_array_test.h"
 
+TLatex* Entries(double x, double y, TH1* hist){
+  char entries [100];
+  int ent = hist->GetEntries();
+  sprintf (entries,"Entries: %d", ent);
+  TLatex* latex = new TLatex(x, y, entries);
+  latex->SetNDC();
+  latex->SetTextFont(42);
+  latex->SetTextAlign(31);
+  return latex;
+}
+TLatex* Mean(double x, double y, TH1* hist){
+  char mean [100];
+  double me = hist->GetMean();
+  sprintf (mean,"Mean: %0.2lf", me);
+  TLatex* latex = new TLatex(x, y, mean);
+  latex->SetNDC();
+  latex->SetTextFont(42);
+  latex->SetTextAlign(31);
+  return latex;
+}
+TLatex* StdDev(double x, double y, TH1* hist){
+  char stddev [100];
+  double std = hist->GetStdDev(); 
+  sprintf (stddev,"StdDev: %0.2lf", std);
+  TLatex* latex = new TLatex(x, y, stddev);
+  latex->SetNDC();
+  latex->SetTextFont(42);
+  latex->SetTextAlign(31);
+  return latex;
+}
+
 void CU_Plots(){
   int NumChanPD = pd_array.size();
   int NumChanRM = sipm_array.size();
+  double convert = 1000;
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
   std::cout<<"Number of RM Channels:          "<<NumChanRM<<std::endl;
 
@@ -34,65 +66,65 @@ void CU_Plots(){
   //----------------------------------------------------------------------
   Double_t xPD0[NumChanPD],xPD1[NumChanPD],xPD2[NumChanPD],xPD3[NumChanPD],xPD4[NumChanPD],xPD5[NumChanPD];
   Double_t yPD0[NumChanPD],yPD1[NumChanPD],yPD2[NumChanPD],yPD3[NumChanPD],yPD4[NumChanPD],yPD5[NumChanPD];
-  TProfile* profile_pd0 = new TProfile("pd0","pd0",44,-0.5,43.5,0,350000);
-  TProfile* profile_pd1 = new TProfile("pd1","pd1",44,-0.5,43.5,0,350000);
-  TProfile* profile_pd2 = new TProfile("pd2","pd2",44,-0.5,43.5,0,350000);
-  TProfile* profile_pd3 = new TProfile("pd3","pd3",44,-0.5,43.5,0,350000);
-  TProfile* profile_pd4 = new TProfile("pd4","pd4",44,-0.5,43.5,0,350000);
-  TProfile* profile_pd5 = new TProfile("pd5","pd5",44,-0.5,43.5,0,350000);
-  TH1F* allPD_dist = new TH1F("allPD","allPD",62,0,350000);
-  TH1F* PD0_dist   = new TH1F("PD0","PD0",62,0,350000);
-  TH1F* PD1_dist   = new TH1F("PD1","PD1",62,0,350000);
-  TH1F* PD2_dist   = new TH1F("PD2","PD2",62,0,350000);
-  TH1F* PD3_dist   = new TH1F("PD3","PD3",62,0,350000);
-  TH1F* PD4_dist   = new TH1F("PD4","PD4",62,0,350000);
-  TH1F* PD5_dist   = new TH1F("PD5","PD5",62,0,350000);
-  TH1F* PD2_3_4_5_dist   = new TH1F("PD 2 3 4 5","PD 2 3 4 5",62,0,350000);
+  TProfile* profile_pd0 = new TProfile("pd0","pd0",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_pd1 = new TProfile("pd1","pd1",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_pd2 = new TProfile("pd2","pd2",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_pd3 = new TProfile("pd3","pd3",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_pd4 = new TProfile("pd4","pd4",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_pd5 = new TProfile("pd5","pd5",44,-0.5,43.5,0,350000/convert);
+  TH1F* allPD_dist = new TH1F("allPD","allPD",62,0,350000/convert);
+  TH1F* PD0_dist   = new TH1F("PD0","PD0",62,0,350000/convert);
+  TH1F* PD1_dist   = new TH1F("PD1","PD1",62,0,350000/convert);
+  TH1F* PD2_dist   = new TH1F("PD2","PD2",62,0,350000/convert);
+  TH1F* PD3_dist   = new TH1F("PD3","PD3",62,0,350000/convert);
+  TH1F* PD4_dist   = new TH1F("PD4","PD4",62,0,350000/convert);
+  TH1F* PD5_dist   = new TH1F("PD5","PD5",62,0,350000/convert);
+  TH1F* PD2_3_4_5_dist   = new TH1F("PD 2 3 4 5","PD 2 3 4 5",62,0,350000/convert);
   std::cout<<"Running over Pid-Diode Channels"<<std::endl;
   char process[100];
   for(unsigned channel = 0; channel < NumChanPD; ++channel){    
     sprintf(process,"Processing Channel: %i/%i",channel,NumChanPD);
     if(channel%10==0){std::cout<<process<<std::endl;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 0){
-      xPD0[channel] = pd_array[channel][0]; yPD0[channel] = pd_array[channel][7];
-      profile_pd0->Fill(pd_array[channel][0],pd_array[channel][7]);
-      PD0_dist->Fill(pd_array[channel][7]);
+      xPD0[channel] = pd_array[channel][0]; yPD0[channel] = pd_array[channel][7]/convert;
+      profile_pd0->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
+      PD0_dist->Fill(pd_array[channel][7]/convert);
     }
     else{xPD0[channel] = -100;yPD0[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 1){
-      xPD1[channel] = pd_array[channel][0]; yPD1[channel] = pd_array[channel][7];
-      profile_pd1->Fill(pd_array[channel][0],pd_array[channel][7]);
-      PD1_dist->Fill(pd_array[channel][7]);
+      xPD1[channel] = pd_array[channel][0]; yPD1[channel] = pd_array[channel][7]/convert;
+      profile_pd1->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
+      PD1_dist->Fill(pd_array[channel][7]/convert);
     }
     else{xPD1[channel] = -100;yPD1[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 2){
-      xPD2[channel] = pd_array[channel][0]; yPD2[channel] = pd_array[channel][7];
-      profile_pd2->Fill(pd_array[channel][0],pd_array[channel][7]);
-      PD2_dist->Fill(pd_array[channel][7]);
+      xPD2[channel] = pd_array[channel][0]; yPD2[channel] = pd_array[channel][7]/convert;
+      profile_pd2->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
+      PD2_dist->Fill(pd_array[channel][7]/convert);
     }
     else{xPD2[channel] = -100;yPD2[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 3){
-      xPD3[channel] = pd_array[channel][0]; yPD3[channel] = pd_array[channel][7];
-      profile_pd3->Fill(pd_array[channel][0],pd_array[channel][7]);
-      PD3_dist->Fill(pd_array[channel][7]);
+      xPD3[channel] = pd_array[channel][0]; yPD3[channel] = pd_array[channel][7]/convert;
+      profile_pd3->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
+      PD3_dist->Fill(pd_array[channel][7]/convert);
     }
     else{xPD3[channel] = -100;yPD3[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 4){
-      xPD4[channel] = pd_array[channel][0]; yPD4[channel] = pd_array[channel][7];
-      profile_pd4->Fill(pd_array[channel][0],pd_array[channel][7]);
-      PD4_dist->Fill(pd_array[channel][7]);
+      xPD4[channel] = pd_array[channel][0]; yPD4[channel] = pd_array[channel][7]/convert;
+      profile_pd4->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
+      PD4_dist->Fill(pd_array[channel][7]/convert);
     }
     else{xPD4[channel] = -100;yPD4[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 5){
-      xPD5[channel] = pd_array[channel][0]; yPD5[channel] = pd_array[channel][7];
-      profile_pd5->Fill(pd_array[channel][0],pd_array[channel][7]);
-      PD5_dist->Fill(pd_array[channel][7]);
+      xPD5[channel] = pd_array[channel][0]; yPD5[channel] = pd_array[channel][7]/convert;
+      profile_pd5->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
+      PD5_dist->Fill(pd_array[channel][7]/convert);
     }
     else{xPD5[channel] = -100;yPD5[channel] = -100;}
     if(pd_array[channel][8] == 1 && (pd_array[channel][3] == 2 || pd_array[channel][3] == 3 || pd_array[channel][3] == 4 || pd_array[channel][3] == 5 )){
-      PD2_3_4_5_dist->Fill(pd_array[channel][7]);
+      PD2_3_4_5_dist->Fill(pd_array[channel][7]/convert);
     }
-    allPD_dist->Fill(pd_array[channel][7]);
+    allPD_dist->Fill(pd_array[channel][7]/convert);
   }
   sprintf(process,"Done with Pid-Diode Channels: %i/%i",NumChanPD,NumChanPD);
   std::cout<<process<<std::endl;
@@ -120,44 +152,44 @@ void CU_Plots(){
   //----------------------------------------------------------------------
   Double_t xRM1[NumChanRM],xRM2[NumChanRM],xRM3[NumChanRM],xRM4[NumChanRM];
   Double_t yRM1[NumChanRM],yRM2[NumChanRM],yRM3[NumChanRM],yRM4[NumChanRM];
-  TProfile* profile_rm1 = new TProfile("RM1","RM1",44,-0.5,43.5,0,350000);
-  TProfile* profile_rm2 = new TProfile("RM2","RM2",44,-0.5,43.5,0,350000);
-  TProfile* profile_rm3 = new TProfile("RM3","RM3",44,-0.5,43.5,0,350000);
-  TProfile* profile_rm4 = new TProfile("RM4","RM4",44,-0.5,43.5,0,350000);  
-  TH1F* allRM_dist = new TH1F("allRM","allRM",62,0,350000);
-  TH1F* RM1_dist   = new TH1F("RM1 Dist","RM1 Dist",62,0,350000);
-  TH1F* RM2_dist   = new TH1F("RM2 Dist","RM2 Dist",62,0,350000);
-  TH1F* RM3_dist   = new TH1F("RM3 Dist","RM3 Dist",62,0,350000);
-  TH1F* RM4_dist   = new TH1F("RM4 Dist","RM4 Dist",62,0,350000);
+  TProfile* profile_rm1 = new TProfile("RM1","RM1",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_rm2 = new TProfile("RM2","RM2",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_rm3 = new TProfile("RM3","RM3",44,-0.5,43.5,0,350000/convert);
+  TProfile* profile_rm4 = new TProfile("RM4","RM4",44,-0.5,43.5,0,350000/convert);  
+  TH1F* allRM_dist = new TH1F("allRM","allRM",62,0,350000/convert);
+  TH1F* RM1_dist   = new TH1F("RM1 Dist","RM1 Dist",62,0,350000/convert);
+  TH1F* RM2_dist   = new TH1F("RM2 Dist","RM2 Dist",62,0,350000/convert);
+  TH1F* RM3_dist   = new TH1F("RM3 Dist","RM3 Dist",62,0,350000/convert);
+  TH1F* RM4_dist   = new TH1F("RM4 Dist","RM4 Dist",62,0,350000/convert);
   std::cout<<"Running over RM Channels"<<std::endl;
   for(unsigned channel = 0; channel < NumChanRM; ++channel){
     sprintf(process,"Processing Channel: %i/%i",channel,NumChanRM);
     if(channel%100==0){std::cout<<process<<std::endl;}
     if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 1){
-      xRM1[channel] = sipm_array[channel][0]; yRM1[channel] = sipm_array[channel][8];	
-      profile_rm1->Fill(sipm_array[channel][0],sipm_array[channel][8]);
-      RM1_dist->Fill(sipm_array[channel][8]);
+      xRM1[channel] = sipm_array[channel][0]; yRM1[channel] = sipm_array[channel][8]/convert;
+      profile_rm1->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
+      RM1_dist->Fill(sipm_array[channel][8]/convert);
     }
     else{xRM1[channel] = -100;yRM1[channel] = -100;}
     if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 2){
-      xRM2[channel] = sipm_array[channel][0]; yRM2[channel] = sipm_array[channel][8];	
-      profile_rm2->Fill(sipm_array[channel][0],sipm_array[channel][8]);
-      RM2_dist->Fill(sipm_array[channel][8]);
+      xRM2[channel] = sipm_array[channel][0]; yRM2[channel] = sipm_array[channel][8]/convert;
+      profile_rm2->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
+      RM2_dist->Fill(sipm_array[channel][8]/convert);
     }
     else{xRM2[channel] = -100;yRM2[channel] = -100;}
     if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 3){
-      xRM3[channel] = sipm_array[channel][0]; yRM3[channel] = sipm_array[channel][8];	
-      profile_rm3->Fill(sipm_array[channel][0],sipm_array[channel][8]);
-      RM3_dist->Fill(sipm_array[channel][8]);
+      xRM3[channel] = sipm_array[channel][0]; yRM3[channel] = sipm_array[channel][8]/convert;
+      profile_rm3->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
+      RM3_dist->Fill(sipm_array[channel][8]/convert);
     }
     else{xRM3[channel] = -100;yRM3[channel] = -100;}
     if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 4){
-      xRM4[channel] = sipm_array[channel][0]; yRM4[channel] = sipm_array[channel][8];	
-      profile_rm4->Fill(sipm_array[channel][0],sipm_array[channel][8]);
-      RM4_dist->Fill(sipm_array[channel][8]);
+      xRM4[channel] = sipm_array[channel][0]; yRM4[channel] = sipm_array[channel][8]/convert;
+      profile_rm4->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
+      RM4_dist->Fill(sipm_array[channel][8]/convert);
     }
     else{xRM4[channel] = -100;yRM4[channel] = -100;}
-    allRM_dist->Fill(sipm_array[channel][8]);
+    allRM_dist->Fill(sipm_array[channel][8]/convert);
   }
   sprintf(process,"Done with RM Channels: %i/%i",NumChanRM,NumChanRM);
   std::cout<<process<<std::endl;
@@ -181,7 +213,7 @@ void CU_Plots(){
   CMSPrelim1->SetNDC();
   CMSPrelim1->SetTextFont(62);
   
-  TLatex* burnIn = new TLatex(0.95, 0.91, "904 Burn In 2017");
+  TLatex* burnIn = new TLatex(0.95, 0.91, "904 Burn-in 2017");
   burnIn->SetNDC();
   burnIn->SetTextFont(42);
   burnIn->SetTextAlign(31);
@@ -198,7 +230,7 @@ void CU_Plots(){
   //Plotting
   //----------------------------------------------------------------------
   std::cout<<"Plotting"<<std::endl;
-  TCanvas *c0 = new TCanvas("MaxfCvsCU","",800,800);  
+  TCanvas *c0 = new TCanvas("MaxpCvsCU","",800,800);  
   TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg0->SetBorderSize(0);
   catLeg0->SetFillStyle(0);
@@ -211,10 +243,10 @@ void CU_Plots(){
   
   TH1F* h0blank = new TH1F("Blank0","",250,0,70);
   h0blank->SetMinimum(0);
-  h0blank->SetMaximum(120000);
+  h0blank->SetMaximum(120000/convert);
   //h0blank->GetXaxis()->SetRange(0,100);
   h0blank->GetXaxis()->SetTitle("CU");
-  h0blank->GetYaxis()->SetTitle("Max Charge [fC]");
+  h0blank->GetYaxis()->SetTitle("Max Charge [pC]");
   h0blank->SetTitle("");
   h0blank->SetName("");
   h0blank->SetTitleSize(0.002);
@@ -256,11 +288,11 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* h1blank = new TH1F("Blank1","",62,0,350000);
+  TH1F* h1blank = new TH1F("Blank1","",62,0,350000/convert);
   h1blank->SetMinimum(0);
   h1blank->SetMaximum(50);
   //h1blank->GetXaxis()->SetRange(0,100);
-  h1blank->GetXaxis()->SetTitle("Max Charge [fC]");
+  h1blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h1blank->GetYaxis()->SetTitle("Channels");
   h1blank->SetTitle("");
   h1blank->SetName("");
@@ -275,39 +307,16 @@ void CU_Plots(){
   h1blank->SetLineColor(1);
   h1blank->Draw("hist");
 
-  char entries [100];
-  int ent = allPD_dist->GetEntries();
-  sprintf (entries,"Entries: %d", ent);
+  TLatex* Entries1 = Entries(0.92,0.85,allPD_dist);
+  TLatex* Mean1    = Mean(0.92, 0.8,allPD_dist);
+  TLatex* StdDev1  = StdDev(0.92, 0.75,allPD_dist); 
   
-  char mean [100];
-  double me = allPD_dist->GetMean();
-  sprintf (mean,"Mean: %0.2lf", me);
-  
-  char stddev [100];
-  double std = allPD_dist->GetStdDev(); 
-  sprintf (stddev,"StdDev: %0.2lf", std);
-  
-  TLatex* Entries = new TLatex(0.92, 0.85, entries);
-  Entries->SetNDC();
-  Entries->SetTextFont(42);
-  Entries->SetTextAlign(31);
-  
-  TLatex* Mean = new TLatex(0.92, 0.8, mean);
-  Mean->SetNDC();
-  Mean->SetTextFont(42);
-  Mean->SetTextAlign(31);
-  
-  TLatex* StdDev = new TLatex(0.92, 0.75, stddev);
-  StdDev->SetNDC();
-  StdDev->SetTextFont(42);
-  StdDev->SetTextAlign(31);
-
   allPD_dist->Draw("same");
   CMSPrelim1->Draw();
   burnIn->Draw();
-  Entries->Draw();
-  Mean->Draw();
-  StdDev->Draw();
+  Entries1->Draw();
+  Mean1->Draw();
+  StdDev1->Draw();
   PinDiode->Draw();
   
   TCanvas *c2 = new TCanvas("CUvsRM","",800,800);  
@@ -323,10 +332,10 @@ void CU_Plots(){
   
   TH1F* h2blank = new TH1F("Blank2","",250,0,70);
   h2blank->SetMinimum(0);
-  h2blank->SetMaximum(350000);
+  h2blank->SetMaximum(350000/convert);
   //h2blank->GetXaxis()->SetRange(0,100);
   h2blank->GetXaxis()->SetTitle("CU");
-  h2blank->GetYaxis()->SetTitle("Max Charge [fC]");
+  h2blank->GetYaxis()->SetTitle("Max Charge [pC]");
   h2blank->SetTitle("");
   h2blank->SetName("");
   h2blank->SetTitleSize(0.002);
@@ -364,11 +373,11 @@ void CU_Plots(){
   gPad->SetLeftMargin(0.14);  
   //gPad->SetLogy();
   
-  TH1F* h3blank = new TH1F("Blank3","",62,0,350000);
+  TH1F* h3blank = new TH1F("Blank3","",62,0,350000/convert);
   h3blank->SetMinimum(0);
   h3blank->SetMaximum(1000);
   //h3blank->GetXaxis()->SetRange(0,100);
-  h3blank->GetXaxis()->SetTitle("Max Charge [fC]");
+  h3blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h3blank->GetYaxis()->SetTitle("Channels");
   h3blank->SetTitle("");
   h3blank->SetName("");
@@ -383,42 +392,19 @@ void CU_Plots(){
   h3blank->SetLineColor(1);
   h3blank->Draw("hist");
   
-  char entries3 [100];
-  int ent3 = allRM_dist->GetEntries();
-  sprintf (entries3,"Entries: %d", ent3);
-  
-  char mean3 [100];
-  double me3 = allRM_dist->GetMean();
-  sprintf (mean3,"Mean: %0.2lf", me3);
-  
-  char stddev3 [100];
-  double std3 = allRM_dist->GetStdDev(); 
-  sprintf (stddev3,"StdDev: %0.2lf", std3);
-  
-  TLatex* Entries3 = new TLatex(0.92, 0.85, entries3);
-  Entries3->SetNDC();
-  Entries3->SetTextFont(42);
-  Entries3->SetTextAlign(31);
-  
-  TLatex* Mean3 = new TLatex(0.92, 0.8, mean3);
-  Mean3->SetNDC();
-  Mean3->SetTextFont(42);
-  Mean3->SetTextAlign(31);
-  
-  TLatex* Stddev3 = new TLatex(0.92, 0.75, stddev3);
-  Stddev3->SetNDC();
-  Stddev3->SetTextFont(42);
-  Stddev3->SetTextAlign(31);
+  TLatex* Entries3 = Entries(0.92,0.85,allRM_dist);
+  TLatex* Mean3    = Mean(0.92, 0.8,allRM_dist);
+  TLatex* StdDev3  = StdDev(0.92, 0.75,allRM_dist); 
 
   allRM_dist->Draw("same");
   CMSPrelim1->Draw();
   burnIn->Draw();
   Entries3->Draw();
   Mean3->Draw();
-  Stddev3->Draw();
+  StdDev3->Draw();
   RM->Draw();
 
-  TCanvas *c4 = new TCanvas("MaxfCvsCU 0,1, RM1-4","",800,800);  
+  TCanvas *c4 = new TCanvas("MaxpCvsCU 0,1, RM1-4","",800,800);  
   TLegend* catLeg4 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg4->SetBorderSize(0);
   catLeg4->SetFillStyle(0);
@@ -431,10 +417,10 @@ void CU_Plots(){
   
   TH1F* h4blank = new TH1F("Blank4","",250,0,50);
   h4blank->SetMinimum(0);
-  h4blank->SetMaximum(350000);
+  h4blank->SetMaximum(350000/convert);
   //h4blank->GetXaxis()->SetRange(0,100);
   h4blank->GetXaxis()->SetTitle("CU");
-  h4blank->GetYaxis()->SetTitle("Max Charge [fC]");
+  h4blank->GetYaxis()->SetTitle("Max Charge [pC]");
   h4blank->SetTitle("");
   h4blank->SetName("");
   h4blank->SetTitleSize(0.002);
@@ -465,7 +451,7 @@ void CU_Plots(){
   CMSPrelim1->Draw();
   burnIn->Draw();
 
-  TCanvas *c5 = new TCanvas("Profile: MaxfCvsCU 0,1, RM1-4","",800,800);  
+  TCanvas *c5 = new TCanvas("Profile: MaxpCvsCU 0,1, RM1-4","",800,800);  
   TLegend* catLeg5 = new TLegend(0.68,0.65,0.96,0.88);
   catLeg5->SetBorderSize(0);
   catLeg5->SetFillStyle(0);
@@ -478,10 +464,10 @@ void CU_Plots(){
   
   TH1F* h5blank = new TH1F("Blank5","",250,0,50);
   h5blank->SetMinimum(0);
-  h5blank->SetMaximum(350000);
+  h5blank->SetMaximum(350000/convert);
   //h5blank->GetXaxis()->SetRange(0,100);
   h5blank->GetXaxis()->SetTitle("CU");
-  h5blank->GetYaxis()->SetTitle("Max Charge [fC]");
+  h5blank->GetYaxis()->SetTitle("Max Charge [pC]");
   h5blank->SetTitle("");
   h5blank->SetName("");
   h5blank->SetTitleSize(0.002);
