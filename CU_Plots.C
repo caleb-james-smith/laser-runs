@@ -5,12 +5,6 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TDirectory.h>
-//Data.....
-//{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
-#include "pd_array.h"
-//{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
-#include "sipm_array.h"
-
 #include "string"
 #include <sstream>
 #include <vector>
@@ -23,145 +17,91 @@
 #include "TLatex.h"
 #include "TColor.h"
 
-//int NumChanPD = pd_array.size(); //Need to change this
-//int NumChanRM = sipm_array.size(); //Need to change this
-
-//TGraph* makePDTGraph(int pd,std::vector<std::vector<double>>& datain){
-//  Double_t x[NumChanPD], y[NumChanPD];
-//  for(unsigned channel = 0; channel < NumChanPD; ++channel){
-//    if(datain[channel][3] == pd){
-//      x[channel] = datain[channel][0];
-//      y[channel] = datain[channel][7];	
-//      //std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
-//    }
-//    else{
-//      x[channel] = -100;
-//      y[channel] = -100;		
-//    }
-//  }
-//  TGraph* gtemp = new TGraph(NumChanPD,x,y);
-//  if(pd == 0){gtemp->SetMarkerColor(kBlack);}
-//  if(pd == 1){gtemp->SetMarkerColor(kRed);}
-//  if(pd == 2){gtemp->SetMarkerColor(kBlue);}
-//  if(pd == 3){gtemp->SetMarkerColor(kGreen+2);}
-//  if(pd == 4){gtemp->SetMarkerColor(kOrange);}
-//  if(pd == 5){gtemp->SetMarkerColor(kMagenta);}      
-//  gtemp->SetMarkerStyle(kFullSquare);
-//  return gtemp;
-//}
-//
-//TProfile* makePDTProfile(int pd,std::vector<std::vector<double>>& datain,const char* name){
-//  TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
-//  for(unsigned channel = 0; channel < NumChanPD; ++channel){
-//    if(datain[channel][3] == pd && datain[channel][8] == 1){
-//      gtemp->Fill(datain[channel][0],datain[channel][7]);
-//      //std::cout<<"Pin-Diode:  "<<pd<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
-//    }
-//  }
-//  if(pd == 0){gtemp->SetLineColor(kBlack);}
-//  if(pd == 1){gtemp->SetLineColor(kRed);}
-//  if(pd == 2){gtemp->SetLineColor(kBlue);}
-//  if(pd == 3){gtemp->SetLineColor(kGreen+2);}
-//  if(pd == 4){gtemp->SetLineColor(kOrange);}
-//  if(pd == 5){gtemp->SetLineColor(kMagenta);}      
-//  return gtemp;
-//}
-//
-//TGraph* makeRMTGraph(double rm,std::vector<std::vector<double>>& datain){
-//  Double_t x[NumChanRM], y[NumChanRM];
-//  for(unsigned channel = 0; channel < NumChanRM; ++channel){
-//    if(datain[channel][3] == rm){
-//      x[channel] = datain[channel][0];
-//      y[channel] = datain[channel][8];	
-//      //std::cout<<"RM:  "<<rm<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
-//    }
-//    else{
-//      x[channel] = -100;
-//      y[channel] = -100;		
-//    }
-//  }
-//  TGraph* gtemp = new TGraph(NumChanRM,x,y);
-//  if(rm == 1){gtemp->SetMarkerColor(kRed);};
-//  if(rm == 2){gtemp->SetMarkerColor(kBlue);};
-//  if(rm == 3){gtemp->SetMarkerColor(kGreen+2);};
-//  if(rm == 4){gtemp->SetMarkerColor(kBlack);};
-//  gtemp->SetMarkerStyle(kFullSquare);
-//  return gtemp;
-//}
-//
-//TProfile* makeRMTProfile(double rm,std::vector<std::vector<double>>& datain,const char*  name){
-//  TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
-//  for(unsigned channel = 0; channel < NumChanRM; ++channel){
-//    if(datain[channel][3] == rm && datain[channel][9] == 1){
-//      gtemp->Fill(datain[channel][0],datain[channel][8]);
-//      //std::cout<<"RM:  "<<rm<<"  CU:  "<<x[channel]<<"  MaxfC:  "<<y[channel]<<std::endl;
-//    }
-//  }
-//  if(rm == 1){gtemp->SetLineColor(kRed);};
-//  if(rm == 2){gtemp->SetLineColor(kBlue);};
-//  if(rm == 3){gtemp->SetLineColor(kGreen+2);};
-//  if(rm == 4){gtemp->SetLineColor(kBlack);};
-//  return gtemp;
-//}
+//Data.....
+//{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
+#include "pd_array.h"
+//{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
+#include "sipm_array.h"
 
 void CU_Plots(){
-  int NumChanPD = pd_array.size(); //Need to change this
-  int NumChanRM = sipm_array.size(); //Need to change this
+  int NumChanPD = pd_array.size();
+  int NumChanRM = sipm_array.size();
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
   std::cout<<"Number of RM Channels:          "<<NumChanRM<<std::endl;
 
-  Double_t x0[NumChanPD],x1[NumChanPD],x2[NumChanPD],x3[NumChanPD],x4[NumChanPD],x5[NumChanPD];
-  Double_t y0[NumChanPD],y1[NumChanPD],y2[NumChanPD],y3[NumChanPD],y4[NumChanPD],y5[NumChanPD];
+  //----------------------------------------------------------------------
+  //Make Pin-Diode Plots
+  //----------------------------------------------------------------------
+  Double_t xPD0[NumChanPD],xPD1[NumChanPD],xPD2[NumChanPD],xPD3[NumChanPD],xPD4[NumChanPD],xPD5[NumChanPD];
+  Double_t yPD0[NumChanPD],yPD1[NumChanPD],yPD2[NumChanPD],yPD3[NumChanPD],yPD4[NumChanPD],yPD5[NumChanPD];
   TProfile* profile_pd0 = new TProfile("pd0","pd0",45,0,44,0,350000);
   TProfile* profile_pd1 = new TProfile("pd1","pd1",45,0,44,0,350000);
   TProfile* profile_pd2 = new TProfile("pd2","pd2",45,0,44,0,350000);
   TProfile* profile_pd3 = new TProfile("pd3","pd3",45,0,44,0,350000);
   TProfile* profile_pd4 = new TProfile("pd4","pd4",45,0,44,0,350000);
   TProfile* profile_pd5 = new TProfile("pd5","pd5",45,0,44,0,350000);
+  TH1F* allPD_dist = new TH1F("allPD","allPD",62,0,350000);
+  TH1F* PD0_dist   = new TH1F("PD0","PD0",62,0,350000);
+  TH1F* PD1_dist   = new TH1F("PD1","PD1",62,0,350000);
+  TH1F* PD2_dist   = new TH1F("PD2","PD2",62,0,350000);
+  TH1F* PD3_dist   = new TH1F("PD3","PD3",62,0,350000);
+  TH1F* PD4_dist   = new TH1F("PD4","PD4",62,0,350000);
+  TH1F* PD5_dist   = new TH1F("PD5","PD5",62,0,350000);
+  TH1F* PD2_3_4_5_dist   = new TH1F("PD 2 3 4 5","PD 2 3 4 5",62,0,350000);
   std::cout<<"Running over Pid-Diode Channels"<<std::endl;
   char process[100];
   for(unsigned channel = 0; channel < NumChanPD; ++channel){    
     sprintf(process,"Processing Channel: %i/%i",channel,NumChanPD);
     if(channel%10==0){std::cout<<process<<std::endl;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 0){
-      x0[channel] = pd_array[channel][0]; y0[channel] = pd_array[channel][7];
+      xPD0[channel] = pd_array[channel][0]; yPD0[channel] = pd_array[channel][7];
       profile_pd0->Fill(pd_array[channel][0],pd_array[channel][7]);
+      PD0_dist->Fill(pd_array[channel][7]);
     }
-    else{x0[channel] = -100;y0[channel] = -100;}
+    else{xPD0[channel] = -100;yPD0[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 1){
-      x1[channel] = pd_array[channel][0]; y1[channel] = pd_array[channel][7];
+      xPD1[channel] = pd_array[channel][0]; yPD1[channel] = pd_array[channel][7];
       profile_pd1->Fill(pd_array[channel][0],pd_array[channel][7]);
+      PD1_dist->Fill(pd_array[channel][7]);
     }
-    else{x1[channel] = -100;y1[channel] = -100;}
+    else{xPD1[channel] = -100;yPD1[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 2){
-      x2[channel] = pd_array[channel][0]; y2[channel] = pd_array[channel][7];
+      xPD2[channel] = pd_array[channel][0]; yPD2[channel] = pd_array[channel][7];
       profile_pd2->Fill(pd_array[channel][0],pd_array[channel][7]);
+      PD2_dist->Fill(pd_array[channel][7]);
     }
-    else{x2[channel] = -100;y2[channel] = -100;}
+    else{xPD2[channel] = -100;yPD2[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 3){
-      x3[channel] = pd_array[channel][0]; y2[channel] = pd_array[channel][7];
+      xPD3[channel] = pd_array[channel][0]; yPD3[channel] = pd_array[channel][7];
       profile_pd3->Fill(pd_array[channel][0],pd_array[channel][7]);
+      PD3_dist->Fill(pd_array[channel][7]);
     }
-    else{x3[channel] = -100;y3[channel] = -100;}
+    else{xPD3[channel] = -100;yPD3[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 4){
-      x4[channel] = pd_array[channel][0]; y2[channel] = pd_array[channel][7];
+      xPD4[channel] = pd_array[channel][0]; yPD4[channel] = pd_array[channel][7];
       profile_pd4->Fill(pd_array[channel][0],pd_array[channel][7]);
+      PD4_dist->Fill(pd_array[channel][7]);
     }
-    else{x4[channel] = -100;y4[channel] = -100;}
+    else{xPD4[channel] = -100;yPD4[channel] = -100;}
     if(pd_array[channel][8] == 1 && pd_array[channel][3] == 5){
-      x5[channel] = pd_array[channel][0]; y2[channel] = pd_array[channel][7];
+      xPD5[channel] = pd_array[channel][0]; yPD5[channel] = pd_array[channel][7];
       profile_pd5->Fill(pd_array[channel][0],pd_array[channel][7]);
+      PD5_dist->Fill(pd_array[channel][7]);
     }
-    else{x5[channel] = -100;y5[channel] = -100;}
+    else{xPD5[channel] = -100;yPD5[channel] = -100;}
+    if(pd_array[channel][8] == 1 && (pd_array[channel][3] == 2 || pd_array[channel][3] == 3 || pd_array[channel][3] == 4 || pd_array[channel][3] == 5 )){
+      PD2_3_4_5_dist->Fill(pd_array[channel][7]);
+    }
+    allPD_dist->Fill(pd_array[channel][7]);
   }
   sprintf(process,"Done with Pid-Diode Channels: %i/%i",NumChanPD,NumChanPD);
   std::cout<<process<<std::endl;
-  TGraph* graph_pd0 = new TGraph(NumChanPD,x0,y0);
-  TGraph* graph_pd1 = new TGraph(NumChanPD,x1,y1);
-  TGraph* graph_pd2 = new TGraph(NumChanPD,x2,y2);
-  TGraph* graph_pd3 = new TGraph(NumChanPD,x3,y3);
-  TGraph* graph_pd4 = new TGraph(NumChanPD,x4,y4);
-  TGraph* graph_pd5 = new TGraph(NumChanPD,x5,y5);
+  TGraph* graph_pd0 = new TGraph(NumChanPD,xPD0,yPD0);
+  TGraph* graph_pd1 = new TGraph(NumChanPD,xPD1,yPD1);
+  TGraph* graph_pd2 = new TGraph(NumChanPD,xPD2,yPD2);
+  TGraph* graph_pd3 = new TGraph(NumChanPD,xPD3,yPD3);
+  TGraph* graph_pd4 = new TGraph(NumChanPD,xPD4,yPD4);
+  TGraph* graph_pd5 = new TGraph(NumChanPD,xPD5,yPD5);
   graph_pd0->SetMarkerColor(kBlack);
   graph_pd1->SetMarkerColor(kRed);
   graph_pd2->SetMarkerColor(kBlue);
@@ -175,72 +115,68 @@ void CU_Plots(){
   graph_pd4->SetMarkerStyle(kFullSquare);
   graph_pd5->SetMarkerStyle(kFullSquare);
 
-  //Double_t x[NumChanRM], y[NumChanRM];
-  //TProfile* gtemp = new TProfile(name,name,45,0,44,0,350000);
-  //for(unsigned channel = 0; channel < NumChanRM; ++channel){
-  //  if(datain[channel][3] == rm && datain[channel][9] == 1){
-  //    x[channel] = datain[channel][0]; y[channel] = datain[channel][8];	
-  //    gtemp->Fill(datain[channel][0],datain[channel][8]);
-  //  }
-  //  else{
-  //    x[channel] = -100;y[channel] = -100;	
-  //  }
-  //}
-  //TGraph* gtemp = new TGraph(NumChanRM,x,y);
-  //if(rm == 1){gtemp->SetMarkerColor(kRed);};
-  //if(rm == 2){gtemp->SetMarkerColor(kBlue);};
-  //if(rm == 3){gtemp->SetMarkerColor(kGreen+2);};
-  //if(rm == 4){gtemp->SetMarkerColor(kBlack);};
-  //gtemp->SetMarkerStyle(kFullSquare);
-  
-  TCanvas *c0 = new TCanvas("MacfCvsCU","",800,800);  
-  TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
-  catLeg0->SetBorderSize(0);
-  catLeg0->SetFillStyle(0);
-  gPad->SetTopMargin(0.1);
-  gPad->SetBottomMargin(0.12);
-  gPad->SetRightMargin(0.05);
-  gPad->SetLeftMargin(0.14);  
-  //gPad->SetLogy();
-  
-  TH1F* hblank = new TH1F("","",250,0,70);
-  hblank->SetMinimum(0);
-  hblank->SetMaximum(120000);
-  //hblank->GetXaxis()->SetRange(0,100);
-  hblank->GetXaxis()->SetTitle("CU");
-  hblank->GetYaxis()->SetTitle("Max Charge [fC]");
-  hblank->SetTitle("");
-  hblank->SetName("");
-  hblank->SetTitleSize(0.002);
-  hblank->SetTitleSize(0.05,"X");
-  hblank->SetTitleSize(0.05,"Y");
-  hblank->SetTitleOffset(1.0,"X");
-  hblank->SetTitleOffset(1.2,"Y");
-  hblank->SetLabelSize(0.04,"X");
-  hblank->SetLabelSize(0.04,"Y");
-  hblank->SetStats(false);
-  hblank->SetLineColor(0);
-  hblank->Draw("hist");
-  
-  //TGraph* graph_pd0 = makePDTGraph(0,pd_array);
-  //TGraph* graph_pd1 = makePDTGraph(1,pd_array);
-  //TGraph* graph_pd2 = makePDTGraph(2,pd_array);
-  //TGraph* graph_pd3 = makePDTGraph(3,pd_array);
-  //TGraph* graph_pd4 = makePDTGraph(4,pd_array);
-  //TGraph* graph_pd5 = makePDTGraph(5,pd_array);
-  //TProfile* graph_pd0 = makePDTProfile(0,pd_array,"pd0");
-  //TProfile* graph_pd1 = makePDTProfile(1,pd_array,"pd1");
-  //TProfile* graph_pd2 = makePDTProfile(2,pd_array,"pd2");
-  //TProfile* graph_pd3 = makePDTProfile(3,pd_array,"pd3");
-  //TProfile* graph_pd4 = makePDTProfile(4,pd_array,"pd4");
-  //TProfile* graph_pd5 = makePDTProfile(5,pd_array,"pd5");
-  graph_pd0->Draw("P same");
-  graph_pd1->Draw("P same");
-  graph_pd2->Draw("P same");
-  graph_pd3->Draw("P same");
-  graph_pd4->Draw("P same");
-  graph_pd5->Draw("P same");
-  
+  //----------------------------------------------------------------------
+  //Make RM Plots
+  //----------------------------------------------------------------------
+  Double_t xRM1[NumChanRM],xRM2[NumChanRM],xRM3[NumChanRM],xRM4[NumChanRM];
+  Double_t yRM1[NumChanRM],yRM2[NumChanRM],yRM3[NumChanRM],yRM4[NumChanRM];
+  TProfile* profile_rm1 = new TProfile("RM1","RM1",45,0,44,0,350000);
+  TProfile* profile_rm2 = new TProfile("RM2","RM2",45,0,44,0,350000);
+  TProfile* profile_rm3 = new TProfile("RM3","RM3",45,0,44,0,350000);
+  TProfile* profile_rm4 = new TProfile("RM4","RM4",45,0,44,0,350000);  
+  TH1F* allRM_dist = new TH1F("allRM","allRM",62,0,350000);
+  TH1F* RM1_dist   = new TH1F("RM1 Dist","RM1 Dist",62,0,350000);
+  TH1F* RM2_dist   = new TH1F("RM2 Dist","RM2 Dist",62,0,350000);
+  TH1F* RM3_dist   = new TH1F("RM3 Dist","RM3 Dist",62,0,350000);
+  TH1F* RM4_dist   = new TH1F("RM4 Dist","RM4 Dist",62,0,350000);
+  std::cout<<"Running over RM Channels"<<std::endl;
+  for(unsigned channel = 0; channel < NumChanRM; ++channel){
+    sprintf(process,"Processing Channel: %i/%i",channel,NumChanRM);
+    if(channel%100==0){std::cout<<process<<std::endl;}
+    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 1){
+      xRM1[channel] = sipm_array[channel][0]; yRM1[channel] = sipm_array[channel][8];	
+      profile_rm1->Fill(sipm_array[channel][0],sipm_array[channel][8]);
+      RM1_dist->Fill(sipm_array[channel][8]);
+    }
+    else{xRM1[channel] = -100;yRM1[channel] = -100;}
+    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 2){
+      xRM2[channel] = sipm_array[channel][0]; yRM2[channel] = sipm_array[channel][8];	
+      profile_rm2->Fill(sipm_array[channel][0],sipm_array[channel][8]);
+      RM2_dist->Fill(sipm_array[channel][8]);
+    }
+    else{xRM2[channel] = -100;yRM2[channel] = -100;}
+    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 3){
+      xRM3[channel] = sipm_array[channel][0]; yRM3[channel] = sipm_array[channel][8];	
+      profile_rm3->Fill(sipm_array[channel][0],sipm_array[channel][8]);
+      RM3_dist->Fill(sipm_array[channel][8]);
+    }
+    else{xRM3[channel] = -100;yRM3[channel] = -100;}
+    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 4){
+      xRM4[channel] = sipm_array[channel][0]; yRM4[channel] = sipm_array[channel][8];	
+      profile_rm4->Fill(sipm_array[channel][0],sipm_array[channel][8]);
+      RM4_dist->Fill(sipm_array[channel][8]);
+    }
+    else{xRM4[channel] = -100;yRM4[channel] = -100;}
+    allRM_dist->Fill(sipm_array[channel][8]);
+  }
+  sprintf(process,"Done with RM Channels: %i/%i",NumChanRM,NumChanRM);
+  std::cout<<process<<std::endl;
+  TGraph* graph_rm1 = new TGraph(NumChanRM,xRM1,yRM1);
+  TGraph* graph_rm2 = new TGraph(NumChanRM,xRM2,yRM2);
+  TGraph* graph_rm3 = new TGraph(NumChanRM,xRM3,yRM3);
+  TGraph* graph_rm4 = new TGraph(NumChanRM,xRM4,yRM4);
+  graph_rm1->SetMarkerColor(kRed);
+  graph_rm2->SetMarkerColor(kBlue);
+  graph_rm3->SetMarkerColor(kGreen+2);
+  graph_rm4->SetMarkerColor(kBlack);
+  graph_rm1->SetMarkerStyle(kFullSquare);
+  graph_rm2->SetMarkerStyle(kFullSquare);
+  graph_rm3->SetMarkerStyle(kFullSquare);
+  graph_rm4->SetMarkerStyle(kFullSquare);
+
+  //----------------------------------------------------------------------
+  //Make TLatex
+  //----------------------------------------------------------------------
   TLatex* CMSPrelim1 = new TLatex(0.14, 0.91, "CMS #scale[0.9]{#font[52]{Preliminary}}");
   CMSPrelim1->SetNDC();
   CMSPrelim1->SetTextFont(62);
@@ -253,265 +189,273 @@ void CU_Plots(){
   TLatex* PinDiode = new TLatex(0.14, 0.96, "Pin-Diodes");
   PinDiode->SetNDC();
   PinDiode->SetTextFont(42);
+
+  TLatex* RM = new TLatex(0.14, 0.96, "Silicon Photomultiplier");
+  RM->SetNDC();
+  RM->SetTextFont(42);
+
+  //----------------------------------------------------------------------
+  //Plotting
+  //----------------------------------------------------------------------
+  std::cout<<"Plotting"<<std::endl;
+  TCanvas *c0 = new TCanvas("MaxfCvsCU","",800,800);  
+  TLegend* catLeg0 = new TLegend(0.68,0.65,0.96,0.88);
+  catLeg0->SetBorderSize(0);
+  catLeg0->SetFillStyle(0);
+  catLeg0->SetTextSize(0.04);
+  gPad->SetTopMargin(0.1);
+  gPad->SetBottomMargin(0.12);
+  gPad->SetRightMargin(0.05);
+  gPad->SetLeftMargin(0.14);  
+  //gPad->SetLogy();
   
+  TH1F* h0blank = new TH1F("Blank0","",250,0,70);
+  h0blank->SetMinimum(0);
+  h0blank->SetMaximum(120000);
+  //h0blank->GetXaxis()->SetRange(0,100);
+  h0blank->GetXaxis()->SetTitle("CU");
+  h0blank->GetYaxis()->SetTitle("Max Charge [fC]");
+  h0blank->SetTitle("");
+  h0blank->SetName("");
+  h0blank->SetTitleSize(0.002);
+  h0blank->SetTitleSize(0.05,"X");
+  h0blank->SetTitleSize(0.05,"Y");
+  h0blank->SetTitleOffset(1.0,"X");
+  h0blank->SetTitleOffset(1.2,"Y");
+  h0blank->SetLabelSize(0.04,"X");
+  h0blank->SetLabelSize(0.04,"Y");
+  h0blank->SetStats(false);
+  h0blank->SetLineColor(0);
+  h0blank->Draw("hist");
+  
+  graph_pd0->Draw("P same");
+  graph_pd1->Draw("P same");
+  graph_pd2->Draw("P same");
+  graph_pd3->Draw("P same");
+  graph_pd4->Draw("P same");
+  graph_pd5->Draw("P same");
+  catLeg0->AddEntry(graph_pd0,"Pin-Diode 0","P");
+  catLeg0->AddEntry(graph_pd1,"Pin-Diode 1","P");
+  catLeg0->AddEntry(graph_pd2,"Pin-Diode 2","P");
+  catLeg0->AddEntry(graph_pd3,"Pin-Diode 3","P");
+  catLeg0->AddEntry(graph_pd4,"Pin-Diode 4","P");
+  catLeg0->AddEntry(graph_pd5,"Pin-Diode 5","P");
+
+  catLeg0->Draw();  
   CMSPrelim1->Draw();
   burnIn->Draw();
   PinDiode->Draw();
+
+  TCanvas *c1 = new TCanvas("1D PD","",800,800);
+  //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
+  //catLeg1->SetBorderSize(0);
+  //catLeg1->SetFillStyle(0);
+  gPad->SetTopMargin(0.1);
+  gPad->SetBottomMargin(0.12);
+  gPad->SetRightMargin(0.05);
+  gPad->SetLeftMargin(0.14);  
+  //gPad->SetLogy();
   
-  Double_t x[1]={-100},y[1]={-100};
-  //catLeg0->AddEntry((TObject*)0,"iPhi 5","");
-  TGraph* pinDiode0 = new TGraph(1,x1,y1);
-  pinDiode0->Draw("same P");
-  pinDiode0->SetMarkerColor(kBlack);
-  pinDiode0->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(pinDiode0,"Pin-Diode 0","P");
-  TGraph* pinDiode1 = new TGraph(1,x,y);
-  pinDiode1->Draw("same P");
-  pinDiode1->SetMarkerColor(kRed);
-  pinDiode1->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(pinDiode1,"Pin-Diode 1","P");
-  TGraph* pinDiode2 = new TGraph(1,x,y);
-  pinDiode2->Draw("same P");
-  pinDiode2->SetMarkerColor(kBlue);
-  pinDiode2->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(pinDiode2,"Pin-Diode 2","P");
-  TGraph* pinDiode3 = new TGraph(1,x,y);
-  pinDiode3->Draw("same P");
-  pinDiode3->SetMarkerColor(kGreen+2);
-  pinDiode3->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(pinDiode3,"Pin-Diode 3","P");
-  TGraph* pinDiode4 = new TGraph(1,x,y);
-  pinDiode4->Draw("same P");
-  pinDiode4->SetMarkerColor(kOrange);
-  pinDiode4->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(pinDiode4,"Pin-Diode 4","P");
-  TGraph* pinDiode5 = new TGraph(1,x,y);
-  pinDiode5->Draw("same P");
-  pinDiode5->SetMarkerColor(kMagenta);
-  pinDiode5->SetMarkerStyle(kFullSquare);
-  catLeg0->AddEntry(pinDiode5,"Pin-Diode 5","P");
+  TH1F* h1blank = new TH1F("Blank1","",62,0,350000);
+  h1blank->SetMinimum(0);
+  h1blank->SetMaximum(50);
+  //h1blank->GetXaxis()->SetRange(0,100);
+  h1blank->GetXaxis()->SetTitle("Max Charge [fC]");
+  h1blank->GetYaxis()->SetTitle("Channels");
+  h1blank->SetTitle("");
+  h1blank->SetName("");
+  h1blank->SetTitleSize(0.002);
+  h1blank->SetTitleSize(0.05,"X");
+  h1blank->SetTitleSize(0.05,"Y");
+  h1blank->SetTitleOffset(1.0,"X");
+  h1blank->SetTitleOffset(1.2,"Y");
+  h1blank->SetLabelSize(0.04,"X");
+  h1blank->SetLabelSize(0.04,"Y");
+  h1blank->SetStats(false);
+  h1blank->SetLineColor(1);
+  h1blank->Draw("hist");
+
+  char entries [100];
+  int ent = allPD_dist->GetEntries();
+  sprintf (entries,"Entries: %d", ent);
   
-  catLeg0->SetTextSize(0.04);
-  catLeg0->Draw();
+  char mean [100];
+  double me = allPD_dist->GetMean();
+  sprintf (mean,"Mean: %0.2lf", me);
   
-  //TCanvas *c1 = new TCanvas("1D PD","",800,800);
-  ////TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
-  ////catLeg1->SetBorderSize(0);
-  ////catLeg1->SetFillStyle(0);
-  //gPad->SetTopMargin(0.1);
-  //gPad->SetBottomMargin(0.12);
-  //gPad->SetRightMargin(0.05);
-  //gPad->SetLeftMargin(0.14);  
-  ////gPad->SetLogy();
-  //
-  //TH1F* hmip = new TH1F("","",62,0,350000);
-  //hmip->SetMinimum(0);
-  //hmip->SetMaximum(50);
-  ////hmip->GetXaxis()->SetRange(0,100);
-  //hmip->GetXaxis()->SetTitle("Max Charge [fC]");
-  //hmip->GetYaxis()->SetTitle("Channels");
-  //hmip->SetTitle("");
-  //hmip->SetName("");
-  //hmip->SetTitleSize(0.002);
-  //hmip->SetTitleSize(0.05,"X");
-  //hmip->SetTitleSize(0.05,"Y");
-  //hmip->SetTitleOffset(1.0,"X");
-  //hmip->SetTitleOffset(1.2,"Y");
-  //hmip->SetLabelSize(0.04,"X");
-  //hmip->SetLabelSize(0.04,"Y");
-  //hmip->SetStats(false);
-  //hmip->SetLineColor(1);
-  //hmip->Draw("hist");
-  //
-  //for(unsigned channel = 0; channel < NumChanPD; ++channel){
-  //  if(pd_array[channel][8]==1){
-  //    hmip->Fill(pd_array[channel][7]);
-  //  }
-  //}
-  //
-  //char entries [100];
-  //int ent = hmip->GetEntries();
-  //sprintf (entries,"Entries: %d", ent);
-  //
-  //char mean [100];
-  //double me = hmip->GetMean();
-  //sprintf (mean,"Mean: %0.2lf", me);
-  //
-  //char stddev [100];
-  //double std = hmip->GetStdDev(); 
-  //sprintf (stddev,"StdDev: %0.2lf", std);
-  //
-  //TLatex* Entries = new TLatex(0.92, 0.85, entries);
-  //Entries->SetNDC();
-  //Entries->SetTextFont(42);
-  //Entries->SetTextAlign(31);
-  //
-  //TLatex* Mean = new TLatex(0.92, 0.8, mean);
-  //Mean->SetNDC();
-  //Mean->SetTextFont(42);
-  //Mean->SetTextAlign(31);
-  //
-  //TLatex* StdDev = new TLatex(0.92, 0.75, stddev);
-  //StdDev->SetNDC();
-  //StdDev->SetTextFont(42);
-  //StdDev->SetTextAlign(31);
-  //
-  //CMSPrelim1->Draw();
-  //burnIn->Draw();
-  //Entries->Draw();
-  //Mean->Draw();
-  //StdDev->Draw();
-  //PinDiode->Draw();
-  //
-  //TCanvas *c2 = new TCanvas("CUvsRM","",800,800);  
-  //TLegend* catLeg2 = new TLegend(0.68,0.65,0.96,0.88);
-  //catLeg2->SetBorderSize(0);
-  //catLeg2->SetFillStyle(0);
-  //gPad->SetTopMargin(0.1);
-  //gPad->SetBottomMargin(0.12);
-  //gPad->SetRightMargin(0.05);
-  //gPad->SetLeftMargin(0.14);  
-  ////gPad->SetLogy();
-  //
-  //TH1F* h2blank = new TH1F("","",250,0,70);
-  //h2blank->SetMinimum(0);
-  //h2blank->SetMaximum(350000);
-  ////h2blank->GetXaxis()->SetRange(0,100);
-  //h2blank->GetXaxis()->SetTitle("CU");
-  //h2blank->GetYaxis()->SetTitle("Max Charge [fC]");
-  //h2blank->SetTitle("");
-  //h2blank->SetName("");
-  //h2blank->SetTitleSize(0.002);
-  //h2blank->SetTitleSize(0.05,"X");
-  //h2blank->SetTitleSize(0.05,"Y");
-  //h2blank->SetTitleOffset(1.0,"X");
-  //h2blank->SetTitleOffset(1.2,"Y");
-  //h2blank->SetLabelSize(0.04,"X");
-  //h2blank->SetLabelSize(0.04,"Y");
-  //h2blank->SetStats(false);
-  //h2blank->SetLineColor(1);
-  //h2blank->Draw("hist");
-  //
-  //TGraph* graph_rm1 = makeRMTGraph(1,sipm_array);
-  //TGraph* graph_rm2 = makeRMTGraph(2,sipm_array);
-  //TGraph* graph_rm3 = makeRMTGraph(3,sipm_array);
-  //TGraph* graph_rm4 = makeRMTGraph(4,sipm_array);
-  ////TProfile* graph_rm1 = makeRMTProfile(1,sipm_array,"rm1");
-  ////TProfile* graph_rm2 = makeRMTProfile(2,sipm_array,"rm2");
-  ////TProfile* graph_rm3 = makeRMTProfile(3,sipm_array,"rm3");
-  ////TProfile* graph_rm4 = makeRMTProfile(4,sipm_array,"rm4");
-  //graph_rm1->Draw("P same");
-  //graph_rm2->Draw("P same");
-  //graph_rm3->Draw("P same");
-  //graph_rm4->Draw("P same");
-  //
-  //TLatex* RM = new TLatex(0.14, 0.96, "Silicon Photomultiplier");
-  //RM->SetNDC();
-  //RM->SetTextFont(42);
-  //
-  //CMSPrelim1->Draw();
-  //burnIn->Draw();
-  //RM->Draw();
-  //
-  ////Double_t x[1]={-100},y[1]={-100};
-  ////catLeg2->AddEntry((TObject*)0,"iPhi 5","");
-  //TGraph* readOutModule1 = new TGraph(1,x,y);
-  //readOutModule1->Draw("same P");
-  //readOutModule1->SetMarkerColor(kRed);
-  //readOutModule1->SetMarkerStyle(kFullSquare);
-  //catLeg2->AddEntry(readOutModule1,"RM 1","P");
-  //TGraph* readOutModule2 = new TGraph(1,x,y);
-  //readOutModule2->Draw("same P");
-  //readOutModule2->SetMarkerColor(kBlue);
-  //readOutModule2->SetMarkerStyle(kFullSquare);
-  //catLeg2->AddEntry(readOutModule2,"RM 2","P");
-  //TGraph* readOutModule3 = new TGraph(1,x,y);
-  //readOutModule3->Draw("same P");
-  //readOutModule3->SetMarkerColor(kGreen+2);
-  //readOutModule3->SetMarkerStyle(kFullSquare);
-  //catLeg2->AddEntry(readOutModule3,"RM 3","P");
-  //TGraph* readOutModule4 = new TGraph(1,x,y);
-  //readOutModule4->Draw("same P");
-  //readOutModule4->SetMarkerColor(kBlack);
-  //readOutModule4->SetMarkerStyle(kFullSquare);
-  //catLeg2->AddEntry(readOutModule4,"RM 4","P");
-  //
-  //catLeg2->SetTextSize(0.04);
-  //catLeg2->Draw();  
-  //
-  //TCanvas *c3 = new TCanvas("1D RM","",800,800);  
-  ////TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
-  ////catLeg1->SetBorderSize(0);
-  ////catLeg1->SetFillStyle(0);
-  //gPad->SetTopMargin(0.1);
-  //gPad->SetBottomMargin(0.12);
-  //gPad->SetRightMargin(0.05);
-  //gPad->SetLeftMargin(0.14);  
-  ////gPad->SetLogy();
-  //
-  //TH1F* h3 = new TH1F("","",62,0,350000);
-  //h3->SetMinimum(0);
-  //h3->SetMaximum(1000);
-  ////h3->GetXaxis()->SetRange(0,100);
-  //h3->GetXaxis()->SetTitle("Max Charge [fC]");
-  //h3->GetYaxis()->SetTitle("Channels");
-  //h3->SetTitle("");
-  //h3->SetName("");
-  //h3->SetTitleSize(0.002);
-  //h3->SetTitleSize(0.05,"X");
-  //h3->SetTitleSize(0.05,"Y");
-  //h3->SetTitleOffset(1.0,"X");
-  //h3->SetTitleOffset(1.2,"Y");
-  //h3->SetLabelSize(0.04,"X");
-  //h3->SetLabelSize(0.04,"Y");
-  //h3->SetStats(false);
-  //h3->SetLineColor(1);
-  //h3->Draw("hist");
-  //
-  //for(unsigned channel = 0; channel < NumChanRM; ++channel){
-  //  if(sipm_array[channel][9]==1){
-  //    h3->Fill(sipm_array[channel][8]);
-  //  }
-  //}
-  //
-  //char entries3 [100];
-  //int ent3 = h3->GetEntries();
-  //sprintf (entries3,"Entries: %d", ent3);
-  //
-  //char mean3 [100];
-  //double me3 = h3->GetMean();
-  //sprintf (mean3,"Mean: %0.2lf", me3);
-  //
-  //char stddev3 [100];
-  //double std3 = h3->GetStdDev(); 
-  //sprintf (stddev3,"StdDev: %0.2lf", std3);
-  //
-  //TLatex* Entries3 = new TLatex(0.92, 0.85, entries3);
-  //Entries3->SetNDC();
-  //Entries3->SetTextFont(42);
-  //Entries3->SetTextAlign(31);
-  //
-  //TLatex* Mean3 = new TLatex(0.92, 0.8, mean3);
-  //Mean3->SetNDC();
-  //Mean3->SetTextFont(42);
-  //Mean3->SetTextAlign(31);
-  //
-  //TLatex* Stddev3 = new TLatex(0.92, 0.75, stddev3);
-  //Stddev3->SetNDC();
-  //Stddev3->SetTextFont(42);
-  //Stddev3->SetTextAlign(31);
-  //
-  //CMSPrelim1->Draw();
-  //burnIn->Draw();
-  //Entries3->Draw();
-  //Mean3->Draw();
-  //Stddev3->Draw();
-  //RM->Draw();
-  //
-  //c0->SaveAs("PDvsCU2D.pdf");
-  //c1->SaveAs("PDvsCU1D.pdf");
-  //c2->SaveAs("RMvsCU2D.pdf");
-  //c3->SaveAs("RMvsCU1D.pdf");
+  char stddev [100];
+  double std = allPD_dist->GetStdDev(); 
+  sprintf (stddev,"StdDev: %0.2lf", std);
+  
+  TLatex* Entries = new TLatex(0.92, 0.85, entries);
+  Entries->SetNDC();
+  Entries->SetTextFont(42);
+  Entries->SetTextAlign(31);
+  
+  TLatex* Mean = new TLatex(0.92, 0.8, mean);
+  Mean->SetNDC();
+  Mean->SetTextFont(42);
+  Mean->SetTextAlign(31);
+  
+  TLatex* StdDev = new TLatex(0.92, 0.75, stddev);
+  StdDev->SetNDC();
+  StdDev->SetTextFont(42);
+  StdDev->SetTextAlign(31);
+
+  allPD_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  Entries->Draw();
+  Mean->Draw();
+  StdDev->Draw();
+  PinDiode->Draw();
+  
+  TCanvas *c2 = new TCanvas("CUvsRM","",800,800);  
+  TLegend* catLeg2 = new TLegend(0.68,0.65,0.96,0.88);
+  catLeg2->SetBorderSize(0);
+  catLeg2->SetFillStyle(0);
+  catLeg2->SetTextSize(0.04);
+  gPad->SetTopMargin(0.1);
+  gPad->SetBottomMargin(0.12);
+  gPad->SetRightMargin(0.05);
+  gPad->SetLeftMargin(0.14);  
+  //gPad->SetLogy();
+  
+  TH1F* h2blank = new TH1F("Blank2","",250,0,70);
+  h2blank->SetMinimum(0);
+  h2blank->SetMaximum(350000);
+  //h2blank->GetXaxis()->SetRange(0,100);
+  h2blank->GetXaxis()->SetTitle("CU");
+  h2blank->GetYaxis()->SetTitle("Max Charge [fC]");
+  h2blank->SetTitle("");
+  h2blank->SetName("");
+  h2blank->SetTitleSize(0.002);
+  h2blank->SetTitleSize(0.05,"X");
+  h2blank->SetTitleSize(0.05,"Y");
+  h2blank->SetTitleOffset(1.0,"X");
+  h2blank->SetTitleOffset(1.2,"Y");
+  h2blank->SetLabelSize(0.04,"X");
+  h2blank->SetLabelSize(0.04,"Y");
+  h2blank->SetStats(false);
+  h2blank->SetLineColor(1);
+  h2blank->Draw("hist");
+  
+  graph_rm1->Draw("P same");
+  graph_rm2->Draw("P same");
+  graph_rm3->Draw("P same");
+  graph_rm4->Draw("P same");
+  catLeg2->AddEntry(graph_rm1,"RM 1","P");
+  catLeg2->AddEntry(graph_rm2,"RM 2","P");
+  catLeg2->AddEntry(graph_rm3,"RM 3","P");
+  catLeg2->AddEntry(graph_rm4,"RM 4","P");
+
+  catLeg2->Draw();  
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
+
+  TCanvas *c3 = new TCanvas("1D RM","",800,800);  
+  //TLegend* catLeg1 = new TLegend(0.75,0.65,0.96,0.88);
+  //catLeg1->SetBorderSize(0);
+  //catLeg1->SetFillStyle(0);
+  gPad->SetTopMargin(0.1);
+  gPad->SetBottomMargin(0.12);
+  gPad->SetRightMargin(0.05);
+  gPad->SetLeftMargin(0.14);  
+  //gPad->SetLogy();
+  
+  TH1F* h3blank = new TH1F("Blank3","",62,0,350000);
+  h3blank->SetMinimum(0);
+  h3blank->SetMaximum(1000);
+  //h3blank->GetXaxis()->SetRange(0,100);
+  h3blank->GetXaxis()->SetTitle("Max Charge [fC]");
+  h3blank->GetYaxis()->SetTitle("Channels");
+  h3blank->SetTitle("");
+  h3blank->SetName("");
+  h3blank->SetTitleSize(0.002);
+  h3blank->SetTitleSize(0.05,"X");
+  h3blank->SetTitleSize(0.05,"Y");
+  h3blank->SetTitleOffset(1.0,"X");
+  h3blank->SetTitleOffset(1.2,"Y");
+  h3blank->SetLabelSize(0.04,"X");
+  h3blank->SetLabelSize(0.04,"Y");
+  h3blank->SetStats(false);
+  h3blank->SetLineColor(1);
+  h3blank->Draw("hist");
+  
+  char entries3 [100];
+  int ent3 = allRM_dist->GetEntries();
+  sprintf (entries3,"Entries: %d", ent3);
+  
+  char mean3 [100];
+  double me3 = allRM_dist->GetMean();
+  sprintf (mean3,"Mean: %0.2lf", me3);
+  
+  char stddev3 [100];
+  double std3 = allRM_dist->GetStdDev(); 
+  sprintf (stddev3,"StdDev: %0.2lf", std3);
+  
+  TLatex* Entries3 = new TLatex(0.92, 0.85, entries3);
+  Entries3->SetNDC();
+  Entries3->SetTextFont(42);
+  Entries3->SetTextAlign(31);
+  
+  TLatex* Mean3 = new TLatex(0.92, 0.8, mean3);
+  Mean3->SetNDC();
+  Mean3->SetTextFont(42);
+  Mean3->SetTextAlign(31);
+  
+  TLatex* Stddev3 = new TLatex(0.92, 0.75, stddev3);
+  Stddev3->SetNDC();
+  Stddev3->SetTextFont(42);
+  Stddev3->SetTextAlign(31);
+
+  allRM_dist->Draw("same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  Entries3->Draw();
+  Mean3->Draw();
+  Stddev3->Draw();
+  RM->Draw();
+  
+  TCanvas *c4  = new TCanvas("1D PD0","",800,800);
+  PD0_dist->Draw();  
+  TCanvas *c5  = new TCanvas("1D PD1","",800,800);
+  PD1_dist->Draw();  
+  TCanvas *c6  = new TCanvas("1D PD2","",800,800);
+  PD2_dist->Draw();  
+  TCanvas *c7  = new TCanvas("1D PD3","",800,800);
+  PD3_dist->Draw();  
+  TCanvas *c8  = new TCanvas("1D PD4","",800,800);
+  PD4_dist->Draw();  
+  TCanvas *c9  = new TCanvas("1D PD5","",800,800);
+  PD5_dist->Draw();  
+  TCanvas *c10 = new TCanvas("1D PD2 3 4 5","",800,800);
+  PD2_3_4_5_dist->Draw();
+  TCanvas *c11 = new TCanvas("1D RM1","",800,800);
+  RM1_dist->Draw();
+  TCanvas *c12 = new TCanvas("1D RM2","",800,800);
+  RM2_dist->Draw();
+  TCanvas *c13 = new TCanvas("1D RM3","",800,800);
+  RM3_dist->Draw();
+  TCanvas *c14 = new TCanvas("1D RM4","",800,800);
+  RM4_dist->Draw();
+
+  c0->SaveAs("PDAllvsCU2D.pdf");
+  c1->SaveAs("PDAll_1D.pdf");
+  c2->SaveAs("RMAllvsCU2D.pdf");
+  c3->SaveAs("RMAll_1D.pdf");
+  c4->SaveAs("PD0_1D.pdf");
+  c5->SaveAs("PD1_1D.pdf");
+  c6->SaveAs("PD2_1D.pdf");
+  c7->SaveAs("PD3_1D.pdf");
+  c8->SaveAs("PD4_1D.pdf");
+  c9->SaveAs("PD5_1D.pdf");
+  c10->SaveAs("PD2_3_4_5_1D.pdf");
+  c11->SaveAs("RM1_1D.pdf");
+  c12->SaveAs("RM2_1D.pdf");
+  c13->SaveAs("RM3_1D.pdf");
+  c14->SaveAs("RM4_1D.pdf");
 } 
 
 int main(){
