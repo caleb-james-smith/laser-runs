@@ -20,10 +20,10 @@
 //Data.....
 //{CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result} 
 //#include "pd_array_test.h"
-#include "passed_cu_data/pd_array.h"
+//#include "passed_cu_data/pd_array.h"
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 //#include "sipm_array_test.h"
-#include "passed_cu_data/sipm_array.h"
+//#include "passed_cu_data/sipm_array.h"
 
 TLatex* Entries(double x, double y, TH1* hist){
   char entries [100];
@@ -81,12 +81,60 @@ TH1F* Blank(const char* name,double num,double low,double high){
 }
 
 void CU_Plots(){
-  int NumChanPD = pd_array.size();
-  int NumChanRM = sipm_array.size();
+  //----------------------------------------------------------------------
+  //Setup
+  //----------------------------------------------------------------------
+  const char* infile1 = "passed_cu_data/pd.root";
+  const char* infile2 = "passed_cu_data/sipm.root";
+  //const char infile1 = "rework_cu_data/pd.root";
+  //const char infile2 = "rework_cu_data/sipm.root";
+  TFile *f1 = new TFile(infile1);
+  if(f1->IsZombie()){
+      cout << "Root file: " << infile1 << " not found!" << endl;
+      return;
+  }
+  TFile *f2 = new TFile(infile2);
+  if(f1->IsZombie()){
+      cout << "Root file: " << infile2 << " not found!" << endl;
+      return;
+  }
+  TTreeReader tReader1("t1",f1);
+  TTreeReader tReader2("t1",f2);
+
+  TTreeReaderValue<Float_t> pd_CU(tReader1, "cu");
+  TTreeReaderValue<Float_t> pd_rbx(tReader1, "rbx");
+  TTreeReaderValue<Float_t> pd_run(tReader1, "run");
+  TTreeReaderValue<Float_t> pd_ch(tReader1, "pd_ch");
+  TTreeReaderValue<Float_t> pd_uhtr_ch(tReader1, "uhtr_ch");
+  TTreeReaderValue<Float_t> pd_shunt(tReader1, "shunt");
+  TTreeReaderValue<Float_t> pd_max_adc(tReader1, "max_adc");
+  TTreeReaderValue<Float_t> pd_max_fc(tReader1, "max_fc");
+  TTreeReaderValue<Float_t> pd_result(tReader1, "result"); 
+
+  TTreeReaderValue<Float_t> sipm_CU(tReader2, "cu");
+  TTreeReaderValue<Float_t> sipm_rbx(tReader2, "rbx");
+  TTreeReaderValue<Float_t> sipm_run(tReader2, "run");
+  TTreeReaderValue<Float_t> sipm_rm(tReader2, "rm");
+  TTreeReaderValue<Float_t> sipm_ch(tReader2, "sipm_ch");
+  TTreeReaderValue<Float_t> sipm_uhtr_ch(tReader2, "uhtr_ch");
+  TTreeReaderValue<Float_t> sipm_shunt(tReader2, "shunt");
+  TTreeReaderValue<Float_t> sipm_max_adc(tReader2, "max_adc");
+  TTreeReaderValue<Float_t> sipm_max_fc(tReader2, "max_fc");
+  TTreeReaderValue<Float_t> sipm_result(tReader2, "result"); 
+
+  int NumChanPD = 0;
+  int NumChanRM = 0;
+  while(tReader1.Next()){NumChanPD+=1;}
+  while(tReader2.Next()){NumChanRM+=1;}
+  tReader1.Restart();
+  tReader2.Restart();
   double convert = 1000;
+  double pinDisMin = 0;
+  double pinDisMax = 20;
+  double rmDisMin = 0;
+  double rmDisMax = 400;
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
   std::cout<<"Number of RM Channels:          "<<NumChanRM<<std::endl;
-
   //----------------------------------------------------------------------
   //Make Pin-Diode Plots
   //----------------------------------------------------------------------
@@ -108,49 +156,51 @@ void CU_Plots(){
   TH1F* PD2_3_4_5_dist   = new TH1F("PD 2 3 4 5","PD 2 3 4 5",62,0,350000/convert);
   std::cout<<"Running over Pin-Diode Channels"<<std::endl;
   char process[100];
-  for(unsigned channel = 0; channel < NumChanPD; ++channel){    
-    sprintf(process,"Processing Channel: %i/%i",channel,NumChanPD);
-    if(channel%10==0){std::cout<<process<<std::endl;}
-    if(pd_array[channel][8] == 1 && pd_array[channel][3] == 0){
-      xPD0[channel] = pd_array[channel][0]; yPD0[channel] = pd_array[channel][7]/convert;
-      profile_pd0->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
-      PD0_dist->Fill(pd_array[channel][7]/convert);
+  int channel1 = -1;
+  while(tReader1.Next()){
+    channel1+=1;
+    sprintf(process,"Processing Channel: %i/%i",channel1,NumChanPD);
+    if(channel1%10==0){std::cout<<process<<std::endl;}
+    if(*pd_result == 1 && *pd_ch == 0){
+      xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_fc/convert;
+      profile_pd0->Fill(*pd_CU,*pd_max_fc/convert);
+      PD0_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD0[channel] = -100;yPD0[channel] = -100;}
-    if(pd_array[channel][8] == 1 && pd_array[channel][3] == 1){
-      xPD1[channel] = pd_array[channel][0]; yPD1[channel] = pd_array[channel][7]/convert;
-      profile_pd1->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
-      PD1_dist->Fill(pd_array[channel][7]/convert);
+    else{xPD0[channel1] = -100;yPD0[channel1] = -100;}
+    if(*pd_result == 1 && *pd_ch == 1){
+      xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_fc/convert;
+      profile_pd1->Fill(*pd_CU,*pd_max_fc/convert);
+      PD1_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD1[channel] = -100;yPD1[channel] = -100;}
-    if(pd_array[channel][8] == 1 && pd_array[channel][3] == 2){
-      xPD2[channel] = pd_array[channel][0]; yPD2[channel] = pd_array[channel][7]/convert;
-      profile_pd2->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
-      PD2_dist->Fill(pd_array[channel][7]/convert);
+    else{xPD1[channel1] = -100;yPD1[channel1] = -100;}
+    if(*pd_result == 1 && *pd_ch == 2){
+      xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_fc/convert;
+      profile_pd2->Fill(*pd_CU,*pd_max_fc/convert);
+      PD2_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD2[channel] = -100;yPD2[channel] = -100;}
-    if(pd_array[channel][8] == 1 && pd_array[channel][3] == 3){
-      xPD3[channel] = pd_array[channel][0]; yPD3[channel] = pd_array[channel][7]/convert;
-      profile_pd3->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
-      PD3_dist->Fill(pd_array[channel][7]/convert);
+    else{xPD2[channel1] = -100;yPD2[channel1] = -100;}
+    if(*pd_result == 1 && *pd_ch == 3){
+      xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_fc/convert;
+      profile_pd3->Fill(*pd_CU,*pd_max_fc/convert);
+      PD3_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD3[channel] = -100;yPD3[channel] = -100;}
-    if(pd_array[channel][8] == 1 && pd_array[channel][3] == 4){
-      xPD4[channel] = pd_array[channel][0]; yPD4[channel] = pd_array[channel][7]/convert;
-      profile_pd4->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
-      PD4_dist->Fill(pd_array[channel][7]/convert);
+    else{xPD3[channel1] = -100;yPD3[channel1] = -100;}
+    if(*pd_result == 1 && *pd_ch == 4){
+      xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_fc/convert;
+      profile_pd4->Fill(*pd_CU,*pd_max_fc/convert);
+      PD4_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD4[channel] = -100;yPD4[channel] = -100;}
-    if(pd_array[channel][8] == 1 && pd_array[channel][3] == 5){
-      xPD5[channel] = pd_array[channel][0]; yPD5[channel] = pd_array[channel][7]/convert;
-      profile_pd5->Fill(pd_array[channel][0],pd_array[channel][7]/convert);
-      PD5_dist->Fill(pd_array[channel][7]/convert);
+    else{xPD4[channel1] = -100;yPD4[channel1] = -100;}
+    if(*pd_result == 1 && *pd_ch == 5){
+      xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_fc/convert;
+      profile_pd5->Fill(*pd_CU,*pd_max_fc/convert);
+      PD5_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD5[channel] = -100;yPD5[channel] = -100;}
-    if(pd_array[channel][8] == 1 && (pd_array[channel][3] == 2 || pd_array[channel][3] == 3 || pd_array[channel][3] == 4 || pd_array[channel][3] == 5 )){
-      PD2_3_4_5_dist->Fill(pd_array[channel][7]/convert);
+    else{xPD5[channel1] = -100;yPD5[channel1] = -100;}
+    if(*pd_result == 1 && (*pd_ch == 2 || *pd_ch == 3 || *pd_ch == 4 || *pd_ch == 5 )){
+      PD2_3_4_5_dist->Fill(*pd_max_fc/convert);
     }
-    allPD_dist->Fill(pd_array[channel][7]/convert);
+    allPD_dist->Fill(*pd_max_fc/convert);
   }
   sprintf(process,"Done with Pin-Diode Channels: %i/%i",NumChanPD,NumChanPD);
   std::cout<<process<<std::endl;
@@ -188,34 +238,36 @@ void CU_Plots(){
   TH1F* RM3_dist   = new TH1F("RM3 Dist","RM3 Dist",62,0,350000/convert);
   TH1F* RM4_dist   = new TH1F("RM4 Dist","RM4 Dist",62,0,350000/convert);
   std::cout<<"Running over RM Channels"<<std::endl;
-  for(unsigned channel = 0; channel < NumChanRM; ++channel){
-    sprintf(process,"Processing Channel: %i/%i",channel,NumChanRM);
-    if(channel%100==0){std::cout<<process<<std::endl;}
-    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 1){
-      xRM1[channel] = sipm_array[channel][0]; yRM1[channel] = sipm_array[channel][8]/convert;
-      profile_rm1->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
-      RM1_dist->Fill(sipm_array[channel][8]/convert);
+  int channel2 = -1;
+  while(tReader2.Next()){    
+    channel2+=1;
+    sprintf(process,"Processing Channel: %i/%i",channel2,NumChanRM);
+    if(channel2%500==0){std::cout<<process<<std::endl;}
+    if(*sipm_result == 1 && *sipm_rm == 1){
+      xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_fc/convert;
+      profile_rm1->Fill(*sipm_CU,*sipm_max_fc/convert);
+      RM1_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM1[channel] = -100;yRM1[channel] = -100;}
-    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 2){
-      xRM2[channel] = sipm_array[channel][0]; yRM2[channel] = sipm_array[channel][8]/convert;
-      profile_rm2->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
-      RM2_dist->Fill(sipm_array[channel][8]/convert);
+    else{xRM1[channel2] = -100;yRM1[channel2] = -100;}
+    if(*sipm_result == 1 && *sipm_rm == 2){
+      xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_fc/convert;
+      profile_rm2->Fill(*sipm_CU,*sipm_max_fc/convert);
+      RM2_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM2[channel] = -100;yRM2[channel] = -100;}
-    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 3){
-      xRM3[channel] = sipm_array[channel][0]; yRM3[channel] = sipm_array[channel][8]/convert;
-      profile_rm3->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
-      RM3_dist->Fill(sipm_array[channel][8]/convert);
+    else{xRM2[channel2] = -100;yRM2[channel2] = -100;}
+    if(*sipm_result == 1 && *sipm_rm == 3){
+      xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_fc/convert;
+      profile_rm3->Fill(*sipm_CU,*sipm_max_fc/convert);
+      RM3_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM3[channel] = -100;yRM3[channel] = -100;}
-    if(sipm_array[channel][9] == 1 && sipm_array[channel][3] == 4){
-      xRM4[channel] = sipm_array[channel][0]; yRM4[channel] = sipm_array[channel][8]/convert;
-      profile_rm4->Fill(sipm_array[channel][0],sipm_array[channel][8]/convert);
-      RM4_dist->Fill(sipm_array[channel][8]/convert);
+    else{xRM3[channel2] = -100;yRM3[channel2] = -100;}
+    if(*sipm_result == 1 && *sipm_rm == 4){
+      xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_fc/convert;
+      profile_rm4->Fill(*sipm_CU,*sipm_max_fc/convert);
+      RM4_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM4[channel] = -100;yRM4[channel] = -100;}
-    allRM_dist->Fill(sipm_array[channel][8]/convert);
+    else{xRM4[channel2] = -100;yRM4[channel2] = -100;}
+    allRM_dist->Fill(*sipm_max_fc/convert);
   }
   sprintf(process,"Done with RM Channels: %i/%i",NumChanRM,NumChanRM);
   std::cout<<process<<std::endl;
@@ -327,8 +379,8 @@ void CU_Plots(){
 
   TCanvas *c1 = Canvas("1D PD",800,800);
   TH1F* h1blank = Blank("Blank1",62,0,350000/convert);
-  h1blank->SetMinimum(0);
-  h1blank->SetMaximum(50);
+  h1blank->SetMinimum(pinDisMin);
+  h1blank->SetMaximum(5*pinDisMax);
   h1blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h1blank->GetYaxis()->SetTitle("Channels");
   h1blank->Draw("hist");  
@@ -366,8 +418,8 @@ void CU_Plots(){
 
   TCanvas *c3 = Canvas("1D RM",800,800);  
   TH1F* h3blank = Blank("Blank3",62,0,350000/convert);
-  h3blank->SetMinimum(0);
-  h3blank->SetMaximum(1000);
+  h3blank->SetMinimum(rmDisMin);
+  h3blank->SetMaximum(4*rmDisMax);
   h3blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h3blank->GetYaxis()->SetTitle("Channels");
   h3blank->Draw("hist");  
@@ -435,8 +487,8 @@ void CU_Plots(){
 
   TCanvas *c6  = Canvas("1D PD0",800,800);
   TH1F* h6blank = Blank("Blank6",250,0,350000/convert);
-  h6blank->SetMinimum(0);
-  h6blank->SetMaximum(50);
+  h6blank->SetMinimum(pinDisMin);
+  h6blank->SetMaximum(pinDisMax);
   h6blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h6blank->GetYaxis()->SetTitle("Channels");
   h6blank->Draw();
@@ -449,8 +501,8 @@ void CU_Plots(){
   StdDevPD0->Draw();
   TCanvas *c7  = Canvas("1D PD1",800,800);
   TH1F* h7blank = Blank("Blank7",250,0,350000/convert);
-  h7blank->SetMinimum(0);
-  h7blank->SetMaximum(50);
+  h7blank->SetMinimum(pinDisMin);
+  h7blank->SetMaximum(pinDisMax);
   h7blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h7blank->GetYaxis()->SetTitle("Channels");
   h7blank->Draw();
@@ -463,8 +515,8 @@ void CU_Plots(){
   StdDevPD1->Draw();
   TCanvas *c8  = Canvas("1D PD2",800,800);
   TH1F* h8blank = Blank("Blank8",250,0,350000/convert);
-  h8blank->SetMinimum(0);
-  h8blank->SetMaximum(50);
+  h8blank->SetMinimum(pinDisMin);
+  h8blank->SetMaximum(pinDisMax);
   h8blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h8blank->GetYaxis()->SetTitle("Channels");
   h8blank->Draw();
@@ -477,8 +529,8 @@ void CU_Plots(){
   StdDevPD2->Draw();
   TCanvas *c9  = Canvas("1D PD3",800,800);
   TH1F* h9blank = Blank("Blank9",250,0,350000/convert);
-  h9blank->SetMinimum(0);
-  h9blank->SetMaximum(50);
+  h9blank->SetMinimum(pinDisMin);
+  h9blank->SetMaximum(pinDisMax);
   h9blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h9blank->GetYaxis()->SetTitle("Channels");
   h9blank->Draw();
@@ -491,8 +543,8 @@ void CU_Plots(){
   StdDevPD3->Draw();
   TCanvas *c10  = Canvas("1D PD4",800,800);
   TH1F* h10blank = Blank("Blank10",250,0,350000/convert);
-  h10blank->SetMinimum(0);
-  h10blank->SetMaximum(50);
+  h10blank->SetMinimum(pinDisMin);
+  h10blank->SetMaximum(pinDisMax);
   h10blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h10blank->GetYaxis()->SetTitle("Channels");
   h10blank->Draw();
@@ -505,8 +557,8 @@ void CU_Plots(){
   StdDevPD4->Draw();
   TCanvas *c11  = Canvas("1D PD5",800,800);
   TH1F* h11blank = Blank("Blank11",250,0,350000/convert);
-  h11blank->SetMinimum(0);
-  h11blank->SetMaximum(50);
+  h11blank->SetMinimum(pinDisMin);
+  h11blank->SetMaximum(pinDisMax);
   h11blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h11blank->GetYaxis()->SetTitle("Channels");
   h11blank->Draw();
@@ -519,8 +571,8 @@ void CU_Plots(){
   StdDevPD5->Draw();
   TCanvas *c12 = Canvas("1D PD2 3 4 5",800,800);
   TH1F* h12blank = Blank("Blank12",250,0,350000/convert);
-  h12blank->SetMinimum(0);
-  h12blank->SetMaximum(50);
+  h12blank->SetMinimum(pinDisMin);
+  h12blank->SetMaximum(3*pinDisMax);
   h12blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h12blank->GetYaxis()->SetTitle("Channels");
   h12blank->Draw();
@@ -533,8 +585,8 @@ void CU_Plots(){
   StdDevPD2_3_4_5->Draw();
   TCanvas *c13 = Canvas("1D RM1",800,800);
   TH1F* h13blank = Blank("Blank13",250,0,350000/convert);
-  h13blank->SetMinimum(0);
-  h13blank->SetMaximum(50);
+  h13blank->SetMinimum(rmDisMin);
+  h13blank->SetMaximum(rmDisMax);
   h13blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h13blank->GetYaxis()->SetTitle("Channels");
   h13blank->Draw();
@@ -547,8 +599,8 @@ void CU_Plots(){
   StdDevRM1->Draw();
   TCanvas *c14 = Canvas("1D RM2",800,800);
   TH1F* h14blank = Blank("Blank14",250,0,350000/convert);
-  h14blank->SetMinimum(0);
-  h14blank->SetMaximum(50);
+  h14blank->SetMinimum(rmDisMin);
+  h14blank->SetMaximum(rmDisMax);
   h14blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h14blank->GetYaxis()->SetTitle("Channels");
   h14blank->Draw();
@@ -561,8 +613,8 @@ void CU_Plots(){
   StdDevRM2->Draw();
   TCanvas *c15 = Canvas("1D RM3",800,800);
   TH1F* h15blank = Blank("Blank15",250,0,350000/convert);
-  h15blank->SetMinimum(0);
-  h15blank->SetMaximum(50);
+  h15blank->SetMinimum(rmDisMin);
+  h15blank->SetMaximum(rmDisMax);
   h15blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h15blank->GetYaxis()->SetTitle("Channels");
   h15blank->Draw();
@@ -575,8 +627,8 @@ void CU_Plots(){
   StdDevRM3->Draw();
   TCanvas *c16 = Canvas("1D RM4",800,800);
   TH1F* h16blank = Blank("Blank16",250,0,350000/convert);
-  h16blank->SetMinimum(0);
-  h16blank->SetMaximum(50);
+  h16blank->SetMinimum(rmDisMin);
+  h16blank->SetMaximum(rmDisMax);
   h16blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h16blank->GetYaxis()->SetTitle("Channels");
   h16blank->Draw();
