@@ -1,6 +1,6 @@
 #include <vector>
 
-// {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
+// {cu,rbx,run,rm,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 std::vector< std::vector<double> > sipm_array = {
 {6, 0, 1, 1, 0, 12, 31, 216, 91282.40, 1},
 {6, 0, 1, 1, 1, 13, 31, 226, 123026.40, 1},

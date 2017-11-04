@@ -195,7 +195,7 @@ def makeTable(runDir, tables, runList):
     adcConverter = ADCConverter()
     for table in tables:
         print "Creating {0} table".format(table)
-        tfile = TFile(table + '.root', 'recreate')
+        tfile = TFile(runDir + table + '.root', 'recreate')
         tree = TTree('t1', 't1')
         array_dict = {}
         with open (runDir + table + "_array.h", 'w') as a:
@@ -205,8 +205,8 @@ def makeTable(runDir, tables, runList):
                 elif table == "pd":
                     columns = ["cu", "rbx", "run", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
                 for key in columns:
-                    array_dict[key] = array('f', [0.0])
-                    float_name = "{0}/F".format(key)
+                    array_dict[key] = array('f', [ 0. ])
+                    float_name = '{0}/F'.format(key)
                     tree.Branch(key, array_dict[key], float_name)
                 
                 header_table = "".join(entry.ljust(col_width) for entry in columns) + "\n"
@@ -301,8 +301,11 @@ def makeTable(runDir, tables, runList):
                                         array_string += "{" + ", ".join(row) + "},\n"
                                         row_string =  "".join(entry.ljust(col_width) for entry in row)
                                         t.write(row_string + "\n") 
+                                        tree_string = ""
                                         for i, key in enumerate(columns):
-                                            array_dict[key] = row[i]
+                                            array_dict[key] = float(row[i])
+                                            tree_string += str(array_dict[key]) + " "
+                                        print tree_string
                                         tree.Fill()
                                         #if result == "0":
                                         #    print row_string
@@ -328,7 +331,7 @@ if __name__ == "__main__":
     # sipm: iterations 1, 2, 3
     tables = ["sipm"]
     runList = list(i for i in xrange(1,4))
-    makeTable(runDir, tables, runList)
+    #makeTable(runDir, tables, runList)
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     tables = ["pd"]
     runList = list(i for i in xrange(1,8))

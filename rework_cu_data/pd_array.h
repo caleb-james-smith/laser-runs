@@ -1,6 +1,6 @@
 #include <vector>
 
-// {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
+// {cu,rbx,run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 std::vector< std::vector<double> > pd_array = {
 {15, 0, 1, 0, 0, 31, 170, 21058.40, 1},
 {15, 0, 1, 1, 1, 31, 154, 12126.40, 1},
