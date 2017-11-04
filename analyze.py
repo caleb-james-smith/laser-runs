@@ -6,6 +6,7 @@ from ADCConverter import ADCConverter
 import os
 import mapping
 from argparse import ArgumentParser
+from array import array
 
 def plotData(file1, file2, ch, type, runDir, plotDir, shunts):
     # Batch Mode removes X-forwarding for canvas creation graphics
@@ -193,13 +194,20 @@ def makeTable(runDir, tables, runList):
     col_width = 10
     adcConverter = ADCConverter()
     for table in tables:
-        print "Proccessing {0} table".format(table)
+        print "Creating {0} table".format(table)
+        tfile = TFile(table + '.root', 'recreate')
+        tree = TTree('t1', 't1')
+        array_dict = {}
         with open (runDir + table + "_array.h", 'w') as a:
             with open (runDir + table + "_table.txt", 'w') as t:
                 if table == "sipm":
-                    columns = ["CU", "RBX", "Run", "RM", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
+                    columns = ["cu", "rbx", "run", "rm", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
                 elif table == "pd":
-                    columns = ["CU", "RBX", "Run", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
+                    columns = ["cu", "rbx", "run", table + "_ch", "uhtr_ch", "shunt", "max_adc", "max_fc", "result"]
+                for key in columns:
+                    array_dict[key] = array('f', [0.0])
+                    float_name = "{0}/F".format(key)
+                    tree.Branch(key, array_dict[key], float_name)
                 
                 header_table = "".join(entry.ljust(col_width) for entry in columns) + "\n"
                 header_array = "{" + ",".join(columns) + "}\n"
@@ -293,6 +301,9 @@ def makeTable(runDir, tables, runList):
                                         array_string += "{" + ", ".join(row) + "},\n"
                                         row_string =  "".join(entry.ljust(col_width) for entry in row)
                                         t.write(row_string + "\n") 
+                                        for i, key in enumerate(columns):
+                                            array_dict[key] = row[i]
+                                        tree.Fill()
                                         #if result == "0":
                                         #    print row_string
                     # calibration unit lopp
@@ -303,6 +314,8 @@ def makeTable(runDir, tables, runList):
                 array_string += "};\n"
                 a.write(array_string)
         # table loop
+        tfile.Write()
+        tfile.Close()
         for c in sorted(cuBadChannels):
             print "CU {0} : {1} bad {2} channels".format(c, cuBadChannels[c], table)
 

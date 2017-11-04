@@ -43,7 +43,7 @@ def getData(data_dir):
                 s = line.split()
                 if int(s[-1]) == 0:
                     # skip data that does not pass
-                    print line
+                    #print line
                     continue
                 d = float(s[fc_position])
                 element_value = int(s[element_position])
