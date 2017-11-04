@@ -303,9 +303,9 @@ def makeTable(runDir, tables, runList):
                                         t.write(row_string + "\n") 
                                         tree_string = ""
                                         for i, key in enumerate(columns):
-                                            array_dict[key] = float(row[i])
-                                            tree_string += str(array_dict[key]) + " "
-                                        print tree_string
+                                            array_dict[key][0] = float(row[i])
+                                            tree_string += str(array_dict[key][0]) + " "
+                                        #print tree_string
                                         tree.Fill()
                                         #if result == "0":
                                         #    print row_string
@@ -331,7 +331,7 @@ if __name__ == "__main__":
     # sipm: iterations 1, 2, 3
     tables = ["sipm"]
     runList = list(i for i in xrange(1,4))
-    #makeTable(runDir, tables, runList)
+    makeTable(runDir, tables, runList)
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     tables = ["pd"]
     runList = list(i for i in xrange(1,8))
