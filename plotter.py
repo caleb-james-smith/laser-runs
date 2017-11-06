@@ -83,6 +83,19 @@ def plotHisto(data, plot_dir, info):
     plt.savefig(plot_dir + name + ".pdf")
     plt.clf()
 
+def plotScatter(x_list, y_list, plot_dir, info):
+    name = info["name"]
+    title = info["title"]
+    xtitle = info["xtitle"]
+    ytitle = info["ytitle"]
+    plt.scatter(x_list, y_list)
+    plt.title(title)
+    plt.xlabel(xtitle)
+    plt.ylabel(ytitle)
+    plt.savefig(plot_dir + name + ".png")
+    plt.savefig(plot_dir + name + ".pdf")
+    plt.clf()
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--config",   "-c", default="config/passed.json", help="json config file")
@@ -106,5 +119,15 @@ if __name__ == "__main__":
     
     for key in info:
         plotHisto(data, plot_dir, info[key])
+
+    pd1vspd0_info = {}
+    pd1vspd0_info["name"] = "pd1_pd0"
+    pd1vspd0_info["title"] = "Pin Diode 1 vs Pin Diode 0"
+    pd1vspd0_info["xtitle"] = "Pin Diode 0 Max fC"
+    pd1vspd0_info["ytitle"] = "Pin Diode 1 Max fC"
+
+    x_list = data["pd0"]
+    y_list = data["pd1"]
+    plotScatter(x_list, y_list, plot_dir, pd1vspd0_info)
 
 
