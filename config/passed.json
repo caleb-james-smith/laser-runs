@@ -6,8 +6,8 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 50,
-        "xstat" : 200000,
-        "ystat" : 3000
+        "xstat" : 220000,
+        "ystat" : 900
         },
     "rm1" : {
         "name" : "rm1",
@@ -16,8 +16,8 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 20,
-        "xstat" : 200000,
-        "ystat" : 700
+        "xstat" : 220000,
+        "ystat" : 400
         },
     "rm2" : {
         "name" : "rm2",
@@ -36,8 +36,8 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 20,
-        "xstat" : 100000,
-        "ystat" : 700
+        "xstat" : 0,
+        "ystat" : 300
         },
     "rm4" : {
         "name" : "rm4",
@@ -46,8 +46,8 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 20,
-        "xstat" : 100000,
-        "ystat" : 800
+        "xstat" : 25000,
+        "ystat" : 400
         },
     "pd" : {
         "name" : "pd",
@@ -66,8 +66,8 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 20,
-        "xstat" : 0,
-        "ystat" : 15
+        "xstat" : 20000,
+        "ystat" : 20
         },
     "pd1" : {
         "name" : "pd1",
@@ -76,7 +76,7 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 20,
-        "xstat" : 10000,
+        "xstat" : 20000,
         "ystat" : 12
         },
     "pd_quartz" : {
@@ -86,8 +86,8 @@
         "ytitle" : "Number of Channels",
         "units" : "fC",
         "nbins" : 30,
-        "xstat" : 0,
-        "ystat" : 35
+        "xstat" : 20000,
+        "ystat" : 30
         },
     "pd_megatile" : {
         "name" : "pd_megatile",
