@@ -79,25 +79,6 @@ def getData(data_dir):
             ave = np.mean(data[cu_key][element_key])
             data["%s_ave" % element_key].append(ave)
     
-    # number of channels for rm 1, 2, 3, 4
-    '''
-    num_channels = [48, 46, 46, 48]
-    total_channels = sum(num_channels)
-    for rm in xrange(1,5):
-        start, i = 0, 1
-        while i < rm:
-            start += num_channels[i-1]
-            i += 1
-        rm_data = data["rm%d"%rm] 
-        rm_channels = num_channels[rm-1]
-        data["rm%d_ave"%rm] = []
-        j = start
-        while j < len(rm_data):
-            rm_ave = np.mean(rm_data[j:j+rm_channels])
-            data["rm%d_ave"%rm].append(rm_ave) 
-            j += total_channels
-    '''
-
     #for key in data:
     #    print "length of {0} data: {1}".format(key, len(data[key]))
 
@@ -198,9 +179,13 @@ def plotRMvsPD(data, plot_dir, info):
         
         title += " %d" % pd
         xtitle += " %d Max fC" % pd
+        
+        axes = plt.gca()
         plt.title(title)
         plt.xlabel(xtitle)
         plt.ylabel(ytitle)
+        axes.set_xlim([0, 70000])
+        axes.set_ylim([30000, 200000])
         plt.savefig(plot_dir + name + "_pd%d.png" % pd)
         plt.savefig(plot_dir + name + "_pd%d.pdf" % pd)
         plt.clf()
@@ -244,8 +229,8 @@ if __name__ == "__main__":
     rm_pd_info["title"] = "SiPMs vs Pin Diode"
     rm_pd_info["xtitle"] = "Pin Diode"
     rm_pd_info["ytitle"] = "SiPM Max fC"
-    rm_pd_info["xstat"] = 20000 
-    rm_pd_info["ystat"] = 50000
+    rm_pd_info["xstat"] = 5000
+    rm_pd_info["ystat"] = 160000
 
     x = data["pd0"]
     y = data["pd1"]
