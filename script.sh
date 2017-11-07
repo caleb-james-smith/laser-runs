@@ -110,6 +110,9 @@ fi fi fi fi fi fi
 # Fe, fi, fo, fum!
 # I hear a giant beating his drum!
 
+# set shunts
+./setup.py -r $rbx
+
 echo "RBX: $rbx"
 echo "uHTR 1: $crate1:$uhtr1"
 echo "uHTR 2: $crate1:$uhtr2"
@@ -197,9 +200,9 @@ done
 #Display pin-diodes plots
 num=2
 pdCareAbout=$(($iteration-$num))
-if [ $iteration = 1 ] || [ $iteration = 2 ] || [ $iteration = 3 ]; then
+# in bash, use gt for greater than and lt for less than when comparing integers
+if [ "$iteration" -lt 4 ] || [ "$iteration" -gt 7 ]; then
     display rbx"$rbx"-cu-pd0_"$iteration".pdf rbx"$rbx"-cu-pd1_"$iteration".pdf rbx"$rbx"-rm*_"$iteration".pdf 
 else
     display rbx"$rbx"-cu-pd"$pdCareAbout"_"$iteration".pdf 
 fi
-    #display rbx"$rbx"-cu-pd0_"$iteration".pdf rbx"$rbx"-cu-pd1_"$iteration".pdf rbx"$rbx"-cu-pd2_"$iteration".pdf rbx"$rbx"-cu-pd3_"$iteration".pdf rbx"$rbx"-cu-pd4_"$iteration".pdf rbx"$rbx"-cu-pd5_"$iteration".pdf
