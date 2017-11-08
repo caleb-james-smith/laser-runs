@@ -179,7 +179,7 @@ def plotMax(runDir, dictionary):
     C1.SaveAs(runDir + 'max_adc_' + ch_type + '.pdf')
 
 # Table options are "sipm", "pd", and "pindiodes"
-def makeTable(runDir, tables, runList):
+def makeTable(runDir, tables, runList, stability=False):
     if runDir[-1] != "/":
         runDir += "/"
     cuList = []
@@ -267,28 +267,36 @@ def makeTable(runDir, tables, runList):
                                     elif table == "pd": 
                                         chList = mapping.rbxPD[rbx_full]
                                     for i, channel in enumerate(chList):
+                                        # mask pin-diodes that do not have light
+                                        if stability:
+                                            if table == "pd":
+                                                if i > 1:
+                                                    continue
+                                        else:
+                                            if table == "sipm":
+                                                if irun > 3:
+                                                    continue
+                                            if table == "pd":
+                                                # runs 1, 2, and 3 are pin-diode chs 0, 1
+                                                if irun < 4:
+                                                    if i > 1:
+                                                        continue 
+                                                # runs 4, 5, 6, and 7 are pin-diode chs 2, 3, 4, and 5
+                                                else:
+                                                    if i != irun-2:
+                                                        continue
                                         rm_ch = str(i % 48)
                                         pd_ch = str(i % 6)
                                         if rm_ch == "0":
                                             RM += 1
                                         rm = "%d" % RM
-                                        uhtr_ch = channel.split("h")[-1]
-                                        max_adc = str(findMaxADC(f, channel, False))
-                                        max_fc  = "%.2f" % adcConverter.linearize(max_adc)
-                                        # mask pin-diodes that do not have light
-                                        if table == "pd":
-                                            # runs 1, 2, and 3 are pin-diode chs 0, 1
-                                            if irun < 4:
-                                                if i > 1:
-                                                    continue 
-                                            # runs 4, 5, 6, and 7 are pin-diode chs 2, 3, 4, and 5
-                                            if irun > 3:
-                                                if i != irun-2:
-                                                    continue
                                         # mask out 4 dark channels per RBX
                                         if (rm, rm_ch) in mapping.darkSipms:
                                             #print "mask out channel: RM %s SiPM %s" % (rm, rm_ch)
                                             continue    
+                                        uhtr_ch = channel.split("h")[-1]
+                                        max_adc = str(findMaxADC(f, channel, False))
+                                        max_fc  = "%.2f" % adcConverter.linearize(max_adc)
                                         if int(max_adc) >= cutoff:
                                             result = "1"
                                         else:
@@ -326,14 +334,16 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--directory", "-d", default="rework_cu_data", help="directory containing directories with CU data")
     options = parser.parse_args()
-    # RBX 0: iterations 1 - 7
     runDir = options.directory
+    
     # sipm: iterations 1, 2, 3
-    tables = ["sipm"]
-    runList = list(i for i in xrange(1,4))
-    makeTable(runDir, tables, runList)
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
-    tables = ["pd"]
+    tables = ["sipm", "pd"]
     runList = list(i for i in xrange(1,8))
-    makeTable(runDir, tables, runList)
+    #makeTable(runDir, tables, runList)
+
+    # sipm: iterations for stability runs
+    tables = ["sipm", "pd"]
+    runList = list(i for i in xrange(10,17))
+    makeTable(runDir, tables, runList, True)
 
