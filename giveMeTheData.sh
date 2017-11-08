@@ -4,14 +4,22 @@
 # run script: ./giveMeTheData.sh -p caleb
 
 dir=""
-if [ "$1" = "-r" ]; then
-    dir="rework_cu_data"
+if [ "$1" = "-a" ]; then
+    dir="all_cu_data"
 else if [ "$1" = "-p" ]; then
     dir="passed_cu_data"
+else if [ "$1" = "-r" ]; then
+    dir="rework_cu_data"
+else if [ "$1" = "-s" ]; then
+    dir="stability_cu_data"
 else
-    echo "Use -r for rework_cu_data and -p for passed_cu_data."
+    echo "Use these options for getting the root file for different data sets."
+    echo "  -a all_cu_data"
+    echo "  -p passed_cu_data"
+    echo "  -r rework_cu_data"
+    echo "  -s stability_cu_data"
     exit 1
-fi fi
+fi fi fi fi 
 echo "You have selected: $dir"
 
 user=""
