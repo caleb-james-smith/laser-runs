@@ -136,14 +136,14 @@ echo ${pd_channels[@]}
 pd=0
 for ch in "${pd_channels[@]}"
 do
-  cu_file=macro_pd"$pd".C
-  echo "{" > $cu_file
-  echo ""$ch"->Draw();" >> $cu_file
-  echo ""$ch"->SetTitle(\"CU "$cu" Pindiode Ch. "$pd", Shunt "$shunt", Iteration "$iteration";ADC;counts\");" >> $cu_file
-  echo "c1->SetLogy();" >> $cu_file
-  echo "c1->SaveAs(\"CU_pd"$pd".pdf\");" >> $cu_file
-  echo "}" >> $cu_file
-  pd=$((pd+1))
+    cu_file=macro_pd"$pd".C
+    echo "{" > $cu_file
+    echo ""$ch"->Draw();" >> $cu_file
+    echo ""$ch"->SetTitle(\"CU "$cu" Pindiode Ch. "$pd", Shunt "$shunt", Iteration "$iteration";ADC;counts\");" >> $cu_file
+    echo "c1->SetLogy();" >> $cu_file
+    echo "c1->SaveAs(\"CU_pd"$pd".pdf\");" >> $cu_file
+    echo "}" >> $cu_file
+    pd=$((pd+1))
 done
 
 # write macros for RMs
@@ -156,14 +156,14 @@ done
 rm=1
 for ch in "${rm_channels[@]}"
 do
-  rm_file=macro_rm"$rm".C
-  echo "{" > $rm_file
-  echo ""$ch"->Draw();" >> $rm_file
-  echo ""$ch"->SetTitle(\"CU "$cu" RM "$rm" Fib. 0 Ch. 0, Shunt "$shunt", Iteration "$iteration";ADC;counts\");" >> $rm_file
-  echo "c1->SetLogy();" >> $rm_file
-  echo "c1->SaveAs(\"RM"$rm".pdf\");" >> $rm_file
-  echo "}" >> $rm_file
-  rm=$((rm+1))
+    rm_file=macro_rm"$rm".C
+    echo "{" > $rm_file
+    echo ""$ch"->Draw();" >> $rm_file
+    echo ""$ch"->SetTitle(\"CU "$cu" RM "$rm" Fib. 0 Ch. 0, Shunt "$shunt", Iteration "$iteration";ADC;counts\");" >> $rm_file
+    echo "c1->SetLogy();" >> $rm_file
+    echo "c1->SaveAs(\"RM"$rm".pdf\");" >> $rm_file
+    echo "}" >> $rm_file
+    rm=$((rm+1))
 done
 
 # initialize links for calibration unit uHTR
@@ -179,21 +179,33 @@ mv data.root rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root
 uHTRtool.exe -o $host -c $crate2:$uhtr3 -s $commands 
 mv data.root rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root
 
-# Use rm macros
-root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm1.C
-root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm2.C
-root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm3.C
-root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm4.C
+# Use rm macros: note that uhtr1 and uhtr2 are used based on the channel mapping
+if [ "${rm_channels[0]}" = "h12" ] || [ "${rm_channels[0]}" = "h48" ]; then
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm1.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm2.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm3.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm4.C
+else if [ "${rm_channels[0]}" = "h0" ]; then
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm1.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm2.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm3.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm4.C
+else if [ "${rm_channels[0]}" = "h96" ]; then
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr1_"$iteration".root macro_rm1.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm2.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm3.C
+    root -b -q rbx"$rbx"_shunt"$shunt"_uhtr2_"$iteration".root macro_rm4.C
+fi fi fi
 
 for rm in `seq 1 4`;
 do
-  mv RM"$rm".pdf rbx"$rbx"-rm"$rm"_"$iteration".pdf
+    mv RM"$rm".pdf rbx"$rbx"-rm"$rm"_"$iteration".pdf
 done
 # Use cu macros
 for pd in `seq 0 5`;
 do
-  root -b -q rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root macro_pd"$pd".C
-  mv CU_pd"$pd".pdf rbx"$rbx"-cu-pd"$pd"_"$iteration".pdf
+    root -b -q rbx"$rbx"_shunt"$shunt"_pd_"$iteration".root macro_pd"$pd".C
+    mv CU_pd"$pd".pdf rbx"$rbx"-cu-pd"$pd"_"$iteration".pdf
 done
 
 
@@ -206,3 +218,4 @@ if [ "$iteration" -lt 4 ] || [ "$iteration" -gt 7 ]; then
 else
     display rbx"$rbx"-cu-pd"$pdCareAbout"_"$iteration".pdf 
 fi
+
