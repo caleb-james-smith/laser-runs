@@ -72,12 +72,18 @@ def getData(data_dir):
         cu_key = "cu%d" % cu
         for pd in xrange(6):
             element_key ="pd%d" % pd 
-            ave = np.mean(data[cu_key][element_key])
-            data["%s_ave" % element_key].append(ave)
+            if data[cu_key][element_key]:
+                ave = np.mean(data[cu_key][element_key])
+                data["%s_ave" % element_key].append(ave)
+            else:
+                print "No pin-diode data for {0} {1}".format(cu_key, element_key)
         for rm in xrange(1,5):
             element_key ="rm%d" % rm
-            ave = np.mean(data[cu_key][element_key])
-            data["%s_ave" % element_key].append(ave)
+            if data[cu_key][element_key]:
+                ave = np.mean(data[cu_key][element_key])
+                data["%s_ave" % element_key].append(ave)
+            else:
+                print "No sipm data for {0} {1}".format(cu_key, element_key)
     
     #for key in data:
     #    print "length of {0} data: {1}".format(key, len(data[key]))
@@ -160,22 +166,26 @@ def plotRMvsPD(data, plot_dir, info):
             print "number of rm %d ave: %d" % (rm, len(y))
             print "y = {0}".format(y)
             
-            # calculate fit function
-            z = np.polyfit(x, y, 1)
-            f = np.poly1d(z)
-            f_string = str(f)
-            f_string = f_string.split("\n")[-1]
-            f_string = "RM {0}: f(x) = {1}".format(rm, f_string)
-            f_box += f_string + "\n"
-            print f_string
+            if False:
+                # calculate fit function
+                z = np.polyfit(x, y, 1)
+                f = np.poly1d(z)
+                f_string = str(f)
+                f_string = f_string.split("\n")[-1]
+                f_string = "RM {0}: f(x) = {1}".format(rm, f_string)
+                f_box += f_string + "\n"
+                print f_string
 
-            # calculate new x's and y's using fit function
-            x_new = np.linspace(min(x), max(x), 50)
-            y_new = f(x_new)
+                # calculate new x's and y's using fit function
+                x_new = np.linspace(min(x), max(x), 50)
+                y_new = f(x_new)
 
-            plt.plot(x,y,'o', x_new, y_new)
+                plt.plot(x,y,'o', x_new, y_new)
+            
+            plt.plot(x,y)
         
-        plt.text(xstat, ystat, f_box)
+        if False:
+            plt.text(xstat, ystat, f_box)
         
         title += " %d" % pd
         xtitle += " %d Max fC" % pd
@@ -234,8 +244,9 @@ if __name__ == "__main__":
 
     x = data["pd0"]
     y = data["pd1"]
+    
     plotScatter(x, y, plot_dir, pd1_pd0_info)
 
-    plotRMvsPD(data, plot_dir, rm_pd_info)
+    #plotRMvsPD(data, plot_dir, rm_pd_info)
 
 
