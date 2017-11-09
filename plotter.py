@@ -158,17 +158,17 @@ def plotRMvsPD(data, plot_dir, info):
         
         x = data["pd%d_ave"%pd] 
         print "number of pd %d ave: %d" % (pd, len(x))
-        print "x = {0}".format(x)
+        #print "x = {0}".format(x)
         
         for rm in xrange(1,5):
             
             y = data["rm%d_ave"%rm] 
             print "number of rm %d ave: %d" % (rm, len(y))
-            print "y = {0}".format(y)
+            #print "y = {0}".format(y)
             
-            if False:
+            if True:
                 # calculate fit function
-                z = np.polyfit(x, y, 1)
+                z = np.polyfit(x, y, 2)
                 f = np.poly1d(z)
                 f_string = str(f)
                 f_string = f_string.split("\n")[-1]
@@ -182,9 +182,7 @@ def plotRMvsPD(data, plot_dir, info):
 
                 plt.plot(x,y,'o', x_new, y_new)
             
-            plt.plot(x,y)
-        
-        if False:
+        if True:
             plt.text(xstat, ystat, f_box)
         
         title += " %d" % pd
@@ -247,6 +245,6 @@ if __name__ == "__main__":
     
     plotScatter(x, y, plot_dir, pd1_pd0_info)
 
-    #plotRMvsPD(data, plot_dir, rm_pd_info)
+    plotRMvsPD(data, plot_dir, rm_pd_info)
 
 
