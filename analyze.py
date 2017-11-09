@@ -332,7 +332,7 @@ def makeTable(runDir, tables, runList, stability=False):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--directory", "-d", default="rework_cu_data", help="directory containing directories with CU data")
+    parser.add_argument("--directory", "-d", default="passed_cu_data", help="directory containing directories with CU data")
     options = parser.parse_args()
     runDir = options.directory
     
