@@ -199,6 +199,8 @@ def plotRMvsPD(data, plot_dir, info, plotFit=False):
         
         legend = ax.legend(loc='lower right')
         ax.grid(True)
+        plt.gcf().subplots_adjust(bottom=0.1)
+        plt.gcf().subplots_adjust(left=0.15)
         axes = plt.gca()
         plt.title(title)
         plt.xlabel(xtitle)
