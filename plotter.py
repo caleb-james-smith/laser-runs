@@ -137,7 +137,8 @@ def plotScatter(x, y, plot_dir, info):
     x_new = np.linspace(min(x), max(x), 50)
     y_new = f(x_new)
 
-    plt.plot(x,y,'o', x_new, y_new)
+    plt.plot(x,y,'o', alpha=0.5)
+    plt.plot(x_new, y_new, '--')
     plt.text(xstat, ystat, f_string)
     plt.title(title)
     plt.xlabel(xtitle)
@@ -146,7 +147,9 @@ def plotScatter(x, y, plot_dir, info):
     plt.savefig(plot_dir + name + ".pdf")
     plt.clf()
 
-def plotRMvsPD(data, plot_dir, info):
+def plotRMvsPD(data, plot_dir, info, plotFit=False):
+    colors = ["xkcd:pinkish red","xkcd:azure","xkcd:bluish green","xkcd:electric purple"]
+    rms = range(1,5)
     for pd in xrange(2):
         name = info["name"]
         title = info["title"]
@@ -160,15 +163,18 @@ def plotRMvsPD(data, plot_dir, info):
         print "number of pd %d ave: %d" % (pd, len(x))
         #print "x = {0}".format(x)
         
-        for rm in xrange(1,5):
+        fig, ax = plt.subplots()
+        
+        for rm, color in zip(rms, colors):
             
             y = data["rm%d_ave"%rm] 
             print "number of rm %d ave: %d" % (rm, len(y))
             #print "y = {0}".format(y)
+            rm_name = "RM {0}".format(rm)
             
-            if True:
+            if plotFit:
                 # calculate fit function
-                z = np.polyfit(x, y, 2)
+                z = np.polyfit(x, y, 1)
                 f = np.poly1d(z)
                 f_string = str(f)
                 f_string = f_string.split("\n")[-1]
@@ -180,14 +186,19 @@ def plotRMvsPD(data, plot_dir, info):
                 x_new = np.linspace(min(x), max(x), 50)
                 y_new = f(x_new)
 
-                plt.plot(x,y,'o', x_new, y_new)
+                ax.plot(x,y,'o',            c=color, label=rm_name, alpha=0.5)
+                ax.plot(x_new, y_new, '--', c=color, label=rm_name+" fit")
+            else:
+                ax.plot(x,y,'o',            c=color, label=rm_name, alpha=0.5)
             
-        if True:
-            plt.text(xstat, ystat, f_box)
+        if plotFit:
+            ax.text(xstat, ystat, f_box)
         
-        title += " %d" % pd
+        title += " %d Max Charge" % pd
         xtitle += " %d Max fC" % pd
         
+        legend = ax.legend(loc='lower right')
+        ax.grid(True)
         axes = plt.gca()
         plt.title(title)
         plt.xlabel(xtitle)
@@ -225,7 +236,7 @@ if __name__ == "__main__":
     # PD1 vs PD0
     pd1_pd0_info = {}
     pd1_pd0_info["name"] = "pd1_pd0"
-    pd1_pd0_info["title"] = "Pin Diode 1 vs Pin Diode 0"
+    pd1_pd0_info["title"] = "Pin Diode 1 Max Charge vs Pin Diode 0 Max Charge"
     pd1_pd0_info["xtitle"] = "Pin Diode 0 Max fC"
     pd1_pd0_info["ytitle"] = "Pin Diode 1 Max fC"
     pd1_pd0_info["xstat"] = 20000 
@@ -234,9 +245,9 @@ if __name__ == "__main__":
     # RM1-4 vs PD0 and PD1
     rm_pd_info = {}
     rm_pd_info["name"] = "rm_pd"
-    rm_pd_info["title"] = "SiPMs vs Pin Diode"
+    rm_pd_info["title"] = "RM SiPMs Average Max Charge vs Pin Diode"
     rm_pd_info["xtitle"] = "Pin Diode"
-    rm_pd_info["ytitle"] = "SiPM Max fC"
+    rm_pd_info["ytitle"] = "SiPM Average Max fC"
     rm_pd_info["xstat"] = 5000
     rm_pd_info["ystat"] = 160000
 
@@ -245,6 +256,6 @@ if __name__ == "__main__":
     
     plotScatter(x, y, plot_dir, pd1_pd0_info)
 
-    plotRMvsPD(data, plot_dir, rm_pd_info)
+    plotRMvsPD(data, plot_dir, rm_pd_info, True)
 
 
