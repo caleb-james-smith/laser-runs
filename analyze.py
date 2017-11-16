@@ -332,7 +332,7 @@ def makeTable(runDir, tables, runList, stability=False):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--directory", "-d", default="rework_cu_data", help="directory containing directories with CU data")
+    parser.add_argument("--directory", "-d", default="passed_cu_data", help="directory containing directories with CU data")
     options = parser.parse_args()
     runDir = options.directory
     
@@ -340,10 +340,10 @@ if __name__ == "__main__":
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     tables = ["sipm", "pd"]
     runList = list(i for i in xrange(1,8))
-    #makeTable(runDir, tables, runList)
+    makeTable(runDir, tables, runList)
 
     # sipm: iterations for stability runs
     tables = ["sipm", "pd"]
-    runList = list(i for i in xrange(10,17))
-    makeTable(runDir, tables, runList, True)
+    runList = list(i for i in xrange(12,18))
+    #makeTable(runDir, tables, runList, True)
 
