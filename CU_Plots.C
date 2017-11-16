@@ -84,10 +84,13 @@ void CU_Plots(){
   //----------------------------------------------------------------------
   //Setup
   //----------------------------------------------------------------------
-  const char* infile1 = "passed_cu_data/pd.root";
-  const char* infile2 = "passed_cu_data/sipm.root";
-  //const char infile1 = "rework_cu_data/pd.root";
-  //const char infile2 = "rework_cu_data/sipm.root";
+  //const char* infile1 = "passed_cu_data/pd.root";
+  //const char* infile2 = "passed_cu_data/sipm.root";
+  //const char* infile1 = "rework_cu_data/pd.root";
+  //const char* infile2 = "rework_cu_data/sipm.root";
+  const char* infile1 = "stability_cu_data/pd.root";
+  const char* infile2 = "stability_cu_data/sipm.root"; 
+
   TFile *f1 = new TFile(infile1);
   if(f1->IsZombie()){
       cout << "Root file: " << infile1 << " not found!" << endl;
@@ -140,6 +143,7 @@ void CU_Plots(){
   //----------------------------------------------------------------------
   Double_t xPD0[NumChanPD],xPD1[NumChanPD],xPD2[NumChanPD],xPD3[NumChanPD],xPD4[NumChanPD],xPD5[NumChanPD];
   Double_t yPD0[NumChanPD],yPD1[NumChanPD],yPD2[NumChanPD],yPD3[NumChanPD],yPD4[NumChanPD],yPD5[NumChanPD];
+  Double_t zPD0[NumChanPD],zPD1[NumChanPD],zPD2[NumChanPD],zPD3[NumChanPD],zPD4[NumChanPD],zPD5[NumChanPD];
   TProfile* profile_pd0 = new TProfile("pd0","pd0",44,-0.5,43.5,0,350000/convert);
   TProfile* profile_pd1 = new TProfile("pd1","pd1",44,-0.5,43.5,0,350000/convert);
   TProfile* profile_pd2 = new TProfile("pd2","pd2",44,-0.5,43.5,0,350000/convert);
@@ -162,41 +166,41 @@ void CU_Plots(){
     sprintf(process,"Processing Channel: %i/%i",channel1,NumChanPD);
     if(channel1%10==0){std::cout<<process<<std::endl;}
     if(*pd_result == 1 && *pd_ch == 0){
-      xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_fc/convert;
+      xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_fc/convert; zPD0[channel1] = *pd_run;
       profile_pd0->Fill(*pd_CU,*pd_max_fc/convert);
       PD0_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD0[channel1] = -100;yPD0[channel1] = -100;}
+    else{xPD0[channel1] = -100;yPD0[channel1] = -100;zPD0[channel1] = -100;}
     if(*pd_result == 1 && *pd_ch == 1){
-      xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_fc/convert;
+      xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_fc/convert; zPD1[channel1] = *pd_run;
       profile_pd1->Fill(*pd_CU,*pd_max_fc/convert);
       PD1_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD1[channel1] = -100;yPD1[channel1] = -100;}
+    else{xPD1[channel1] = -100;yPD1[channel1] = -100;zPD1[channel1] = -100;}
     if(*pd_result == 1 && *pd_ch == 2){
-      xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_fc/convert;
+      xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_fc/convert; zPD2[channel1] = *pd_run;
       profile_pd2->Fill(*pd_CU,*pd_max_fc/convert);
       PD2_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD2[channel1] = -100;yPD2[channel1] = -100;}
+    else{xPD2[channel1] = -100;yPD2[channel1] = -100;zPD2[channel1] = -100;}
     if(*pd_result == 1 && *pd_ch == 3){
-      xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_fc/convert;
+      xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_fc/convert; zPD3[channel1] = *pd_run;
       profile_pd3->Fill(*pd_CU,*pd_max_fc/convert);
       PD3_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD3[channel1] = -100;yPD3[channel1] = -100;}
+    else{xPD3[channel1] = -100;yPD3[channel1] = -100;zPD3[channel1] = -100;}
     if(*pd_result == 1 && *pd_ch == 4){
-      xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_fc/convert;
+      xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_fc/convert; zPD4[channel1] = *pd_run;
       profile_pd4->Fill(*pd_CU,*pd_max_fc/convert);
       PD4_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD4[channel1] = -100;yPD4[channel1] = -100;}
+    else{xPD4[channel1] = -100;yPD4[channel1] = -100;zPD4[channel1] = -100;}
     if(*pd_result == 1 && *pd_ch == 5){
-      xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_fc/convert;
+      xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_fc/convert; zPD5[channel1] = *pd_run;
       profile_pd5->Fill(*pd_CU,*pd_max_fc/convert);
       PD5_dist->Fill(*pd_max_fc/convert);
     }
-    else{xPD5[channel1] = -100;yPD5[channel1] = -100;}
+    else{xPD5[channel1] = -100;yPD5[channel1] = -100;zPD5[channel1] = -100;}
     if(*pd_result == 1 && (*pd_ch == 2 || *pd_ch == 3 || *pd_ch == 4 || *pd_ch == 5 )){
       PD2_3_4_5_dist->Fill(*pd_max_fc/convert);
     }
@@ -210,24 +214,31 @@ void CU_Plots(){
   TGraph* graph_pd3 = new TGraph(NumChanPD,xPD3,yPD3);
   TGraph* graph_pd4 = new TGraph(NumChanPD,xPD4,yPD4);
   TGraph* graph_pd5 = new TGraph(NumChanPD,xPD5,yPD5);
+  TGraph* graph_stab_0 = new TGraph(NumChanPD,zPD0,yPD0);
+  TGraph* graph_stab_1 = new TGraph(NumChanPD,zPD1,yPD1);
   graph_pd0->SetMarkerColor(kMagenta);     profile_pd0->SetLineColor(kMagenta);
   graph_pd1->SetMarkerColor(kOrange);      profile_pd1->SetLineColor(kOrange);
   graph_pd2->SetMarkerColor(kBlue+2);      profile_pd2->SetLineColor(kBlue+2);
   graph_pd3->SetMarkerColor(kGray);        profile_pd3->SetLineColor(kGray);
   graph_pd4->SetMarkerColor(kYellow+2);    profile_pd4->SetLineColor(kYellow+2);
   graph_pd5->SetMarkerColor(kMagenta+2);   profile_pd5->SetLineColor(kMagenta+2);      
+  graph_stab_0->SetMarkerColor(kRed);
+  graph_stab_1->SetMarkerColor(kBlack);
   graph_pd0->SetMarkerStyle(kFullSquare);
   graph_pd1->SetMarkerStyle(kFullSquare);
   graph_pd2->SetMarkerStyle(kFullSquare);
   graph_pd3->SetMarkerStyle(kFullSquare);
   graph_pd4->SetMarkerStyle(kFullSquare);
   graph_pd5->SetMarkerStyle(kFullSquare);
+  graph_stab_0->SetMarkerStyle(kFullSquare);
+  graph_stab_1->SetMarkerStyle(kFullSquare);
 
   //----------------------------------------------------------------------
   //Make RM Plots
   //----------------------------------------------------------------------
   Double_t xRM1[NumChanRM],xRM2[NumChanRM],xRM3[NumChanRM],xRM4[NumChanRM];
   Double_t yRM1[NumChanRM],yRM2[NumChanRM],yRM3[NumChanRM],yRM4[NumChanRM];
+  Double_t zRM1[NumChanRM],zRM2[NumChanRM],zRM3[NumChanRM],zRM4[NumChanRM];
   TProfile* profile_rm1 = new TProfile("RM1","RM1",44,-0.5,43.5,0,350000/convert);
   TProfile* profile_rm2 = new TProfile("RM2","RM2",44,-0.5,43.5,0,350000/convert);
   TProfile* profile_rm3 = new TProfile("RM3","RM3",44,-0.5,43.5,0,350000/convert);
@@ -244,29 +255,29 @@ void CU_Plots(){
     sprintf(process,"Processing Channel: %i/%i",channel2,NumChanRM);
     if(channel2%500==0){std::cout<<process<<std::endl;}
     if(*sipm_result == 1 && *sipm_rm == 1){
-      xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_fc/convert;
+      xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_fc/convert; zRM1[channel2] = *sipm_run;
       profile_rm1->Fill(*sipm_CU,*sipm_max_fc/convert);
       RM1_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM1[channel2] = -100;yRM1[channel2] = -100;}
+    else{xRM1[channel2] = -100;yRM1[channel2] = -100;zRM1[channel2] = -100;}
     if(*sipm_result == 1 && *sipm_rm == 2){
-      xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_fc/convert;
+      xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_fc/convert; zRM2[channel2] = *sipm_run;
       profile_rm2->Fill(*sipm_CU,*sipm_max_fc/convert);
       RM2_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM2[channel2] = -100;yRM2[channel2] = -100;}
+    else{xRM2[channel2] = -100;yRM2[channel2] = -100;zRM2[channel2] = -100;}
     if(*sipm_result == 1 && *sipm_rm == 3){
-      xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_fc/convert;
+      xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_fc/convert; zRM3[channel2] = *sipm_run;
       profile_rm3->Fill(*sipm_CU,*sipm_max_fc/convert);
       RM3_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM3[channel2] = -100;yRM3[channel2] = -100;}
+    else{xRM3[channel2] = -100;yRM3[channel2] = -100;zRM3[channel2] = -100;}
     if(*sipm_result == 1 && *sipm_rm == 4){
-      xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_fc/convert;
+      xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_fc/convert; zRM4[channel2] = *sipm_run;
       profile_rm4->Fill(*sipm_CU,*sipm_max_fc/convert);
       RM4_dist->Fill(*sipm_max_fc/convert);
     }
-    else{xRM4[channel2] = -100;yRM4[channel2] = -100;}
+    else{xRM4[channel2] = -100;yRM4[channel2] = -100;zRM4[channel2] = -100;}
     allRM_dist->Fill(*sipm_max_fc/convert);
   }
   sprintf(process,"Done with RM Channels: %i/%i",NumChanRM,NumChanRM);
@@ -275,15 +286,27 @@ void CU_Plots(){
   TGraph* graph_rm2 = new TGraph(NumChanRM,xRM2,yRM2);
   TGraph* graph_rm3 = new TGraph(NumChanRM,xRM3,yRM3);
   TGraph* graph_rm4 = new TGraph(NumChanRM,xRM4,yRM4);
+  TGraph* graph_stab_rm1 = new TGraph(NumChanPD,zRM1,yRM1);
+  TGraph* graph_stab_rm2 = new TGraph(NumChanPD,zRM2,yRM2);
+  TGraph* graph_stab_rm3 = new TGraph(NumChanPD,zRM3,yRM3);
+  TGraph* graph_stab_rm4 = new TGraph(NumChanPD,zRM4,yRM4);
   graph_rm1->SetMarkerColor(kRed);        profile_rm1->SetLineColor(kRed);
   graph_rm2->SetMarkerColor(kBlue);       profile_rm2->SetLineColor(kBlue);
   graph_rm3->SetMarkerColor(kBlack);      profile_rm3->SetLineColor(kBlack);
   graph_rm4->SetMarkerColor(kGreen+2);    profile_rm4->SetLineColor(kGreen+2);
+  graph_stab_rm1->SetMarkerColor(kMagenta);
+  graph_stab_rm2->SetMarkerColor(kBlue);
+  graph_stab_rm3->SetMarkerColor(kBlack);
+  graph_stab_rm4->SetMarkerColor(kGray);
   graph_rm1->SetMarkerStyle(kFullSquare);
   graph_rm2->SetMarkerStyle(kFullSquare);
   graph_rm3->SetMarkerStyle(kFullSquare);
   graph_rm4->SetMarkerStyle(kFullSquare);
-
+  graph_stab_rm1->SetMarkerStyle(kFullSquare);
+  graph_stab_rm2->SetMarkerStyle(kFullSquare);
+  graph_stab_rm3->SetMarkerStyle(kFullSquare);
+  graph_stab_rm4->SetMarkerStyle(kFullSquare);
+  
   //----------------------------------------------------------------------
   //Make TLatex
   //----------------------------------------------------------------------
@@ -639,6 +662,22 @@ void CU_Plots(){
   EntriesRM4->Draw();
   MeanRM4->Draw();
   StdDevRM4->Draw();
+  TCanvas *c17 = Canvas("Stability",800,800);
+  TH1F* h17blank = Blank("Blank17",250,5,20);
+  h17blank->SetMinimum(0);
+  h17blank->SetMaximum(350);
+  h17blank->GetXaxis()->SetTitle("Max Charge [pC]");
+  h17blank->GetYaxis()->SetTitle("Channels");
+  h17blank->Draw();
+  graph_stab_0->Draw("P same");
+  graph_stab_1->Draw("P same");
+  graph_stab_rm1->Draw("P same");
+  graph_stab_rm2->Draw("P same");
+  graph_stab_rm3->Draw("P same");
+  graph_stab_rm4->Draw("P same");
+  CMSPrelim1->Draw();
+  burnIn->Draw();
+  RM->Draw();
 
   c0->SaveAs("PDAllvsCU2D.pdf");
   c1->SaveAs("PDAll_1D.pdf");
@@ -657,6 +696,7 @@ void CU_Plots(){
   c14->SaveAs("RM2_1D.pdf");
   c15->SaveAs("RM3_1D.pdf");
   c16->SaveAs("RM4_1D.pdf");
+  c17->SaveAs("stability.pdf");
 } 
 
 int main(){
