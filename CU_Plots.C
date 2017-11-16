@@ -133,7 +133,7 @@ void CU_Plots(){
   tReader2.Restart();
   double convert = 1000;
   double pinDisMin = 0;
-  double pinDisMax = 10;
+  double pinDisMax = 6;
   double rmDisMin = 0;
   double rmDisMax = 100;
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
@@ -156,13 +156,13 @@ void CU_Plots(){
   TProfile* profile_stab_pd3 = new TProfile("pd3 stab","pd3 stab",10,-0.5,9.5,0,350000/convert);
   TProfile* profile_stab_pd4 = new TProfile("pd4 stab","pd4 stab",10,-0.5,9.5,0,350000/convert);
   TProfile* profile_stab_pd5 = new TProfile("pd5 stab","pd5 stab",10,-0.5,9.5,0,350000/convert);
-  TH1F* allPD_dist = new TH1F("allPD","allPD",62,0,350000/convert);
-  TH1F* PD0_dist   = new TH1F("PD0","PD0",62,0,350000/convert);
-  TH1F* PD1_dist   = new TH1F("PD1","PD1",62,0,350000/convert);
-  TH1F* PD2_dist   = new TH1F("PD2","PD2",62,0,350000/convert);
-  TH1F* PD3_dist   = new TH1F("PD3","PD3",62,0,350000/convert);
-  TH1F* PD4_dist   = new TH1F("PD4","PD4",62,0,350000/convert);
-  TH1F* PD5_dist   = new TH1F("PD5","PD5",62,0,350000/convert);
+  TH1F* allPD_dist = new TH1F("allPD","allPD",800,0,350000/convert);
+  TH1F* PD0_dist   = new TH1F("PD0","PD0",800,0,350000/convert);
+  TH1F* PD1_dist   = new TH1F("PD1","PD1",800,0,350000/convert);
+  TH1F* PD2_dist   = new TH1F("PD2","PD2",800,0,350000/convert);
+  TH1F* PD3_dist   = new TH1F("PD3","PD3",800,0,350000/convert);
+  TH1F* PD4_dist   = new TH1F("PD4","PD4",800,0,350000/convert);
+  TH1F* PD5_dist   = new TH1F("PD5","PD5",800,0,350000/convert);
   TH1F* PD2_3_4_5_dist   = new TH1F("PD 2 3 4 5","PD 2 3 4 5",62,0,350000/convert);
   std::cout<<"Running over Pin-Diode Channels"<<std::endl;
   char process[100];
@@ -171,49 +171,49 @@ void CU_Plots(){
     channel1+=1;
     sprintf(process,"Processing Channel: %i/%i",channel1,NumChanPD);
     if(channel1%10==0){std::cout<<process<<std::endl;}
-    if(*pd_result == 1 && *pd_ch == 0){
+    if(*pd_ch == 0){
       xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_fc/convert; zPD0[channel1] = *pd_run;
       profile_pd0->Fill(*pd_CU,*pd_max_fc/convert);
       profile_stab_pd0->Fill(*pd_run,*pd_max_fc/convert);
       PD0_dist->Fill(*pd_max_fc/convert);
     }
     else{xPD0[channel1] = -100;yPD0[channel1] = -100;zPD0[channel1] = -100;}
-    if(*pd_result == 1 && *pd_ch == 1){
+    if(*pd_ch == 1){
       xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_fc/convert; zPD1[channel1] = *pd_run;
       profile_pd1->Fill(*pd_CU,*pd_max_fc/convert);
       profile_stab_pd1->Fill(*pd_run,*pd_max_fc/convert);
       PD1_dist->Fill(*pd_max_fc/convert);
     }
     else{xPD1[channel1] = -100;yPD1[channel1] = -100;zPD1[channel1] = -100;}
-    if(*pd_result == 1 && *pd_ch == 2){
+    if(*pd_ch == 2){
       xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_fc/convert; zPD2[channel1] = *pd_run;
       profile_pd2->Fill(*pd_CU,*pd_max_fc/convert);
       profile_stab_pd2->Fill(*pd_run,*pd_max_fc/convert);
       PD2_dist->Fill(*pd_max_fc/convert);
     }
     else{xPD2[channel1] = -100;yPD2[channel1] = -100;zPD2[channel1] = -100;}
-    if(*pd_result == 1 && *pd_ch == 3){
+    if(*pd_ch == 3){
       xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_fc/convert; zPD3[channel1] = *pd_run;
       profile_pd3->Fill(*pd_CU,*pd_max_fc/convert);
       profile_stab_pd3->Fill(*pd_run,*pd_max_fc/convert);
       PD3_dist->Fill(*pd_max_fc/convert);
     }
     else{xPD3[channel1] = -100;yPD3[channel1] = -100;zPD3[channel1] = -100;}
-    if(*pd_result == 1 && *pd_ch == 4){
+    if(*pd_ch == 4){
       xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_fc/convert; zPD4[channel1] = *pd_run;
       profile_pd4->Fill(*pd_CU,*pd_max_fc/convert);
       profile_stab_pd4->Fill(*pd_run,*pd_max_fc/convert);
       PD4_dist->Fill(*pd_max_fc/convert);
     }
     else{xPD4[channel1] = -100;yPD4[channel1] = -100;zPD4[channel1] = -100;}
-    if(*pd_result == 1 && *pd_ch == 5){
+    if(*pd_ch == 5){
       xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_fc/convert; zPD5[channel1] = *pd_run;
       profile_pd5->Fill(*pd_CU,*pd_max_fc/convert);
       profile_stab_pd5->Fill(*pd_run,*pd_max_fc/convert);
       PD5_dist->Fill(*pd_max_fc/convert);
     }
     else{xPD5[channel1] = -100;yPD5[channel1] = -100;zPD5[channel1] = -100;}
-    if(*pd_result == 1 && (*pd_ch == 2 || *pd_ch == 3 || *pd_ch == 4 || *pd_ch == 5 )){
+    if((*pd_ch == 2 || *pd_ch == 3 || *pd_ch == 4 || *pd_ch == 5 )){
       PD2_3_4_5_dist->Fill(*pd_max_fc/convert);
     }
     allPD_dist->Fill(*pd_max_fc/convert);
@@ -244,6 +244,14 @@ void CU_Plots(){
   graph_stab_pd3->SetMarkerColor(kGray);         profile_stab_pd3->SetLineColor(kGray);
   graph_stab_pd4->SetMarkerColor(kYellow+2);     profile_stab_pd4->SetLineColor(kYellow+2);
   graph_stab_pd5->SetMarkerColor(kMagenta+2);    profile_stab_pd5->SetLineColor(kMagenta+2);
+  allPD_dist->SetLineColor(kBlack);
+  PD0_dist->SetLineColor(kBlack);
+  PD1_dist->SetLineColor(kBlack);
+  PD2_dist->SetLineColor(kBlack);
+  PD3_dist->SetLineColor(kBlack);
+  PD4_dist->SetLineColor(kBlack);
+  PD5_dist->SetLineColor(kBlack);
+  PD2_3_4_5_dist->SetLineColor(kBlack);
   graph_pd0->SetMarkerStyle(kFullSquare);        graph_stab_pd0->SetMarkerStyle(kFullSquare);
   graph_pd1->SetMarkerStyle(kFullSquare);        graph_stab_pd1->SetMarkerStyle(kFullSquare);
   graph_pd2->SetMarkerStyle(kFullSquare);        graph_stab_pd2->SetMarkerStyle(kFullSquare);
@@ -276,28 +284,28 @@ void CU_Plots(){
     channel2+=1;
     sprintf(process,"Processing Channel: %i/%i",channel2,NumChanRM);
     if(channel2%500==0){std::cout<<process<<std::endl;}
-    if(*sipm_result == 1 && *sipm_rm == 1){
+    if(*sipm_rm == 1){
       xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_fc/convert; zRM1[channel2] = *sipm_run;
       profile_rm1->Fill(*sipm_CU,*sipm_max_fc/convert);
       profile_stab_rm1->Fill(*sipm_run,*sipm_max_fc/convert);
       RM1_dist->Fill(*sipm_max_fc/convert);
     }
     else{xRM1[channel2] = -100;yRM1[channel2] = -100;zRM1[channel2] = -100;}
-    if(*sipm_result == 1 && *sipm_rm == 2){
+    if(*sipm_rm == 2){
       xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_fc/convert; zRM2[channel2] = *sipm_run;
       profile_rm2->Fill(*sipm_CU,*sipm_max_fc/convert);
       profile_stab_rm2->Fill(*sipm_run,*sipm_max_fc/convert);
       RM2_dist->Fill(*sipm_max_fc/convert);
     }
     else{xRM2[channel2] = -100;yRM2[channel2] = -100;zRM2[channel2] = -100;}
-    if(*sipm_result == 1 && *sipm_rm == 3){
+    if(*sipm_rm == 3){
       xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_fc/convert; zRM3[channel2] = *sipm_run;
       profile_rm3->Fill(*sipm_CU,*sipm_max_fc/convert);
       profile_stab_rm3->Fill(*sipm_run,*sipm_max_fc/convert);
       RM3_dist->Fill(*sipm_max_fc/convert);
     }
     else{xRM3[channel2] = -100;yRM3[channel2] = -100;zRM3[channel2] = -100;}
-    if(*sipm_result == 1 && *sipm_rm == 4){
+    if(*sipm_rm == 4){
       xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_fc/convert; zRM4[channel2] = *sipm_run;
       profile_rm4->Fill(*sipm_CU,*sipm_max_fc/convert);
       profile_stab_rm4->Fill(*sipm_run,*sipm_max_fc/convert);
@@ -324,6 +332,11 @@ void CU_Plots(){
   graph_stab_rm2->SetMarkerColor(kBlue);        profile_stab_rm2->SetLineColor(kBlue);
   graph_stab_rm3->SetMarkerColor(kBlack);       profile_stab_rm3->SetLineColor(kBlack);
   graph_stab_rm4->SetMarkerColor(kGray);        profile_stab_rm4->SetLineColor(kGray);
+  allRM_dist->SetLineColor(kBlack);
+  RM1_dist->SetLineColor(kBlack);  
+  RM2_dist->SetLineColor(kBlack);  
+  RM3_dist->SetLineColor(kBlack);  
+  RM4_dist->SetLineColor(kBlack);  
   graph_rm1->SetMarkerStyle(kFullSquare);       graph_stab_rm1->SetMarkerStyle(kFullSquare);
   graph_rm2->SetMarkerStyle(kFullSquare);       graph_stab_rm2->SetMarkerStyle(kFullSquare);
   graph_rm3->SetMarkerStyle(kFullSquare);       graph_stab_rm3->SetMarkerStyle(kFullSquare);
@@ -341,13 +354,43 @@ void CU_Plots(){
   burnIn->SetTextFont(42);
   burnIn->SetTextAlign(31);
   
-  TLatex* PinDiode = new TLatex(0.14, 0.96, "Pin-Diodes");
+  TLatex* PinDiode = new TLatex(0.14, 0.91, "Pin-Diodes");
   PinDiode->SetNDC();
   PinDiode->SetTextFont(42);
+  TLatex* PinDiode0 = new TLatex(0.14, 0.91, "Pin-Diode 0");
+  PinDiode0->SetNDC();
+  PinDiode0->SetTextFont(42);
+  TLatex* PinDiode1 = new TLatex(0.14, 0.91, "Pin-Diode 1");
+  PinDiode1->SetNDC();
+  PinDiode1->SetTextFont(42);
+  TLatex* PinDiode2 = new TLatex(0.14, 0.91, "Pin-Diode 2");
+  PinDiode2->SetNDC();
+  PinDiode2->SetTextFont(42);
+  TLatex* PinDiode3 = new TLatex(0.14, 0.91, "Pin-Diode 3");
+  PinDiode3->SetNDC();
+  PinDiode3->SetTextFont(42);
+  TLatex* PinDiode4 = new TLatex(0.14, 0.91, "Pin-Diode 4");
+  PinDiode4->SetNDC();
+  PinDiode4->SetTextFont(42);
+  TLatex* PinDiode5 = new TLatex(0.14, 0.91, "Pin-Diode 5");
+  PinDiode5->SetNDC();
+  PinDiode5->SetTextFont(42);
 
-  TLatex* RM = new TLatex(0.14, 0.96, "Silicon Photomultiplier");
+  TLatex* RM = new TLatex(0.14, 0.91, "Silicon Photomultiplier");
   RM->SetNDC();
   RM->SetTextFont(42);
+  TLatex* RM1 = new TLatex(0.2, 0.85, "RM 1");
+  RM1->SetNDC();
+  RM1->SetTextFont(42);
+  TLatex* RM2 = new TLatex(0.2, 0.85, "RM 2");
+  RM2->SetNDC();
+  RM2->SetTextFont(42);
+  TLatex* RM3 = new TLatex(0.2, 0.85, "RM 3");
+  RM3->SetNDC();
+  RM3->SetTextFont(42);
+  TLatex* RM4 = new TLatex(0.2, 0.85, "RM 4");
+  RM4->SetNDC();
+  RM4->SetTextFont(42);
 
   TLatex* EntriesAllRM = Entries(0.92,0.85,allRM_dist);
   TLatex* MeanAllRM    = Mean(0.92, 0.8,allRM_dist);
@@ -423,9 +466,9 @@ void CU_Plots(){
   catLeg0->AddEntry(graph_pd5,"Pin-Diode 5","P");
 
   TCanvas *c1 = Canvas("1D PD",800,800);
-  TH1F* h1blank = Blank("Blank1",62,0,125000/convert);
+  TH1F* h1blank = Blank("Blank1",62,0,10000/convert);
   h1blank->SetMinimum(pinDisMin);
-  h1blank->SetMaximum(5*pinDisMax);
+  h1blank->SetMaximum(6);
   h1blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h1blank->GetYaxis()->SetTitle("Channels");
   h1blank->Draw("hist");  
@@ -531,7 +574,7 @@ void CU_Plots(){
   catLeg5->AddEntry(profile_rm4,"RM 4","L");
 
   TCanvas *c6  = Canvas("1D PD0",800,800);
-  TH1F* h6blank = Blank("Blank6",125,0,125000/convert);
+  TH1F* h6blank = Blank("Blank6",125,0,10000/convert);
   h6blank->SetMinimum(pinDisMin);
   h6blank->SetMaximum(pinDisMax);
   h6blank->GetXaxis()->SetTitle("Max Charge [pC]");
@@ -540,12 +583,13 @@ void CU_Plots(){
   PD0_dist->Draw("same");  
   //CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD0->Draw();
   MeanPD0->Draw();
   StdDevPD0->Draw();
+  PinDiode0->Draw();
   TCanvas *c7  = Canvas("1D PD1",800,800);
-  TH1F* h7blank = Blank("Blank7",125,0,125000/convert);
+  TH1F* h7blank = Blank("Blank7",125,0,10000/convert);
   h7blank->SetMinimum(pinDisMin);
   h7blank->SetMaximum(pinDisMax);
   h7blank->GetXaxis()->SetTitle("Max Charge [pC]");
@@ -554,10 +598,11 @@ void CU_Plots(){
   PD1_dist->Draw("same");  
   //CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD1->Draw();
   MeanPD1->Draw();
   StdDevPD1->Draw();
+  PinDiode1->Draw();
   TCanvas *c8  = Canvas("1D PD2",800,800);
   TH1F* h8blank = Blank("Blank8",125,0,125000/convert);
   h8blank->SetMinimum(pinDisMin);
@@ -568,10 +613,11 @@ void CU_Plots(){
   PD2_dist->Draw("same");  
   //CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD2->Draw();
   MeanPD2->Draw();
   StdDevPD2->Draw();
+  PinDiode2->Draw();
   TCanvas *c9  = Canvas("1D PD3",800,800);
   TH1F* h9blank = Blank("Blank9",125,0,125000/convert);
   h9blank->SetMinimum(pinDisMin);
@@ -582,10 +628,11 @@ void CU_Plots(){
   PD3_dist->Draw("same");  
   //CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD3->Draw();
   MeanPD3->Draw();
   StdDevPD3->Draw();
+  PinDiode3->Draw();
   TCanvas *c10  = Canvas("1D PD4",800,800);
   TH1F* h10blank = Blank("Blank10",125,0,125000/convert);
   h10blank->SetMinimum(pinDisMin);
@@ -596,10 +643,11 @@ void CU_Plots(){
   PD4_dist->Draw("same");  
   //CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD4->Draw();
   MeanPD4->Draw();
   StdDevPD4->Draw();
+  PinDiode4->Draw();
   TCanvas *c11  = Canvas("1D PD5",800,800);
   TH1F* h11blank = Blank("Blank11",125,0,125000/convert);
   h11blank->SetMinimum(pinDisMin);
@@ -610,10 +658,11 @@ void CU_Plots(){
   PD5_dist->Draw("same");  
   //CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD5->Draw();
   MeanPD5->Draw();
   StdDevPD5->Draw();
+  PinDiode5->Draw();
   TCanvas *c12 = Canvas("1D PD2 3 4 5",800,800);
   TH1F* h12blank = Blank("Blank12",125,0,125000/convert);
   h12blank->SetMinimum(pinDisMin);
@@ -622,9 +671,9 @@ void CU_Plots(){
   h12blank->GetYaxis()->SetTitle("Channels");
   h12blank->Draw();
   PD2_3_4_5_dist->Draw("same");
-  //CMSPrelim1->Draw();
+  CMSPrelim1->Draw();
   burnIn->Draw();
-  PinDiode->Draw();
+  //PinDiode->Draw();
   EntriesPD2_3_4_5->Draw();
   MeanPD2_3_4_5->Draw();
   StdDevPD2_3_4_5->Draw();
@@ -642,6 +691,7 @@ void CU_Plots(){
   EntriesRM1->Draw();
   MeanRM1->Draw();
   StdDevRM1->Draw();
+  RM1->Draw();
   TCanvas *c14 = Canvas("1D RM2",800,800);
   TH1F* h14blank = Blank("Blank14",125,0,125000/convert);
   h14blank->SetMinimum(rmDisMin);
@@ -656,6 +706,7 @@ void CU_Plots(){
   EntriesRM2->Draw();
   MeanRM2->Draw();
   StdDevRM2->Draw();
+  RM2->Draw();
   TCanvas *c15 = Canvas("1D RM3",800,800);
   TH1F* h15blank = Blank("Blank15",125,0,125000/convert);
   h15blank->SetMinimum(rmDisMin);
@@ -670,6 +721,7 @@ void CU_Plots(){
   EntriesRM3->Draw();
   MeanRM3->Draw();
   StdDevRM3->Draw();
+  RM3->Draw();
   TCanvas *c16 = Canvas("1D RM4",800,800);
   TH1F* h16blank = Blank("Blank16",125,0,125000/convert);
   h16blank->SetMinimum(rmDisMin);
@@ -684,6 +736,7 @@ void CU_Plots(){
   EntriesRM4->Draw();
   MeanRM4->Draw();
   StdDevRM4->Draw();
+  RM4->Draw();
   TCanvas *c17 = Canvas("Stability Graph",800,800);
   TH1F* h17blank = Blank("Blank17",125,0,7);
   h17blank->SetMinimum(0);
@@ -701,6 +754,10 @@ void CU_Plots(){
   burnIn->Draw();
   RM->Draw();
   TCanvas *c18 = Canvas("Stability Profile",800,800);
+  TLegend* catLeg18 = new TLegend(0.68,0.65,0.96,0.88);
+  catLeg18->SetBorderSize(0);
+  catLeg18->SetFillStyle(0);
+  catLeg18->SetTextSize(0.04);
   TH1F* h18blank = Blank("Blank18",125,0,7);
   h18blank->SetMinimum(0);
   h18blank->SetMaximum(125000/convert);
@@ -713,6 +770,14 @@ void CU_Plots(){
   profile_stab_rm2->Draw("P same");
   profile_stab_rm3->Draw("P same");
   profile_stab_rm4->Draw("P same");
+  catLeg18->Draw();
+  catLeg18->AddEntry(graph_stab_pd0,"Pin-Diode 0","P");
+  catLeg18->AddEntry(graph_stab_pd1,"Pin-Diode 1","P");
+  catLeg18->AddEntry(profile_stab_rm1,"RM 1","L");
+  catLeg18->AddEntry(profile_stab_rm2,"RM 2","L");
+  catLeg18->AddEntry(profile_stab_rm3,"RM 3","L");
+  catLeg18->AddEntry(profile_stab_rm4,"RM 4","L");
+  
   //CMSPrelim1->Draw();
   burnIn->Draw();
   RM->Draw();
