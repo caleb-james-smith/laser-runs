@@ -291,9 +291,14 @@ def makeTable(runDir, tables, runList, stability=False):
                                             RM += 1
                                         rm = "%d" % RM
                                         # mask out 4 dark channels per RBX
-                                        if (rm, rm_ch) in mapping.darkSipms:
-                                            #print "mask out channel: RM %s SiPM %s" % (rm, rm_ch)
+                                        # rbx0 has RM type 2 in slot 4
+                                        masked_rm = rm
+                                        if rbx == "0" and masked_rm == "4":
+                                            masked_rm = "2"
+                                        if (masked_rm, rm_ch) in mapping.darkSipms:
+                                            print "mask out channel: RM %s SiPM %s masked rm: %s" % (rm, rm_ch, masked_rm)
                                             continue    
+                                        
                                         uhtr_ch = channel.split("h")[-1]
                                         max_adc = str(findMaxADC(f, channel, False))
                                         max_fc  = "%.2f" % adcConverter.linearize(max_adc)
@@ -338,12 +343,13 @@ if __name__ == "__main__":
     
     # sipm: iterations 1, 2, 3
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
-    tables = ["sipm", "pd"]
-    runList = list(i for i in xrange(1,8))
-    makeTable(runDir, tables, runList)
+    
+    #tables = ["sipm", "pd"]
+    #runList = list(i for i in xrange(1,8))
+    #makeTable(runDir, tables, runList)
 
-    # sipm: iterations for stability runs
+    # iterations for stability runs
     tables = ["sipm", "pd"]
-    runList = list(i for i in xrange(12,18))
-    #makeTable(runDir, tables, runList, True)
+    runList = list(i for i in xrange(1,7))
+    makeTable(runDir, tables, runList, True)
 
