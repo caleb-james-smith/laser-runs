@@ -117,11 +117,20 @@ def findMaxADC(rootFile, ch, verb):
     F = TFile(rootFile)
     H = F.Get(ch)
     # Find Max ADC
-    Bin = 255   # Bin index 0 to 255
+    Bin = 255    # Bin index 0 to 255
+    nonZero = 0  # number of consecutive non zero bins
+    required = 2 # required number of consecutive non zero bins
     while Bin > 0:
         b = H.GetBinContent(Bin)
-        if verb:    print "Bin %-3i: %.3f" % (Bin, b)
-        if b > 1:   return Bin
+        if verb:
+            print "Bin %-3i: %.3f" % (Bin, b)
+        if b > 1:
+            nonZero += 1
+        else:
+            nonZero = 0
+        if nonZero >= required:
+            # return first nonzero bin
+            return Bin + nonZero - 1
         Bin -= 1
     return Bin  # Return bin in 0 to 255 range
 
