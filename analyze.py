@@ -117,11 +117,20 @@ def findMaxADC(rootFile, ch, verb):
     F = TFile(rootFile)
     H = F.Get(ch)
     # Find Max ADC
-    Bin = 255   # Bin index 0 to 255
+    Bin = 255    # Bin index 0 to 255
+    nonZero = 0  # number of consecutive non zero bins
+    required = 2 # required number of consecutive non zero bins
     while Bin > 0:
         b = H.GetBinContent(Bin)
-        if verb:    print "Bin %-3i: %.3f" % (Bin, b)
-        if b > 1:   return Bin
+        if verb:
+            print "Bin %-3i: %.3f" % (Bin, b)
+        if b > 1:
+            nonZero += 1
+        else:
+            nonZero = 0
+        if nonZero >= required:
+            # return first nonzero bin
+            return Bin + nonZero - 1
         Bin -= 1
     return Bin  # Return bin in 0 to 255 range
 
@@ -293,7 +302,7 @@ def makeTable(runDir, tables, runList, stability=False):
                                         # mask out 4 dark channels per RBX
                                         # rbx0 has RM type 2 in slot 4 for stability run only!!!
                                         masked_rm = rm
-                                        if rbx == "0" and masked_rm == "4" and stability:
+                                        if masked_rm == "4":
                                             masked_rm = "2"
                                         if (masked_rm, rm_ch) in mapping.darkSipms:
                                             print "mask out channel: RM %s SiPM %s masked rm: %s" % (rm, rm_ch, masked_rm)
@@ -345,7 +354,7 @@ if __name__ == "__main__":
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     
     tables = ["sipm", "pd"]
-    runList = list(i for i in xrange(1))
+    runList = list(i for i in xrange(1,2))
     makeTable(runDir, tables, runList)
 
     # iterations for stability runs
