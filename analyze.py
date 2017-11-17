@@ -345,7 +345,7 @@ if __name__ == "__main__":
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     
     tables = ["sipm", "pd"]
-    runList = list(i for i in xrange(1,8))
+    runList = list(i for i in xrange(1))
     makeTable(runDir, tables, runList)
 
     # iterations for stability runs

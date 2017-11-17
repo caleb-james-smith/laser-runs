@@ -4,8 +4,8 @@
 # run script: ./giveMeTheData.sh -p caleb
 
 dir=""
-if [ "$1" = "-a" ]; then
-    dir="all_cu_data"
+if [ "$1" = "-f" ]; then
+    dir="final_cu_data"
 else if [ "$1" = "-p" ]; then
     dir="passed_cu_data"
 else if [ "$1" = "-r" ]; then
@@ -14,7 +14,7 @@ else if [ "$1" = "-s" ]; then
     dir="stability_cu_data"
 else
     echo "Use these options for getting the root file for different data sets."
-    echo "  -a all_cu_data"
+    echo "  -f final_cu_data"
     echo "  -p passed_cu_data"
     echo "  -r rework_cu_data"
     echo "  -s stability_cu_data"
