@@ -135,9 +135,9 @@ void CU_Plots(){
   tReader2.Restart();
   double convert = 1000;
   double pinDisMin = 0;
-  double pinDisMax = 6;
+  double pinDisMax = 20;
   double rmDisMin = 0;
-  double rmDisMax = 100;
+  double rmDisMax = 150;
   double disMax = 350000;
   double disMaxPD = 100000;
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
@@ -447,7 +447,7 @@ void CU_Plots(){
   catLeg0->SetTextSize(0.04);
   TH1F* h0blank = Blank("Blank0",125,0,70);
   h0blank->SetMinimum(0);
-  h0blank->SetMaximum(120000/convert);
+  h0blank->SetMaximum(60000/convert);
   h0blank->GetXaxis()->SetTitle("CU");
   h0blank->GetYaxis()->SetTitle("Max Charge [pC]");
   h0blank->Draw("hist");  
@@ -472,7 +472,7 @@ void CU_Plots(){
   TCanvas *c1 = Canvas("1D PD",800,800);
   TH1F* h1blank = Blank("Blank1",62,0,disMaxPD/convert);
   h1blank->SetMinimum(pinDisMin);
-  h1blank->SetMaximum(6);
+  h1blank->SetMaximum(pinDisMax);
   h1blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h1blank->GetYaxis()->SetTitle("Channels");
   h1blank->Draw("hist");  
