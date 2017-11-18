@@ -192,7 +192,6 @@ def makeTable(runDir, tables, runList, stability=False):
     if runDir[-1] != "/":
         runDir += "/"
     cuList = []
-    cuBadChannels = {}
     for directory in os.listdir(runDir):
         if "CU" in directory:
             cu = int(directory.split("CU_")[-1])
@@ -203,6 +202,9 @@ def makeTable(runDir, tables, runList, stability=False):
     col_width = 10
     adcConverter = ADCConverter()
     for table in tables:
+        cuBadChannels = {}
+        total_channels = 0
+        total_bad_channels = 0
         print "Creating {0} table".format(table)
         tfile = TFile(runDir + table + '.root', 'recreate')
         tree = TTree('t1', 't1')
@@ -269,7 +271,7 @@ def makeTable(runDir, tables, runList, stability=False):
                                     rbx = "%d" % irbx
                                     shunt = "%d" % ishunt
                                     if shunt == "0":    cutoff = 150
-                                    else:               cutoff = 125
+                                    else:               cutoff = 100
                                     # RM, pindiode/sipm_ch, uHTR, uhtr_ch, max_adc will vary within a file 
                                     if table == "sipm": 
                                         chList = mapping.rbxSIPM[rbx_full][iuhtr-1]
@@ -305,17 +307,19 @@ def makeTable(runDir, tables, runList, stability=False):
                                         if masked_rm == "4":
                                             masked_rm = "2"
                                         if (masked_rm, rm_ch) in mapping.darkSipms:
-                                            print "mask out channel: RM %s SiPM %s masked rm: %s" % (rm, rm_ch, masked_rm)
+                                            #print "mask out channel: RM %s SiPM %s masked rm: %s" % (rm, rm_ch, masked_rm)
                                             continue    
                                         
                                         uhtr_ch = channel.split("h")[-1]
                                         max_adc = str(findMaxADC(f, channel, False))
                                         max_fc  = "%.2f" % adcConverter.linearize(max_adc)
+                                        total_channels += 1 
                                         if int(max_adc) >= cutoff:
                                             result = "1"
                                         else:
                                             result = "0"
                                             bad_channels += 1
+                                            total_bad_channels += 1
                                         if table == "sipm":
                                             row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_fc, result]
                                         if table == "pd":
@@ -342,7 +346,9 @@ def makeTable(runDir, tables, runList, stability=False):
         tfile.Write()
         tfile.Close()
         for c in sorted(cuBadChannels):
-            print "CU {0} : {1} bad {2} channels".format(c, cuBadChannels[c], table)
+            print "CU {0} : {1} {2} channels less than {3} ADC".format(c, cuBadChannels[c], table, cutoff)
+        print "Total: {0} {1} channels less than {2} ADC out of {3} total channels".format(total_bad_channels, table, cutoff, total_channels)
+
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -354,11 +360,11 @@ if __name__ == "__main__":
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     
     tables = ["sipm", "pd"]
-    runList = list(i for i in xrange(1,2))
+    runList = [1,4,5,6,7]
     makeTable(runDir, tables, runList)
 
-    # iterations for stability runs
+    # iterations for stability runs: iteration 1 is bad for CU6
     #tables = ["sipm", "pd"]
-    #runList = list(i for i in xrange(1,7))
-    #makeTable(runDir, tables, runList, True)
+    #runList = list(i for i in xrange(2,7))
+    #makeTable(runDir, tables, runList, stability=True)
 
