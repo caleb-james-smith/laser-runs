@@ -136,6 +136,7 @@ def plotScatter(plot_dir, info):
         y_range = info["yrange"]
     f_box = ""
     fig, ax = plt.subplots()
+    deg = 2
     
     print "number of x values: {0}".format(len(x))
     
@@ -147,7 +148,7 @@ def plotScatter(plot_dir, info):
 
         if plotFit:
             # calculate fit function
-            z = np.polyfit(x, y, 1)
+            z = np.polyfit(x, y, deg)
             f = np.poly1d(z)
             f_string = str(f)
             f_string = f_string.split("\n")[-1]
@@ -234,8 +235,8 @@ if __name__ == "__main__":
     info[-1]["ytitle"] = "Pin Diode 1 Max fC"
     info[-1]["xstat"] = 20000 
     info[-1]["ystat"] = 52000
-    info[-1]["xrange"] = [5000, 60000]
-    info[-1]["yrange"] = [5000, 60000]
+    info[-1]["xrange"] = [0, 100000]
+    info[-1]["yrange"] = [0, 200000]
     info[-1]["plotfit"] = True
     info[-1]["setrange"] = False
 
@@ -250,8 +251,8 @@ if __name__ == "__main__":
     info[-1]["ytitle"] = "SiPM Average Max fC"
     info[-1]["xstat"] = 5000
     info[-1]["ystat"] = 170000
-    info[-1]["xrange"] = [0, 70000]
-    info[-1]["yrange"] = [40000, 200000]
+    info[-1]["xrange"] = [0, 100000]
+    info[-1]["yrange"] = [0, 200000]
     info[-1]["plotfit"] = True
     info[-1]["setrange"] = True
 
@@ -266,8 +267,8 @@ if __name__ == "__main__":
     info[-1]["ytitle"] = "SiPM Average Max fC"
     info[-1]["xstat"] = 5000
     info[-1]["ystat"] = 170000
-    info[-1]["xrange"] = [0, 70000]
-    info[-1]["yrange"] = [40000, 200000]
+    info[-1]["xrange"] = [0, 100000]
+    info[-1]["yrange"] = [0, 200000]
     info[-1]["plotfit"] = True
     info[-1]["setrange"] = True
 
@@ -282,8 +283,8 @@ if __name__ == "__main__":
     info[-1]["ytitle"] = "SiPM and Pin Diode 1 Average Max fC"
     info[-1]["xstat"] = 15000
     info[-1]["ystat"] = 170000
-    info[-1]["xrange"] = [10000, 75000]
-    info[-1]["yrange"] = [0, 220000]
+    info[-1]["xrange"] = [0, 100000]
+    info[-1]["yrange"] = [0, 200000]
     info[-1]["plotfit"] = True
     info[-1]["setrange"] = True
 
