@@ -335,6 +335,8 @@ def makeTable(runDir, tables, runList, stability=False):
                                         tree.Fill()
                                         #if result == "0":
                                         #    print row_string
+                                        if int(max_adc) > 240:
+                                            print row_string
                     # calibration unit lopp
                     cuBadChannels[icu] = bad_channels
                 # end of array

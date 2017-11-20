@@ -111,7 +111,16 @@ fi fi fi fi fi fi
 # I hear a giant beating his drum!
 
 # set shunts
-./setup.py -r $rbx
+#shunts_set=$(./setup.py -r $rbx -s $shunt 2>&1)
+./setup.py -r $rbx -s $shunt
+shunts_set=$?
+echo "Error code for setting shunts: $shunts_set"
+if [ $shunts_set = "0" ]; then
+    echo "Shunts have been set to $shunt."
+else
+    echo "There was an error when attempting to set shunt=$shunt."
+    exit 1
+fi
 
 echo "RBX: $rbx"
 echo "uHTR 1: $crate1:$uhtr1"
