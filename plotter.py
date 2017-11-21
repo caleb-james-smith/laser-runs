@@ -27,16 +27,19 @@ def getData(data_dir):
         element_name = "rm%d" % rm
         data[element_name] = []
         data["%s_ave" % element_name] = []
+        for sipm in xrange(48):
+            data["%s_sipm%d" % (element_name, sipm)] = []
 
     # sipm array: {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
     # pd array: {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
     cu_list = []
+    fc_position = -2
+    element_position = 3
+    sipm_position = 4
     for dictionary in dictionaries:
         f = dictionary["file"]
         tag = dictionary["tag"]
         element = dictionary["element"]
-        fc_position = -2
-        element_position = 3
         with open(data_dir + f) as df:
             for line in df:
                 if line[0] == "#":
@@ -64,6 +67,8 @@ def getData(data_dir):
                         data[cu_name]["rm%d" % rm] = []
 
                 data["cu%d"%cu][element_name].append(d)
+                if tag == "sipm":
+                    data["%s_sipm%s" % (element_name, s[sipm_position])].append(d)
    
     data["pd_quartz"] = data["pd0"] + data["pd0"]
     data["pd_megatile"] = data["pd2"] + data["pd3"] + data["pd4"] + data["pd5"]
@@ -90,9 +95,13 @@ def getData(data_dir):
 
     return data
 
-def getStat(x_min, x_max, y_min, y_max):
-    x_stat = x_max - (x_max - x_min) / 3.0
-    y_stat = y_max - (y_max - y_min) / 5.0
+def getStat(x_min, x_max, y_min, y_max, loc=1):
+    if loc == 0: # top left
+        x_stat = x_min + (x_max - x_min) / 5.0
+        y_stat = y_max - (y_max - y_min) / 5.0
+    elif loc == 1: # top right
+        x_stat = x_max - (x_max - x_min) / 3.0
+        y_stat = y_max - (y_max - y_min) / 5.0
     return (x_stat, y_stat)
 
 def plotHisto(data, plot_dir, info):
@@ -105,6 +114,7 @@ def plotHisto(data, plot_dir, info):
     #xstat = info["xstat"]
     #ystat = info["ystat"]
     data_list = data[name]
+    
     entries = len(data_list)
     mean = np.mean(data_list)
     std = np.std(data_list)
@@ -113,8 +123,9 @@ def plotHisto(data, plot_dir, info):
     stat_string += "Mean = %.2f %s\n" % (mean, units)
     stat_string += "St. Dev. = %.2f %s\n" % (std, units)
     stat_string += "Variation = %.2f %%" % var
+    
     h_y, h_x, h = plt.hist(data_list, bins=nbins)
-    xstat, ystat = getStat(h_x.min(), h_x.max(), h_y.min(), h_y.max())
+    xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
     plt.xlabel(xtitle)
@@ -133,8 +144,8 @@ def plotScatter(plot_dir, info):
     title = info["title"]
     xtitle = info["xtitle"]
     ytitle = info["ytitle"]
-    xstat = info["xstat"]
-    ystat = info["ystat"]
+    #xstat = info["xstat"]
+    #ystat = info["ystat"]
     plotFit = info["plotfit"]
     setRange = info["setrange"] 
     if setRange:
@@ -143,10 +154,17 @@ def plotScatter(plot_dir, info):
     f_box = ""
     fig, ax = plt.subplots()
     deg = 2
-    
+    y_min = 10 ** 10
+    y_max = -10 ** 10
+
     print "number of x values: {0}".format(len(x))
     
     for i, y in enumerate(ydata): 
+        if min(y) < y_min:
+            y_min = min(y)
+        if max(y) > y_max:
+            y_max = max(y)
+
         yname = ynames[i]
         color = colors[i % len(colors)] # in case there are more y data sets than colors
         
@@ -171,8 +189,11 @@ def plotScatter(plot_dir, info):
         else:
             ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
 
-    if f_box[-1] == "\n":
-        f_box = f_box[:-1]
+    xstat, ystat = getStat(min(x), max(x), y_min, y_max, 0)
+
+    if f_box:
+        if f_box[-1] == "\n":
+            f_box = f_box[:-1]
 
     if plotFit:
         ax.text(xstat, ystat, f_box)
@@ -197,21 +218,23 @@ def plotScatter(plot_dir, info):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--config",   "-c", default="config/passed.json", help="json config file")
-    parser.add_argument("--data_dir", "-d", default="passed_cu_data",     help="directory containing data tables")
-    parser.add_argument("--plot_dir", "-p", default="passed_plots",       help="directory to save plots")
+    parser.add_argument("--histo_config",   "-c", default="config/final_histo.json",    help="json config file for histograms")
+    parser.add_argument("--scatter_config", "-s", default="config/final_scatter.json",  help="json config file for scatter plots")
+    parser.add_argument("--data_dir",       "-d", default="Nov17-18_Final_CU_Data",     help="directory containing data tables")
+    parser.add_argument("--plot_dir",       "-p", default="Nov17-18_Final_Plots",       help="directory to save plots")
     
     options = parser.parse_args()
     plot_dir = options.plot_dir
     data_dir = options.data_dir
-    config = options.config
+    histo_config = options.histo_config
+    scatter_config = options.scatter_config
 
     if plot_dir[-1] != "/":
         plot_dir += "/"
     if data_dir[-1] != "/":
         data_dir += "/"
     
-    with open(config) as json_file:
+    with open(histo_config) as json_file:
         info = json.load(json_file)
 
     data = getData(data_dir)
@@ -228,73 +251,18 @@ if __name__ == "__main__":
 
     # list of dictionaries containing plot information
 
-    info = []
+    with open(scatter_config) as json_file:
+        info = json.load(json_file)
     
-    # PD1 vs PD0
-    info.append({})
-    info[-1]["name"] = "pd1_pd0"
-    info[-1]["ynames"] = ["PD 1"]
-    info[-1]["xdata"] = pd0_data 
-    info[-1]["ydata"] = [pd1_data]
-    info[-1]["title"] = "Pin Diode 1 vs Pin Diode 0 (Max Charge)"
-    info[-1]["xtitle"] = "Pin Diode 0 Max fC"
-    info[-1]["ytitle"] = "Pin Diode 1 Max fC"
-    info[-1]["xstat"] = 20000 
-    info[-1]["ystat"] = 52000
-    info[-1]["xrange"] = [0, 100000]
-    info[-1]["yrange"] = [0, 200000]
-    info[-1]["plotfit"] = True
-    info[-1]["setrange"] = False
-
-    # RM1-4 vs PD0
-    info.append({})
-    info[-1]["name"] = "rm_pd0"
-    info[-1]["ynames"] = ["RM 1", "RM 2", "RM 3", "RM 4"]
-    info[-1]["xdata"] = pd0_data 
-    info[-1]["ydata"] = rm_data
-    info[-1]["title"] = "RM SiPMs vs Pin Diode 0 (Average Max Charge)"
-    info[-1]["xtitle"] = "Pin Diode 0 Max fC"
-    info[-1]["ytitle"] = "SiPM Average Max fC"
-    info[-1]["xstat"] = 5000
-    info[-1]["ystat"] = 170000
-    info[-1]["xrange"] = [0, 100000]
-    info[-1]["yrange"] = [0, 200000]
-    info[-1]["plotfit"] = True
-    info[-1]["setrange"] = True
-
-    # RM1-4 vs PD1
-    info.append({})
-    info[-1]["name"] = "rm_pd1"
-    info[-1]["ynames"] = ["RM 1", "RM 2", "RM 3", "RM 4"]
-    info[-1]["xdata"] = pd1_data 
-    info[-1]["ydata"] = rm_data
-    info[-1]["title"] = "RM SiPMs vs Pin Diode 1 (Average Max Charge)"
-    info[-1]["xtitle"] = "Pin Diode 1 Max fC"
-    info[-1]["ytitle"] = "SiPM Average Max fC"
-    info[-1]["xstat"] = 5000
-    info[-1]["ystat"] = 170000
-    info[-1]["xrange"] = [0, 100000]
-    info[-1]["yrange"] = [0, 200000]
-    info[-1]["plotfit"] = True
-    info[-1]["setrange"] = True
-
-    # RM1-4 and PD1 vs PD0
-    info.append({})
-    info[-1]["name"] = "rm_pd1_pd0"
-    info[-1]["ynames"] = ["RM 1", "RM 2", "RM 3", "RM 4", "PD 1"]
-    info[-1]["xdata"] = pd0_data 
-    info[-1]["ydata"] = rm_data + [pd1_data]
-    info[-1]["title"] = "RM SiPMs and Pin Diode 1 vs Pin Diode 0 (Average Max Charge)"
-    info[-1]["xtitle"] = "Pin Diode 0 Max fC"
-    info[-1]["ytitle"] = "SiPM and Pin Diode 1 Average Max fC"
-    info[-1]["xstat"] = 15000
-    info[-1]["ystat"] = 170000
-    info[-1]["xrange"] = [0, 100000]
-    info[-1]["yrange"] = [0, 200000]
-    info[-1]["plotfit"] = True
-    info[-1]["setrange"] = True
-
-    # create scatter plots
-    for plot_info in info:
-        plotScatter(plot_dir, plot_info)
+    info["pd1_pd0"]["xdata"] = pd0_data 
+    info["pd1_pd0"]["ydata"] = [pd1_data]
+    info["rm_pd0"]["xdata"] = pd0_data 
+    info["rm_pd0"]["ydata"] = rm_data
+    info["rm_pd1"]["xdata"] = pd1_data 
+    info["rm_pd1"]["ydata"] = rm_data
+    info["rm_pd1_pd0"]["xdata"] = pd0_data 
+    info["rm_pd1_pd0"]["ydata"] = rm_data + [pd1_data]
+    
+    for key in info:
+        plotScatter(plot_dir, info[key])
 
