@@ -200,7 +200,7 @@ def makeTable(runDir, tables, runList, stability=False):
     shuntList = [31]
     pdList = list(i for i in xrange(6))
     col_width = 10
-    adcConverter = ADCConverter()
+    adcConverter = ADCConverter(1, 31) # 1 for pC and 31 for shunt
     for table in tables:
         cuBadChannels = {}
         total_channels = 0
