@@ -1,0 +1,142 @@
+{
+    "sipm" : {
+        "name" : "sipm",
+        "title" : "Max Charge for SiPM Channels",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 30,
+        "xstat" : 150000,
+        "ystat" : 400
+    },
+    "rm1" : {
+        "name" : "rm1",
+        "title" : "Max Charge for SiPM Channels, RM 1",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 50000,
+        "ystat" : 200
+    },
+    "rm2" : {
+        "name" : "rm2",
+        "title" : "Max Charge for SiPM Channels, RM 2",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 250000,
+        "ystat" : 300
+    },
+    "rm3" : {
+        "name" : "rm3",
+        "title" : "Max Charge for SiPM Channels, RM 3",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 0,
+        "ystat" : 150
+    },
+    "rm4" : {
+        "name" : "rm4",
+        "title" : "Max Charge for SiPM Channels, RM 4",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 50000,
+        "ystat" : 200
+    },
+    "rm1_sipm0" : {
+        "name" : "rm1_sipm0",
+        "title" : "Max Charge for RM 1 SiPM Channel 0",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 50000,
+        "ystat" : 200
+    },
+    "rm2_sipm0" : {
+        "name" : "rm2_sipm0",
+        "title" : "Max Charge for RM 2 SiPM Channel 0",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 50000,
+        "ystat" : 200
+    },
+    "rm3_sipm0" : {
+        "name" : "rm3_sipm0",
+        "title" : "Max Charge for RM 3 SiPM Channel 0",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 50000,
+        "ystat" : 200
+    },
+    "rm4_sipm0" : {
+        "name" : "rm4_sipm0",
+        "title" : "Max Charge for RM 4 SiPM Channel 0",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 50000,
+        "ystat" : 200
+    },
+    "pd" : {
+        "name" : "pd",
+        "title" : "Max Charge for Pin-Diode Channels",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 30,
+        "xstat" : 10000,
+        "ystat" : 6
+    },
+    "pd0" : {
+        "name" : "pd0",
+        "title" : "Max Charge for Quartz Fiber Pin-Diode Channel 0",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 10000,
+        "ystat" : 8
+    },
+    "pd1" : {
+        "name" : "pd1",
+        "title" : "Max Charge for Quartz Fiber Pin-Diode Channel 1",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 20,
+        "xstat" : 10000,
+        "ystat" : 8
+    },
+    "pd_quartz" : {
+        "name" : "pd_quartz",
+        "title" : "Max Charge for Quartz Fiber Pin-Diode Channels 0 and 1",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 30,
+        "xstat" : 10000,
+        "ystat" : 12
+    },
+    "pd_megatile" : {
+        "name" : "pd_megatile",
+        "title" : "Max Charge for Megatile Pin-Diode Channels 2, 3, 4, and 5",
+        "xtitle" : "Maximum pC",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 10,
+        "xstat" : 50000,
+        "ystat" : 20
+    }
+}

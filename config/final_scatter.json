@@ -1,0 +1,54 @@
+{
+    "pd1_pd0" : {
+        "name" : "pd1_pd0",
+        "ynames" : ["PD 1"],
+        "title" : "Pin Diode 1 vs Pin Diode 0 (Max Charge)",
+        "xtitle" : "Pin Diode 0 Max pC",
+        "ytitle" : "Pin Diode 1 Max pC",
+        "xstat" : 20000,
+        "ystat" : 52000,
+        "xrange" : [0, 100000],
+        "yrange" : [0, 200000],
+        "plotfit" : 1,
+        "setrange" : 0
+    },
+    "rm_pd0" : {
+        "name" : "rm_pd0",
+        "ynames" : ["RM 1", "RM 2", "RM 3", "RM 4"],
+        "title" : "RM SiPMs vs Pin Diode 0 (Average Max Charge)",
+        "xtitle" : "Pin Diode 0 Max pC",
+        "ytitle" : "SiPM Average Max pC",
+        "xstat" : 5000,
+        "ystat" : 170000,
+        "xrange" : [0, 100000],
+        "yrange" : [0, 200000],
+        "plotfit" : 1,
+        "setrange" : 1
+    },
+    "rm_pd1" : {
+        "name" : "rm_pd1",
+        "ynames" : ["RM 1", "RM 2", "RM 3", "RM 4"],
+        "title" : "RM SiPMs vs Pin Diode 1 (Average Max Charge)",
+        "xtitle" : "Pin Diode 1 Max pC",
+        "ytitle" : "SiPM Average Max pC",
+        "xstat" : 5000,
+        "ystat" : 170000,
+        "xrange" : [0, 100000],
+        "yrange" : [0, 200000],
+        "plotfit" : 1,
+        "setrange" : 1
+    },
+    "rm_pd1_pd0" : {
+        "name" : "rm_pd1_pd0",
+        "ynames" : ["RM 1", "RM 2", "RM 3", "RM 4", "PD 1"],
+        "title" : "RM SiPMs and Pin Diode 1 vs Pin Diode 0 (Average Max Charge)",
+        "xtitle" : "Pin Diode 0 Max pC",
+        "ytitle" : "SiPM and Pin Diode 1 Average Max pC",
+        "xstat" : 15000,
+        "ystat" : 170000,
+        "xrange" : [0, 100000],
+        "yrange" : [0, 200000],
+        "plotfit" : 1,
+        "setrange" : 1
+    }
+}
