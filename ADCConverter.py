@@ -19,7 +19,11 @@ class ADCConverter:
     # A class to convert ADC to fC
     fc = {}
 
-    def __init__(self):
+    def __init__(self, unit=0, shunt=0):
+        self.unit = unit
+        self.shunt = shunt
+        self.shuntFactor = self.getShuntFactor()
+        print "shunt : {0} factor: {1}".format(self.shunt, self.shuntFactor)
         # Loop over exponents, 0 - 3
         for exp in xrange(0, 4):
             # Loop over mantissas, 0 - 63
@@ -40,9 +44,14 @@ class ADCConverter:
                 self.fc[exp * 64 + man] = self.inputCharge[exp * 5 + subrange] + ((man - self.adcBase[subrange]) + .5) * sensitivity
 
     def linearize(self, adc):
+        factors = list(10.0**k for k in xrange(0,9,3)) # fC, pC, nC
+        if self.unit > len(factors) - 1:
+            print "The unit is ouside the available range 0 to {0}.".format(len(factors)-1)
+            return -1
+        unitFactor = factors[self.unit]
         adc = int(adc) # in case of string
         if adc > 255: adc = 255
-        return self.fc[int(adc)]
+        return self.shuntFactor * self.fc[int(adc)] / unitFactor
     
     def getBins(self):
         xbins = []
@@ -57,15 +66,25 @@ class ADCConverter:
         xbins.append(bin_256)
         return xbins
 
+    def getShuntFactor(self):
+        if self.shunt < 0 or self.shunt > 31:
+            print "The shunt outside the available range 0 to 31."
+            return -1
+        cookies = [4, 3, 2, 1, 0.5]
+        cake = 1 # factor
+        crumbs = bin(self.shunt).split('0b')[-1] # bits
+        for i in xrange(1, len(crumbs) + 1):
+            cake += int(crumbs[-i]) * cookies[-i]
+        return cake
 
 if __name__ == "__main__":
-    converter = ADCConverter()
+    for s in xrange(32):
+        ADCConverter(1, s)
+    converter = ADCConverter(1, 31)
     xbins = converter.getBins()
     cleanBins = []
-    print "ADC : fC : xbin"
+    print "ADC : pC : xbin"
     for adc in xrange(257):
         print "%3d : %.2f : %.2f" % (adc, converter.linearize(adc), xbins[adc])
         cleanBins.append(float("%.2f" % xbins[adc]))
-    #print cleanBins
-
 
