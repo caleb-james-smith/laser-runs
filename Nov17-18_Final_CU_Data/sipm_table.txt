@@ -1,4 +1,4 @@
-# cu        rbx       run       rm        sipm_ch   uhtr_ch   shunt     max_adc   max_fc    result    
+# cu        rbx       run       rm        sipm_ch   uhtr_ch   shunt     max_adc   max_pc    result    
 2         0         1         1         0         12        31        200       602.50    1         
 2         0         1         1         1         13        31        211       867.22    1         
 2         0         1         1         2         14        31        211       867.22    1         
