@@ -90,6 +90,11 @@ def getData(data_dir):
 
     return data
 
+def getStat(x_min, x_max, y_min, y_max):
+    x_stat = x_max - (x_max - x_min) / 3.0
+    y_stat = y_max - (y_max - y_min) / 5.0
+    return (x_stat, y_stat)
+
 def plotHisto(data, plot_dir, info):
     name = info["name"]
     title = info["title"]
@@ -97,8 +102,8 @@ def plotHisto(data, plot_dir, info):
     ytitle = info["ytitle"]
     nbins = info["nbins"]
     units = info["units"]
-    xstat = info["xstat"]
-    ystat = info["ystat"]
+    #xstat = info["xstat"]
+    #ystat = info["ystat"]
     data_list = data[name]
     entries = len(data_list)
     mean = np.mean(data_list)
@@ -108,7 +113,8 @@ def plotHisto(data, plot_dir, info):
     stat_string += "Mean = %.2f %s\n" % (mean, units)
     stat_string += "St. Dev. = %.2f %s\n" % (std, units)
     stat_string += "Variation = %.2f %%" % var
-    plt.hist(data_list, bins=nbins)
+    h_y, h_x, h = plt.hist(data_list, bins=nbins)
+    xstat, ystat = getStat(h_x.min(), h_x.max(), h_y.min(), h_y.max())
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
     plt.xlabel(xtitle)
