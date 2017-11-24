@@ -4,6 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 from argparse import ArgumentParser
+from scipy.optimize import curve_fit
 
 def getData(data_dir):
     sipm_file = "sipm_table.txt"
@@ -95,9 +96,12 @@ def getData(data_dir):
 
     return data
 
+def logarithm(x, a, b, c):
+    return a * np.log(b * x) + c
+
 def getStat(x_min, x_max, y_min, y_max, loc=1):
     if loc == 0: # top left
-        x_stat = x_min + (x_max - x_min) / 5.0
+        x_stat = x_min # + (x_max - x_min) / 5.0
         y_stat = y_max - (y_max - y_min) / 5.0
     elif loc == 1: # top right
         x_stat = x_max - (x_max - x_min) / 3.0
@@ -153,7 +157,7 @@ def plotScatter(plot_dir, info):
         y_range = info["yrange"]
     f_box = ""
     fig, ax = plt.subplots()
-    deg = 2
+    deg = 1
     y_min = 10 ** 10
     y_max = -10 ** 10
 
@@ -170,7 +174,7 @@ def plotScatter(plot_dir, info):
         
         print "number of y values for {0}: {1}".format(yname, len(y))
 
-        if plotFit:
+        if plotFit == 1:
             # calculate fit function
             z = np.polyfit(x, y, deg)
             f = np.poly1d(z)
@@ -181,9 +185,23 @@ def plotScatter(plot_dir, info):
             print f_string
 
             # calculate new x's and y's using fit function
-            x_new = np.linspace(min(x), max(x), 50)
+            x_new = np.linspace(min(x), max(x), 100)
             y_new = f(x_new)
             
+            ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
+            ax.plot(x_new, y_new, '--', c=color, label=yname+" fit")
+        elif plotFit == 2:
+            # calculate fit function
+            popt, pcov = curve_fit(logarithm, x, y)
+            # calculate new x's and y's using fit function
+            x_new = np.linspace(min(x), max(x), 100)
+            y_new = logarithm(x_new, *popt)
+            if popt[2] >= 0.0:
+                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f} x) + {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
+            else:
+                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f} x) {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
+            print f_string
+            f_box += f_string + "\n"
             ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
             ax.plot(x_new, y_new, '--', c=color, label=yname+" fit")
         else:

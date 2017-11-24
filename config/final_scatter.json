@@ -22,8 +22,8 @@
         "ystat" : 170000,
         "xrange" : [0, 100000],
         "yrange" : [0, 200000],
-        "plotfit" : 1,
-        "setrange" : 1
+        "plotfit" : 2,
+        "setrange" : 0
     },
     "rm_pd1" : {
         "name" : "rm_pd1",
@@ -35,8 +35,8 @@
         "ystat" : 170000,
         "xrange" : [0, 100000],
         "yrange" : [0, 200000],
-        "plotfit" : 1,
-        "setrange" : 1
+        "plotfit" : 2,
+        "setrange" : 0
     },
     "rm_pd1_pd0" : {
         "name" : "rm_pd1_pd0",
@@ -48,7 +48,7 @@
         "ystat" : 170000,
         "xrange" : [0, 100000],
         "yrange" : [0, 200000],
-        "plotfit" : 1,
-        "setrange" : 1
+        "plotfit" : 0,
+        "setrange" : 0
     }
 }
