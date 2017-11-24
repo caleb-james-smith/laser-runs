@@ -150,7 +150,7 @@ def plotScatter(plot_dir, info):
     ytitle = info["ytitle"]
     #xstat = info["xstat"]
     #ystat = info["ystat"]
-    plotFit = info["plotfit"]
+    plotFitTypes = info["plotfit"]
     setRange = info["setrange"] 
     if setRange:
         x_range = info["xrange"]
@@ -161,6 +161,13 @@ def plotScatter(plot_dir, info):
     y_min = 10 ** 10
     y_max = -10 ** 10
 
+    if len(ynames) != len(ydata):
+        print "The length of the ynames list should be the same as the number of y data sets."
+        return
+    if len(plotFitTypes) != len(ydata):
+        print "The length of the plotfit list should be the same as the number of y data sets."
+        return
+    
     print "number of x values: {0}".format(len(x))
     
     for i, y in enumerate(ydata): 
@@ -169,6 +176,7 @@ def plotScatter(plot_dir, info):
         if max(y) > y_max:
             y_max = max(y)
 
+        plotFit = plotFitTypes[i]
         yname = ynames[i]
         color = colors[i % len(colors)] # in case there are more y data sets than colors
         
@@ -212,8 +220,6 @@ def plotScatter(plot_dir, info):
     if f_box:
         if f_box[-1] == "\n":
             f_box = f_box[:-1]
-
-    if plotFit:
         ax.text(xstat, ystat, f_box)
 
     legend = ax.legend(loc='lower right')
