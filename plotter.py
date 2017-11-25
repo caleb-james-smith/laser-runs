@@ -136,13 +136,16 @@ def plotHisto(data, plot_dir, info):
     stat_string += "Minimum = %.2f\n" % min_val
     stat_string += "Maximum = %.2f" % max_val
     
+    h_y, h_x, h = plt.hist(data_list, bins=nbins)
+    
     if setRange:
         axes = plt.gca()
         axes.set_xlim(x_range)
         axes.set_ylim(y_range)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1])
+    else:
+        xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
     
-    h_y, h_x, h = plt.hist(data_list, bins=nbins)
-    xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
     plt.xlabel(xtitle)
@@ -240,6 +243,9 @@ def plotScatter(plot_dir, info):
         axes = plt.gca()
         axes.set_xlim(x_range)
         axes.set_ylim(y_range)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], 0)
+    else:
+        xstat, ystat = getStat(min(x), max(x), y_min, y_max, 0)
     
     plt.gcf().subplots_adjust(bottom=0.1)
     plt.gcf().subplots_adjust(left=0.15)
