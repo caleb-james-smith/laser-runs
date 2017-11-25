@@ -117,8 +117,10 @@ def plotHisto(data, plot_dir, info):
     ytitle = info["ytitle"]
     nbins = info["nbins"]
     units = info["units"]
-    #xstat = info["xstat"]
-    #ystat = info["ystat"]
+    setRange = info["setrange"] 
+    if setRange:
+        x_range = info["xrange"]
+        y_range = info["yrange"]
     data_list = data[name]
     
     entries = len(data_list)
@@ -133,6 +135,11 @@ def plotHisto(data, plot_dir, info):
     stat_string += "Variation = %.2f %%\n" % var
     stat_string += "Minimum = %.2f\n" % min_val
     stat_string += "Maximum = %.2f" % max_val
+    
+    if setRange:
+        axes = plt.gca()
+        axes.set_xlim(x_range)
+        axes.set_ylim(y_range)
     
     h_y, h_x, h = plt.hist(data_list, bins=nbins)
     xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
@@ -154,8 +161,6 @@ def plotScatter(plot_dir, info):
     title = info["title"]
     xtitle = info["xtitle"]
     ytitle = info["ytitle"]
-    #xstat = info["xstat"]
-    #ystat = info["ystat"]
     plotFitTypes = info["plotfit"]
     setRange = info["setrange"] 
     if setRange:
