@@ -1,4 +1,7 @@
 # Converts ADC to fC (Nate Chaverin's class)
+import matplotlib.pyplot as plt
+import numpy as np
+
 class ADCConverter:
     # Bitmasks for 8-bit ADC input
     expMask = 192
@@ -77,6 +80,49 @@ class ADCConverter:
             cake += int(crumbs[-i]) * cookies[-i]
         return cake
 
+    def plot(self):
+        raw_colors = ["pinkish red","azure","bluish green","electric purple","tangerine","neon pink","dark sky blue","avocado"]
+        colors = list("xkcd:{0}".format(c) for c in raw_colors)
+        adc_ranges = list(list(i + j for j in xrange(64)) for i in xrange(0,256,64))
+        
+        # plot each range on separate plot
+        for i, adc_range in enumerate(adc_ranges):
+            fig, ax = plt.subplots()
+            color = colors[i % len(colors)] # in case there are more ranges than colors
+            name = "Range {0}".format(i)
+            charge = []
+            for adc in adc_range:
+                charge.append(self.linearize(adc))
+            ax.plot(adc_range, charge, 'o', c=color, label=name, alpha=0.5)
+        
+            legend = ax.legend(loc='lower right')
+            ax.grid(True)
+            plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
+            plt.xlabel("ADC")
+            plt.ylabel("pC")
+            plt.savefig("ADC_to_pC_range{0}.png".format(i))
+            plt.savefig("ADC_to_pC_range{0}.pdf".format(i))
+            plt.clf()
+
+        # plot all ranges on one plot
+        fig, ax = plt.subplots()
+        for i, adc_range in enumerate(adc_ranges):
+            color = colors[i % len(colors)] # in case there are more ranges than colors
+            name = "Range {0}".format(i)
+            charge = []
+            for adc in adc_range:
+                charge.append(self.linearize(adc))
+            ax.plot(adc_range, charge, 'o', c=color, label=name, alpha=0.5)
+        
+        legend = ax.legend(loc='lower right')
+        ax.grid(True)
+        plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
+        plt.xlabel("ADC")
+        plt.ylabel("pC")
+        plt.savefig("ADC_to_pC.png")
+        plt.savefig("ADC_to_pC.pdf")
+        plt.clf()
+
 if __name__ == "__main__":
     for s in xrange(32):
         ADCConverter(1, s)
@@ -87,4 +133,6 @@ if __name__ == "__main__":
     for adc in xrange(257):
         print "%3d : %.2f : %.2f" % (adc, converter.linearize(adc), xbins[adc])
         cleanBins.append(float("%.2f" % xbins[adc]))
+    converter.plot()
+
 
