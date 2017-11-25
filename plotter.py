@@ -34,7 +34,8 @@ def getData(data_dir):
     # sipm array: {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
     # pd array: {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
     cu_list = []
-    fc_position = -2
+    charge_position = -2
+    adc_position = -3
     element_position = 3
     sipm_position = 4
     for dictionary in dictionaries:
@@ -50,7 +51,8 @@ def getData(data_dir):
                     # skip data that does not pass
                     #print line
                     #continue
-                d = float(s[fc_position])
+                #d = int(s[adc_position])
+                d = float(s[charge_position])
                 element_index = int(s[element_position])
                 element_name = "%s%d" % (element, element_index)
                 data[tag].append(d)
@@ -102,10 +104,10 @@ def logarithm(x, a, b, c):
 def getStat(x_min, x_max, y_min, y_max, loc=1):
     if loc == 0: # top left
         x_stat = x_min # + (x_max - x_min) / 5.0
-        y_stat = y_max - (y_max - y_min) / 5.0
+        y_stat = y_max # - (y_max - y_min) / 8.0
     elif loc == 1: # top right
         x_stat = x_max - (x_max - x_min) / 3.0
-        y_stat = y_max - (y_max - y_min) / 5.0
+        y_stat = y_max - (y_max - y_min) / 4.0
     return (x_stat, y_stat)
 
 def plotHisto(data, plot_dir, info):
@@ -123,10 +125,14 @@ def plotHisto(data, plot_dir, info):
     mean = np.mean(data_list)
     std = np.std(data_list)
     var = 100* std / mean
+    min_val = min(data_list)
+    max_val = max(data_list)
     stat_string = "Num. Entries = %d\n" % entries
     stat_string += "Mean = %.2f %s\n" % (mean, units)
     stat_string += "St. Dev. = %.2f %s\n" % (std, units)
-    stat_string += "Variation = %.2f %%" % var
+    stat_string += "Variation = %.2f %%\n" % var
+    stat_string += "Minimum = %.2f\n" % min_val
+    stat_string += "Maximum = %.2f" % max_val
     
     h_y, h_x, h = plt.hist(data_list, bins=nbins)
     xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
