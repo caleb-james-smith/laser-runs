@@ -72,7 +72,7 @@ TH1F* Blank(const char* name,double num,double low,double high){
   blank->SetTitleSize(0.05,"X");
   blank->SetTitleSize(0.05,"Y");
   blank->SetTitleOffset(1.0,"X");
-  blank->SetTitleOffset(1.2,"Y");
+  blank->SetTitleOffset(1.4,"Y");
   blank->SetLabelSize(0.04,"X");
   blank->SetLabelSize(0.04,"Y");
   blank->SetStats(false);
@@ -115,7 +115,7 @@ void CU_Plots(){
   TTreeReaderValue<Float_t> pd_uhtr_ch(tReader1, "uhtr_ch");
   TTreeReaderValue<Float_t> pd_shunt(tReader1, "shunt");
   TTreeReaderValue<Float_t> pd_max_adc(tReader1, "max_adc");
-  TTreeReaderValue<Float_t> pd_max_fc(tReader1, "max_fc");
+  TTreeReaderValue<Float_t> pd_max_pc(tReader1, "max_pc");
   TTreeReaderValue<Float_t> pd_result(tReader1, "result"); 
 
   TTreeReaderValue<Float_t> sipm_CU(tReader2, "cu");
@@ -126,7 +126,7 @@ void CU_Plots(){
   TTreeReaderValue<Float_t> sipm_uhtr_ch(tReader2, "uhtr_ch");
   TTreeReaderValue<Float_t> sipm_shunt(tReader2, "shunt");
   TTreeReaderValue<Float_t> sipm_max_adc(tReader2, "max_adc");
-  TTreeReaderValue<Float_t> sipm_max_fc(tReader2, "max_fc");
+  TTreeReaderValue<Float_t> sipm_max_pc(tReader2, "max_pc");
   TTreeReaderValue<Float_t> sipm_result(tReader2, "result"); 
 
   int NumChanPD = 0;
@@ -135,11 +135,11 @@ void CU_Plots(){
   while(tReader2.Next()){NumChanRM+=1;}
   tReader1.Restart();
   tReader2.Restart();
-  double convert = 1000;
+  double convert = (1000/14);
   double pinDisMin = 0;
-  double pinDisMax = 30;
+  double pinDisMax = 32;
   double rmDisMin = 0;
-  double rmDisMax = 150;
+  double rmDisMax = 225;
   double disMax = 250000;
   double disMaxPD = 100000;
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
@@ -178,51 +178,51 @@ void CU_Plots(){
     sprintf(process,"Processing Channel: %i/%i",channel1,NumChanPD);
     if(channel1%10==0){std::cout<<process<<std::endl;}
     if(*pd_ch == 0){
-      xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_fc/convert; zPD0[channel1] = *pd_run;
-      profile_pd0->Fill(*pd_CU,*pd_max_fc/convert);
-      profile_stab_pd0->Fill(*pd_run,*pd_max_fc/convert);
-      PD0_dist->Fill(*pd_max_fc/convert);
+      xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_pc; zPD0[channel1] = *pd_run;
+      profile_pd0->Fill(*pd_CU,*pd_max_pc);
+      profile_stab_pd0->Fill(*pd_run,*pd_max_pc);
+      PD0_dist->Fill(*pd_max_pc);
     }
     else{xPD0[channel1] = -100;yPD0[channel1] = -100;zPD0[channel1] = -100;}
     if(*pd_ch == 1){
-      xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_fc/convert; zPD1[channel1] = *pd_run;
-      profile_pd1->Fill(*pd_CU,*pd_max_fc/convert);
-      profile_stab_pd1->Fill(*pd_run,*pd_max_fc/convert);
-      PD1_dist->Fill(*pd_max_fc/convert);
+      xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_pc; zPD1[channel1] = *pd_run;
+      profile_pd1->Fill(*pd_CU,*pd_max_pc);
+      profile_stab_pd1->Fill(*pd_run,*pd_max_pc);
+      PD1_dist->Fill(*pd_max_pc);
     }
     else{xPD1[channel1] = -100;yPD1[channel1] = -100;zPD1[channel1] = -100;}
     if(*pd_ch == 2){
-      xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_fc/convert; zPD2[channel1] = *pd_run;
-      profile_pd2->Fill(*pd_CU,*pd_max_fc/convert);
-      profile_stab_pd2->Fill(*pd_run,*pd_max_fc/convert);
-      PD2_dist->Fill(*pd_max_fc/convert);
+      xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_pc; zPD2[channel1] = *pd_run;
+      profile_pd2->Fill(*pd_CU,*pd_max_pc);
+      profile_stab_pd2->Fill(*pd_run,*pd_max_pc);
+      PD2_dist->Fill(*pd_max_pc);
     }
     else{xPD2[channel1] = -100;yPD2[channel1] = -100;zPD2[channel1] = -100;}
     if(*pd_ch == 3){
-      xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_fc/convert; zPD3[channel1] = *pd_run;
-      profile_pd3->Fill(*pd_CU,*pd_max_fc/convert);
-      profile_stab_pd3->Fill(*pd_run,*pd_max_fc/convert);
-      PD3_dist->Fill(*pd_max_fc/convert);
+      xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_pc; zPD3[channel1] = *pd_run;
+      profile_pd3->Fill(*pd_CU,*pd_max_pc);
+      profile_stab_pd3->Fill(*pd_run,*pd_max_pc);
+      PD3_dist->Fill(*pd_max_pc);
     }
     else{xPD3[channel1] = -100;yPD3[channel1] = -100;zPD3[channel1] = -100;}
     if(*pd_ch == 4){
-      xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_fc/convert; zPD4[channel1] = *pd_run;
-      profile_pd4->Fill(*pd_CU,*pd_max_fc/convert);
-      profile_stab_pd4->Fill(*pd_run,*pd_max_fc/convert);
-      PD4_dist->Fill(*pd_max_fc/convert);
+      xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_pc; zPD4[channel1] = *pd_run;
+      profile_pd4->Fill(*pd_CU,*pd_max_pc);
+      profile_stab_pd4->Fill(*pd_run,*pd_max_pc);
+      PD4_dist->Fill(*pd_max_pc);
     }
     else{xPD4[channel1] = -100;yPD4[channel1] = -100;zPD4[channel1] = -100;}
     if(*pd_ch == 5){
-      xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_fc/convert; zPD5[channel1] = *pd_run;
-      profile_pd5->Fill(*pd_CU,*pd_max_fc/convert);
-      profile_stab_pd5->Fill(*pd_run,*pd_max_fc/convert);
-      PD5_dist->Fill(*pd_max_fc/convert);
+      xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_pc; zPD5[channel1] = *pd_run;
+      profile_pd5->Fill(*pd_CU,*pd_max_pc);
+      profile_stab_pd5->Fill(*pd_run,*pd_max_pc);
+      PD5_dist->Fill(*pd_max_pc);
     }
     else{xPD5[channel1] = -100;yPD5[channel1] = -100;zPD5[channel1] = -100;}
     if((*pd_ch == 2 || *pd_ch == 3 || *pd_ch == 4 || *pd_ch == 5 )){
-      PD2_3_4_5_dist->Fill(*pd_max_fc/convert);
+      PD2_3_4_5_dist->Fill(*pd_max_pc);
     }
-    allPD_dist->Fill(*pd_max_fc/convert);
+    allPD_dist->Fill(*pd_max_pc);
   }
   sprintf(process,"Done with Pin-Diode Channels: %i/%i",NumChanPD,NumChanPD);
   std::cout<<process<<std::endl;
@@ -292,35 +292,35 @@ void CU_Plots(){
     sprintf(process,"Processing Channel: %i/%i",channel2,NumChanRM);
     if(channel2%500==0){std::cout<<process<<std::endl;}
     if(*sipm_rm == 1){
-      xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_fc/convert; zRM1[channel2] = *sipm_run;
-      profile_rm1->Fill(*sipm_CU,*sipm_max_fc/convert);
-      profile_stab_rm1->Fill(*sipm_run,*sipm_max_fc/convert);
-      RM1_dist->Fill(*sipm_max_fc/convert);
-      if(*sipm_ch == 20) RM1_dist_ch20->Fill(*sipm_max_fc/convert);
+      xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_pc; zRM1[channel2] = *sipm_run;
+      profile_rm1->Fill(*sipm_CU,*sipm_max_pc);
+      profile_stab_rm1->Fill(*sipm_run,*sipm_max_pc);
+      RM1_dist->Fill(*sipm_max_pc);
+      if(*sipm_ch == 20) RM1_dist_ch20->Fill(*sipm_max_pc);
     }
     else{xRM1[channel2] = -100;yRM1[channel2] = -100;zRM1[channel2] = -100;}
     if(*sipm_rm == 2){
-      xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_fc/convert; zRM2[channel2] = *sipm_run;
-      profile_rm2->Fill(*sipm_CU,*sipm_max_fc/convert);
-      profile_stab_rm2->Fill(*sipm_run,*sipm_max_fc/convert);
-      RM2_dist->Fill(*sipm_max_fc/convert);
+      xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_pc; zRM2[channel2] = *sipm_run;
+      profile_rm2->Fill(*sipm_CU,*sipm_max_pc);
+      profile_stab_rm2->Fill(*sipm_run,*sipm_max_pc);
+      RM2_dist->Fill(*sipm_max_pc);
     }
     else{xRM2[channel2] = -100;yRM2[channel2] = -100;zRM2[channel2] = -100;}
     if(*sipm_rm == 3){
-      xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_fc/convert; zRM3[channel2] = *sipm_run;
-      profile_rm3->Fill(*sipm_CU,*sipm_max_fc/convert);
-      profile_stab_rm3->Fill(*sipm_run,*sipm_max_fc/convert);
-      RM3_dist->Fill(*sipm_max_fc/convert);
+      xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_pc; zRM3[channel2] = *sipm_run;
+      profile_rm3->Fill(*sipm_CU,*sipm_max_pc);
+      profile_stab_rm3->Fill(*sipm_run,*sipm_max_pc);
+      RM3_dist->Fill(*sipm_max_pc);
     }
     else{xRM3[channel2] = -100;yRM3[channel2] = -100;zRM3[channel2] = -100;}
     if(*sipm_rm == 4){
-      xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_fc/convert; zRM4[channel2] = *sipm_run;
-      profile_rm4->Fill(*sipm_CU,*sipm_max_fc/convert);
-      profile_stab_rm4->Fill(*sipm_run,*sipm_max_fc/convert);
-      RM4_dist->Fill(*sipm_max_fc/convert);
+      xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_pc; zRM4[channel2] = *sipm_run;
+      profile_rm4->Fill(*sipm_CU,*sipm_max_pc);
+      profile_stab_rm4->Fill(*sipm_run,*sipm_max_pc);
+      RM4_dist->Fill(*sipm_max_pc);
     }
     else{xRM4[channel2] = -100;yRM4[channel2] = -100;zRM4[channel2] = -100;}
-    allRM_dist->Fill(*sipm_max_fc/convert);
+    allRM_dist->Fill(*sipm_max_pc);
   }
   sprintf(process,"Done with RM Channels: %i/%i",NumChanRM,NumChanRM);
   std::cout<<process<<std::endl;
