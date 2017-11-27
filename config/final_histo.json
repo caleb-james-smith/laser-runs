@@ -117,7 +117,7 @@
         "xrange" : 10000,
         "yrange" : 6,
         "setrange" : 0,
-        "statloc" : 1
+        "statloc" : 0
     },
     "pd0" : {
         "name" : "pd0",

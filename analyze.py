@@ -132,7 +132,7 @@ def findMaxADC(rootFile, ch, verb):
             # return first nonzero bin
             return Bin + nonZero - 1
         Bin -= 1
-    return Bin  # Return bin in 0 to 255 range
+    return Bin  # Return Bin = 0
 
 def plotMax(runDir, dictionary):
     gROOT.SetBatch()

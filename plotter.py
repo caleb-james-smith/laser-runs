@@ -110,8 +110,8 @@ def getStat(x_min, x_max, y_min, y_max, loc=1):
         x_stat = x_max - (x_max - x_min) / 3.0
         y_stat = y_max - (y_max - y_min) / 3.0
     elif loc == 2: # upper top left for scatter
-        x_stat = x_min 
-        y_stat = y_max
+        x_stat = x_min + (x_max - x_min) / 25.0
+        y_stat = y_max - (y_max - y_min) / 4.0
     return (x_stat, y_stat)
 
 def plotHisto(data, plot_dir, info):
@@ -121,8 +121,8 @@ def plotHisto(data, plot_dir, info):
     ytitle = info["ytitle"]
     nbins = info["nbins"]
     units = info["units"]
-    stat_loc = info["statloc"]
     setRange = info["setrange"] 
+    statLocation = info["statloc"]
     if setRange:
         x_range = info["xrange"]
         y_range = info["yrange"]
@@ -147,9 +147,9 @@ def plotHisto(data, plot_dir, info):
         axes = plt.gca()
         axes.set_xlim(x_range)
         axes.set_ylim(y_range)
-        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], stat_loc)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
     else:
-        xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y), stat_loc)
+        xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y), statLocation)
     
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
@@ -171,6 +171,7 @@ def plotScatter(plot_dir, info):
     ytitle = info["ytitle"]
     plotFitTypes = info["plotfit"]
     setRange = info["setrange"] 
+    statLocation = info["statloc"]
     if setRange:
         x_range = info["xrange"]
         y_range = info["yrange"]
@@ -234,8 +235,14 @@ def plotScatter(plot_dir, info):
         else:
             ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
 
-    xstat, ystat = getStat(min(x), max(x), y_min, y_max, 0)
-
+    if setRange:
+        axes = plt.gca()
+        axes.set_xlim(x_range)
+        axes.set_ylim(y_range)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
+    else:
+        xstat, ystat = getStat(min(x), max(x), y_min, y_max, statLocation)
+    
     if f_box:
         if f_box[-1] == "\n":
             f_box = f_box[:-1]
@@ -244,14 +251,6 @@ def plotScatter(plot_dir, info):
     legend = ax.legend(loc='lower right')
     ax.grid(True)
         
-    if setRange:
-        axes = plt.gca()
-        axes.set_xlim(x_range)
-        axes.set_ylim(y_range)
-        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], 2)
-    else:
-        xstat, ystat = getStat(min(x), max(x), y_min, y_max, 2)
-    
     plt.gcf().subplots_adjust(bottom=0.1)
     plt.gcf().subplots_adjust(left=0.15)
     

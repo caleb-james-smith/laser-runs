@@ -95,7 +95,7 @@ class ADCConverter:
                 charge.append(self.linearize(adc))
             ax.plot(adc_range, charge, 'o', c=color, label=name, alpha=0.5)
         
-            legend = ax.legend(loc='lower right')
+            legend = ax.legend(loc='upper left')
             ax.grid(True)
             plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
             plt.xlabel("ADC")
@@ -114,7 +114,7 @@ class ADCConverter:
                 charge.append(self.linearize(adc))
             ax.plot(adc_range, charge, 'o', c=color, label=name, alpha=0.5)
         
-        legend = ax.legend(loc='lower right')
+        legend = ax.legend(loc='upper left')
         ax.grid(True)
         plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
         plt.xlabel("ADC")
