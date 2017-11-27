@@ -34,7 +34,8 @@ def getData(data_dir):
     # sipm array: {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
     # pd array: {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
     cu_list = []
-    fc_position = -2
+    charge_position = -2
+    adc_position = -3
     element_position = 3
     sipm_position = 4
     for dictionary in dictionaries:
@@ -50,7 +51,8 @@ def getData(data_dir):
                     # skip data that does not pass
                     #print line
                     #continue
-                d = float(s[fc_position])
+                #d = int(s[adc_position])
+                d = float(s[charge_position])
                 element_index = int(s[element_position])
                 element_name = "%s%d" % (element, element_index)
                 data[tag].append(d)
@@ -100,12 +102,16 @@ def logarithm(x, a, b, c):
     return a * np.log(b * x) + c
 
 def getStat(x_min, x_max, y_min, y_max, loc=1):
+    xstat, ystat = 0, 0
     if loc == 0: # top left
-        x_stat = x_min # + (x_max - x_min) / 5.0
-        y_stat = y_max - (y_max - y_min) / 5.0
+        x_stat = x_min + (x_max - x_min) / 8.0
+        y_stat = y_max - (y_max - y_min) / 3.0
     elif loc == 1: # top right
         x_stat = x_max - (x_max - x_min) / 3.0
-        y_stat = y_max - (y_max - y_min) / 5.0
+        y_stat = y_max - (y_max - y_min) / 3.0
+    elif loc == 2: # upper top left for scatter
+        x_stat = x_min + (x_max - x_min) / 25.0
+        y_stat = y_max - (y_max - y_min) / 4.0
     return (x_stat, y_stat)
 
 def plotHisto(data, plot_dir, info):
@@ -115,21 +121,36 @@ def plotHisto(data, plot_dir, info):
     ytitle = info["ytitle"]
     nbins = info["nbins"]
     units = info["units"]
-    #xstat = info["xstat"]
-    #ystat = info["ystat"]
+    setRange = info["setrange"] 
+    statLocation = info["statloc"]
+    if setRange:
+        x_range = info["xrange"]
+        y_range = info["yrange"]
     data_list = data[name]
     
     entries = len(data_list)
     mean = np.mean(data_list)
     std = np.std(data_list)
     var = 100* std / mean
+    min_val = min(data_list)
+    max_val = max(data_list)
     stat_string = "Num. Entries = %d\n" % entries
     stat_string += "Mean = %.2f %s\n" % (mean, units)
-    stat_string += "St. Dev. = %.2f %s\n" % (std, units)
-    stat_string += "Variation = %.2f %%" % var
+    stat_string += "Std Dev = %.2f %s\n" % (std, units)
+    stat_string += "Variation = %.2f %%\n" % var
+    stat_string += "Minimum = %.2f\n" % min_val
+    stat_string += "Maximum = %.2f" % max_val
     
     h_y, h_x, h = plt.hist(data_list, bins=nbins)
-    xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
+    
+    if setRange:
+        axes = plt.gca()
+        axes.set_xlim(x_range)
+        axes.set_ylim(y_range)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
+    else:
+        xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y), statLocation)
+    
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
     plt.xlabel(xtitle)
@@ -148,10 +169,9 @@ def plotScatter(plot_dir, info):
     title = info["title"]
     xtitle = info["xtitle"]
     ytitle = info["ytitle"]
-    #xstat = info["xstat"]
-    #ystat = info["ystat"]
     plotFitTypes = info["plotfit"]
     setRange = info["setrange"] 
+    statLocation = info["statloc"]
     if setRange:
         x_range = info["xrange"]
         y_range = info["yrange"]
@@ -205,9 +225,9 @@ def plotScatter(plot_dir, info):
             x_new = np.linspace(min(x), max(x), 100)
             y_new = logarithm(x_new, *popt)
             if popt[2] >= 0.0:
-                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f} x) + {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
+                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f}\ x) + {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
             else:
-                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f} x) {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
+                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f}\ x) {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
             print f_string
             f_box += f_string + "\n"
             ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
@@ -215,8 +235,14 @@ def plotScatter(plot_dir, info):
         else:
             ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
 
-    xstat, ystat = getStat(min(x), max(x), y_min, y_max, 0)
-
+    if setRange:
+        axes = plt.gca()
+        axes.set_xlim(x_range)
+        axes.set_ylim(y_range)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
+    else:
+        xstat, ystat = getStat(min(x), max(x), y_min, y_max, statLocation)
+    
     if f_box:
         if f_box[-1] == "\n":
             f_box = f_box[:-1]
@@ -225,11 +251,6 @@ def plotScatter(plot_dir, info):
     legend = ax.legend(loc='lower right')
     ax.grid(True)
         
-    if setRange:
-        axes = plt.gca()
-        axes.set_xlim(x_range)
-        axes.set_ylim(y_range)
-    
     plt.gcf().subplots_adjust(bottom=0.1)
     plt.gcf().subplots_adjust(left=0.15)
     

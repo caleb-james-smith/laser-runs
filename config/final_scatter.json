@@ -10,7 +10,8 @@
         "xrange" : [0, 100000],
         "yrange" : [0, 200000],
         "plotfit" : [1],
-        "setrange" : 0
+        "setrange" : 0,
+        "statloc" : 2
     },
     "rm_pd0" : {
         "name" : "rm_pd0",
@@ -20,10 +21,11 @@
         "ytitle" : "SiPM Average Max pC",
         "xstat" : 5000,
         "ystat" : 170000,
-        "xrange" : [0, 100000],
-        "yrange" : [0, 200000],
+        "xrange" : [0, 700],
+        "yrange" : [0, 2500],
         "plotfit" : [2,2,2,2],
-        "setrange" : 0
+        "setrange" : 1,
+        "statloc" : 2
     },
     "rm_pd1" : {
         "name" : "rm_pd1",
@@ -33,10 +35,11 @@
         "ytitle" : "SiPM Average Max pC",
         "xstat" : 5000,
         "ystat" : 170000,
-        "xrange" : [0, 100000],
-        "yrange" : [0, 200000],
+        "xrange" : [0, 700],
+        "yrange" : [0, 2500],
         "plotfit" : [2,2,2,2],
-        "setrange" : 0
+        "setrange" : 1,
+        "statloc" : 2
     },
     "rm_pd1_pd0" : {
         "name" : "rm_pd1_pd0",
@@ -46,9 +49,10 @@
         "ytitle" : "SiPM and Pin Diode 1 Average Max pC",
         "xstat" : 15000,
         "ystat" : 170000,
-        "xrange" : [0, 100000],
-        "yrange" : [0, 200000],
+        "xrange" : [0, 900],
+        "yrange" : [0, 2500],
         "plotfit" : [2,2,2,2,1],
-        "setrange" : 0
+        "setrange" : 1,
+        "statloc" : 2
     }
 }

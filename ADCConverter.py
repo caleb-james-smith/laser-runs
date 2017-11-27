@@ -95,7 +95,7 @@ class ADCConverter:
                 charge.append(self.linearize(adc))
             ax.plot(adc_range, charge, 'o', c=color, label=name, alpha=0.5)
         
-            legend = ax.legend(loc='lower right')
+            legend = ax.legend(loc='upper left')
             ax.grid(True)
             plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
             plt.xlabel("ADC")
@@ -114,7 +114,7 @@ class ADCConverter:
                 charge.append(self.linearize(adc))
             ax.plot(adc_range, charge, 'o', c=color, label=name, alpha=0.5)
         
-        legend = ax.legend(loc='lower right')
+        legend = ax.legend(loc='upper left')
         ax.grid(True)
         plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
         plt.xlabel("ADC")
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     cleanBins = []
     print "ADC : pC : xbin"
     for adc in xrange(257):
-        print "%3d : %.2f : %.2f" % (adc, converter.linearize(adc), xbins[adc])
+        print "%3d : %.4f : %.4f" % (adc, converter.linearize(adc), xbins[adc])
         cleanBins.append(float("%.2f" % xbins[adc]))
     converter.plot()
 
