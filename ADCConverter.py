@@ -131,7 +131,7 @@ if __name__ == "__main__":
     cleanBins = []
     print "ADC : pC : xbin"
     for adc in xrange(257):
-        print "%3d : %.2f : %.2f" % (adc, converter.linearize(adc), xbins[adc])
+        print "%3d : %.4f : %.4f" % (adc, converter.linearize(adc), xbins[adc])
         cleanBins.append(float("%.2f" % xbins[adc]))
     converter.plot()
 

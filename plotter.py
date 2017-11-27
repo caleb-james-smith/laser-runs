@@ -102,12 +102,16 @@ def logarithm(x, a, b, c):
     return a * np.log(b * x) + c
 
 def getStat(x_min, x_max, y_min, y_max, loc=1):
+    xstat, ystat = 0, 0
     if loc == 0: # top left
-        x_stat = x_min # + (x_max - x_min) / 5.0
-        y_stat = y_max # - (y_max - y_min) / 8.0
+        x_stat = x_min + (x_max - x_min) / 8.0
+        y_stat = y_max - (y_max - y_min) / 3.0
     elif loc == 1: # top right
         x_stat = x_max - (x_max - x_min) / 3.0
-        y_stat = y_max - (y_max - y_min) / 4.0
+        y_stat = y_max - (y_max - y_min) / 3.0
+    elif loc == 2: # upper top left for scatter
+        x_stat = x_min 
+        y_stat = y_max
     return (x_stat, y_stat)
 
 def plotHisto(data, plot_dir, info):
@@ -117,6 +121,7 @@ def plotHisto(data, plot_dir, info):
     ytitle = info["ytitle"]
     nbins = info["nbins"]
     units = info["units"]
+    stat_loc = info["statloc"]
     setRange = info["setrange"] 
     if setRange:
         x_range = info["xrange"]
@@ -131,7 +136,7 @@ def plotHisto(data, plot_dir, info):
     max_val = max(data_list)
     stat_string = "Num. Entries = %d\n" % entries
     stat_string += "Mean = %.2f %s\n" % (mean, units)
-    stat_string += "St. Dev. = %.2f %s\n" % (std, units)
+    stat_string += "Std Dev = %.2f %s\n" % (std, units)
     stat_string += "Variation = %.2f %%\n" % var
     stat_string += "Minimum = %.2f\n" % min_val
     stat_string += "Maximum = %.2f" % max_val
@@ -142,9 +147,9 @@ def plotHisto(data, plot_dir, info):
         axes = plt.gca()
         axes.set_xlim(x_range)
         axes.set_ylim(y_range)
-        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1])
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], stat_loc)
     else:
-        xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y))
+        xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y), stat_loc)
     
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
@@ -219,9 +224,9 @@ def plotScatter(plot_dir, info):
             x_new = np.linspace(min(x), max(x), 100)
             y_new = logarithm(x_new, *popt)
             if popt[2] >= 0.0:
-                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f} x) + {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
+                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f}\ x) + {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
             else:
-                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f} x) {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
+                f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f}\ x) {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
             print f_string
             f_box += f_string + "\n"
             ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
@@ -243,9 +248,9 @@ def plotScatter(plot_dir, info):
         axes = plt.gca()
         axes.set_xlim(x_range)
         axes.set_ylim(y_range)
-        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], 0)
+        xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], 2)
     else:
-        xstat, ystat = getStat(min(x), max(x), y_min, y_max, 0)
+        xstat, ystat = getStat(min(x), max(x), y_min, y_max, 2)
     
     plt.gcf().subplots_adjust(bottom=0.1)
     plt.gcf().subplots_adjust(left=0.15)
