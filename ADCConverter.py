@@ -1,6 +1,10 @@
 # Converts ADC to fC (Nate Chaverin's class)
-import matplotlib.pyplot as plt
+
 import numpy as np
+try:
+    import matplotlib.pyplot as plt
+except:
+    print "matplotlib.pyplot cannot be imported"
 
 class ADCConverter:
     # Bitmasks for 8-bit ADC input
