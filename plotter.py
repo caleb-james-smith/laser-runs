@@ -134,12 +134,12 @@ def plotHisto(data, plot_dir, info):
     var = 100* std / mean
     min_val = min(data_list)
     max_val = max(data_list)
-    stat_string = "Num. Entries = %d\n" % entries
+    stat_string = "Num Entries = %d\n" % entries
     stat_string += "Mean = %.2f %s\n" % (mean, units)
     stat_string += "Std Dev = %.2f %s\n" % (std, units)
     stat_string += "Variation = %.2f %%\n" % var
-    stat_string += "Minimum = %.2f\n" % min_val
-    stat_string += "Maximum = %.2f" % max_val
+    stat_string += "Min = %.2f %s\n" % (min_val, units)
+    stat_string += "Max = %.2f %s" % (max_val, units)
     
     h_y, h_x, h = plt.hist(data_list, bins=nbins)
     
