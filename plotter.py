@@ -9,8 +9,7 @@ from scipy.optimize import curve_fit
 class Plotter:
 
     def __init__(self, data_dir, plot_dir):
-        self.pd0_constants = {}
-        self.pd1_constants = {}
+        self.constants = {}
         self.data_dir = data_dir
         self.plot_dir = plot_dir
         self.data = self.getData(data_dir)
@@ -42,7 +41,7 @@ class Plotter:
     
         # sipm array: {CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
         # pd array: {CU,RBX,Run,pd_ch,uhtr_ch,shunt,max_adc,max_fc,result}
-        cu_list = []
+        self.cu_list = []
         charge_position = -2
         adc_position = -3
         element_position = 3
@@ -69,8 +68,8 @@ class Plotter:
                     
                     # data organized by CU
                     cu = int(s[0]) 
-                    if cu not in cu_list:
-                        cu_list.append(cu) 
+                    if cu not in self.cu_list:
+                        self.cu_list.append(cu) 
                         cu_name = "cu%d" % cu
                         data[cu_name] = {}
                         for pd in xrange(6):
@@ -78,6 +77,10 @@ class Plotter:
                         for rm in xrange(1,5):
                             data[cu_name]["rm%d" % rm] = []
                         data[cu_name]["sipm"] = []
+                        # 4 constants for RM 1-4 for each pd 0 and 1
+                        self.constants[cu_name] = {}
+                        self.constants[cu_name]["pd0"] = []
+                        self.constants[cu_name]["pd1"] = []
     
                     data["cu%d"%cu][element_name].append(d)
                     if tag == "sipm":
@@ -87,7 +90,7 @@ class Plotter:
         data["pd_quartz"] = data["pd0"] + data["pd0"]
         data["pd_megatile"] = data["pd2"] + data["pd3"] + data["pd4"] + data["pd5"]
         
-        for cu in cu_list:
+        for cu in self.cu_list:
             cu_key = "cu%d" % cu
             for pd in xrange(6):
                 element_key ="pd%d" % pd 
@@ -146,7 +149,7 @@ class Plotter:
         min_val = min(data_list)
         max_val = max(data_list)
         stat_string = "Num Entries = %d\n" % entries
-        stat_string += "Mean = %.2f %s\n" % (mean, units)
+        stat_string += "Mean = %.4f %s\n" % (mean, units)
         stat_string += "Std Dev = %.2f %s\n" % (std, units)
         stat_string += "Variation = %.2f %%\n" % var
         stat_string += "Min = %.2f %s\n" % (min_val, units)
@@ -174,6 +177,7 @@ class Plotter:
             plt.savefig(self.plot_dir + name + ".pdf")
         plt.clf()
     
+    # makes scatter plots and calculates constants
     def plotScatter(self, info):
         raw_colors = ["pinkish red","azure","bluish green","electric purple","tangerine","neon pink","dark sky blue","avocado"]
         colors = list("xkcd:{0}".format(c) for c in raw_colors)
@@ -247,9 +251,24 @@ class Plotter:
                 f_box += f_string + "\n"
                 ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
                 ax.plot(x_new, y_new, '--', c=color, label=yname+" fit")
+                
+                # calculate correction constants from fit function
+                if name == "rm_pd0" or name == "rm_pd1":
+                    pd_name = name.split("_")[-1]
+                    for cu in self.cu_list:
+                        cu_name = "cu%d" % cu
+                        if len(self.data[cu_name][pd_name]) != 1:
+                            print "There is not exactly one {0} value for {1}.".format(pd_name, cu_name)
+                        else: # there is only one value as expected
+                            pd_value = self.data[cu_name][pd_name][0]
+                            constant = self.logarithm(pd_value, *popt)
+                            self.constants[cu_name][pd_name].append(constant)
+                            print "CU {0} {1} {2}: pd_value = {3} : constant = {4}".format(cu, pd_name, yname, pd_value, constant)
+            
             else:
                 ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
-    
+  
+
         if setRange:
             axes = plt.gca()
             axes.set_xlim(x_range)
@@ -276,6 +295,20 @@ class Plotter:
         plt.savefig(self.plot_dir + name + ".pdf")
         plt.clf()
 
+    # should be used after making scatter plot, which calculates constants
+    def normalize(self):
+        self.data["norm_sipm_pd0"] = []
+        self.data["norm_sipm_pd1"] = []
+        for cu in self.cu_list:
+            cu_name = "cu%d" % cu
+            for pd in xrange(2):
+                pd_name = "pd%d" % pd
+                print "CU {0} {1} constants : {2}".format(cu, pd_name, self.constants[cu_name][pd_name])
+                for rm in xrange(1,5):
+                    rm_name = "rm%d" % rm
+                    for d in self.data[cu_name][rm_name]:
+                        self.data["norm_sipm_%s" % pd_name].append(d / self.constants[cu_name][pd_name][rm-1])
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--histo_config",   "-c", default="config/final_histo.json",    help="json config file for histograms")
@@ -300,19 +333,9 @@ if __name__ == "__main__":
    
     # choose which plots to create
     makeHistos = True
-    makeScatter = False
+    makeScatter = True
     makeHistosPerCU = False
 
-    ###################
-    # make histograms #
-    ###################
-    
-    if makeHistos:
-        with open(histo_config) as json_file:
-            info = json.load(json_file)
-        
-        for key in info:
-            p.plotHisto(p.data, info[key])
 
     ###################### 
     # make scatter plots #
@@ -343,6 +366,20 @@ if __name__ == "__main__":
         for key in info:
             p.plotScatter(info[key])
 
+        # important for normalized SiPM plots
+        p.normalize()
+
+    ###################
+    # make histograms #
+    ###################
+    
+    if makeHistos:
+        with open(histo_config) as json_file:
+            info = json.load(json_file)
+        
+        for key in info:
+            p.plotHisto(p.data, info[key])
+    
     #########################
     # make one histo per CU # 
     #########################

@@ -11,6 +11,30 @@
         "setrange" : 1,
         "statloc" : 1
     },
+    "norm_sipm_pd0" : {
+        "name" : "norm_sipm_pd0",
+        "title" : "Normalized Max Charge for SiPM Channels using Pin-Diode 0",
+        "xtitle" : "Normalized SiPM Charge",
+        "ytitle" : "Number of Channels",
+        "units" : "",
+        "nbins" : 50,
+        "xrange" : [0, 2],
+        "yrange" : [0, 1200],
+        "setrange" : 1,
+        "statloc" : 1
+    },
+    "norm_sipm_pd1" : {
+        "name" : "norm_sipm_pd1",
+        "title" : "Normalized Max Charge for SiPM Channels using Pin-Diode 1",
+        "xtitle" : "Normalized SiPM Charge",
+        "ytitle" : "Number of Channels",
+        "units" : "",
+        "nbins" : 50,
+        "xrange" : [0, 2],
+        "yrange" : [0, 1200],
+        "setrange" : 1,
+        "statloc" : 1
+    },
     "rm1" : {
         "name" : "rm1",
         "title" : "Max Charge for SiPM Channels, RM 1",
