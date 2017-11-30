@@ -68,10 +68,12 @@ def getData(data_dir):
                         data[cu_name]["pd%d" % pd] = []
                     for rm in xrange(1,5):
                         data[cu_name]["rm%d" % rm] = []
+                    data[cu_name]["sipm"] = []
 
                 data["cu%d"%cu][element_name].append(d)
                 if tag == "sipm":
                     data["%s_sipm%s" % (element_name, s[sipm_position])].append(d)
+                    data[cu_name]["sipm"].append(d)
    
     data["pd_quartz"] = data["pd0"] + data["pd0"]
     data["pd_megatile"] = data["pd2"] + data["pd3"] + data["pd4"] + data["pd5"]
@@ -114,7 +116,7 @@ def getStat(x_min, x_max, y_min, y_max, loc=1):
         y_stat = y_max - (y_max - y_min) / 4.0
     return (x_stat, y_stat)
 
-def plotHisto(data, plot_dir, info):
+def plotHisto(data, plot_dir, info, fileName=""):
     name = info["name"]
     title = info["title"]
     xtitle = info["xtitle"]
@@ -131,7 +133,7 @@ def plotHisto(data, plot_dir, info):
     entries = len(data_list)
     mean = np.mean(data_list)
     std = np.std(data_list)
-    var = 100* std / mean
+    var = 100.0 * std / mean
     min_val = min(data_list)
     max_val = max(data_list)
     stat_string = "Num Entries = %d\n" % entries
@@ -141,22 +143,26 @@ def plotHisto(data, plot_dir, info):
     stat_string += "Min = %.2f %s\n" % (min_val, units)
     stat_string += "Max = %.2f %s" % (max_val, units)
     
-    h_y, h_x, h = plt.hist(data_list, bins=nbins)
-    
     if setRange:
         axes = plt.gca()
         axes.set_xlim(x_range)
         axes.set_ylim(y_range)
+        h_y, h_x, h = plt.hist(data_list, bins=nbins, range=x_range)
         xstat, ystat = getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
     else:
+        h_y, h_x, h = plt.hist(data_list, bins=nbins)
         xstat, ystat = getStat(min(h_x), max(h_x), min(h_y), max(h_y), statLocation)
     
     plt.text(xstat, ystat, stat_string)
     plt.title(title)
     plt.xlabel(xtitle)
     plt.ylabel(ytitle)
-    plt.savefig(plot_dir + name + ".png")
-    plt.savefig(plot_dir + name + ".pdf")
+    if fileName:
+        plt.savefig(plot_dir + fileName + ".png")
+        plt.savefig(plot_dir + fileName + ".pdf")
+    else:
+        plt.savefig(plot_dir + name + ".png")
+        plt.savefig(plot_dir + name + ".pdf")
     plt.clf()
 
 def plotScatter(plot_dir, info):
@@ -310,4 +316,26 @@ if __name__ == "__main__":
     
     for key in info:
         plotScatter(plot_dir, info[key])
+
+    cu_info = {}
+    cu_info["name"] = "sipm"
+    cu_info["title"] = ""
+    cu_info["xtitle"] = "Max Charge (pC)"
+    cu_info["ytitle"] = "Number of Channels"
+    cu_info["nbins"] = 25
+    cu_info["units"] = "pC"
+    cu_info["setrange"] = 1
+    cu_info["statloc"] = 1
+    cu_info["xrange"] = [0, 2500]
+    cu_info["yrange"] = [0, 100]
+    
+    for key in data:
+        if "cu" in key:
+            print "Plot histogram for {0}".format(key)
+            cu_number = key.split("cu")[-1]
+            cu_info["title"] = "SiPM Max Charge for CU {0}".format(cu_number)
+            plotHisto(data[key], plot_dir, cu_info, "%s_sipm" % key)
+
+
+
 
