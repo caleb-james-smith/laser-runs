@@ -19,7 +19,7 @@
         "units" : "",
         "nbins" : 50,
         "xrange" : [0, 2],
-        "yrange" : [0, 1200],
+        "yrange" : [0, 1000],
         "setrange" : 1,
         "statloc" : 1
     },
@@ -31,7 +31,7 @@
         "units" : "",
         "nbins" : 50,
         "xrange" : [0, 2],
-        "yrange" : [0, 1200],
+        "yrange" : [0, 1000],
         "setrange" : 1,
         "statloc" : 1
     },
