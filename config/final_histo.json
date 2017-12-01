@@ -6,9 +6,33 @@
         "ytitle" : "Number of Channels",
         "units" : "pC",
         "nbins" : 30,
-        "xrange" : 150000,
-        "yrange" : 400,
-        "setrange" : 0,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 1000],
+        "setrange" : 1,
+        "statloc" : 1
+    },
+    "norm_sipm_pd0" : {
+        "name" : "norm_sipm_pd0",
+        "title" : "Normalized Max Charge for SiPM Channels using Pin-Diode 0",
+        "xtitle" : "Normalized SiPM Charge",
+        "ytitle" : "Number of Channels",
+        "units" : "",
+        "nbins" : 50,
+        "xrange" : [0, 2],
+        "yrange" : [0, 1000],
+        "setrange" : 1,
+        "statloc" : 1
+    },
+    "norm_sipm_pd1" : {
+        "name" : "norm_sipm_pd1",
+        "title" : "Normalized Max Charge for SiPM Channels using Pin-Diode 1",
+        "xtitle" : "Normalized SiPM Charge",
+        "ytitle" : "Number of Channels",
+        "units" : "",
+        "nbins" : 50,
+        "xrange" : [0, 2],
+        "yrange" : [0, 1000],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm1" : {
@@ -17,10 +41,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 50000,
-        "yrange" : 200,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 500],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm2" : {
@@ -29,10 +53,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 250000,
-        "yrange" : 300,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 500],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm3" : {
@@ -41,10 +65,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 0,
-        "yrange" : 150,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 500],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm4" : {
@@ -53,10 +77,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 50000,
-        "yrange" : 200,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 500],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm1_sipm0" : {
@@ -65,10 +89,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 50000,
-        "yrange" : 200,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 20],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm2_sipm0" : {
@@ -77,10 +101,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 50000,
-        "yrange" : 200,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 20],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm3_sipm0" : {
@@ -89,10 +113,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 50000,
-        "yrange" : 200,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 20],
+        "setrange" : 1,
         "statloc" : 1
     },
     "rm4_sipm0" : {
@@ -101,10 +125,10 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : 50000,
-        "yrange" : 200,
-        "setrange" : 0,
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 20],
+        "setrange" : 1,
         "statloc" : 1
     },
     "pd" : {
@@ -114,9 +138,9 @@
         "ytitle" : "Number of Channels",
         "units" : "pC",
         "nbins" : 30,
-        "xrange" : 10000,
-        "yrange" : 6,
-        "setrange" : 0,
+        "xrange" : [0, 800],
+        "yrange" : [0, 50],
+        "setrange" : 1,
         "statloc" : 0
     },
     "pd0" : {
@@ -125,9 +149,9 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : [0, 700],
-        "yrange" : [0, 15],
+        "nbins" : 30,
+        "xrange" : [0, 800],
+        "yrange" : [0, 50],
         "setrange" : 1,
         "statloc" : 1
     },
@@ -137,9 +161,9 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 20,
-        "xrange" : [0, 700],
-        "yrange" : [0, 15],
+        "nbins" : 30,
+        "xrange" : [0, 800],
+        "yrange" : [0, 50],
         "setrange" : 1,
         "statloc" : 1
     },
@@ -151,7 +175,7 @@
         "units" : "pC",
         "nbins" : 30,
         "xrange" : [0, 800],
-        "yrange" : [0, 40],
+        "yrange" : [0, 50],
         "setrange" : 1,
         "statloc" : 1
     },
@@ -161,9 +185,9 @@
         "xtitle" : "Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
-        "nbins" : 10,
+        "nbins" : 30,
         "xrange" : [0, 800],
-        "yrange" : [0, 40],
+        "yrange" : [0, 50],
         "setrange" : 1,
         "statloc" : 0
     }

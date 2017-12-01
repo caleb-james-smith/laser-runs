@@ -85,7 +85,7 @@ def makePlots(runDir, plotDir, dictionary, shunts):
 # Return maximum ADC value for a histogram (final nonzero bin)
 # update to accept channel list and return a list of max values...
 # this will be more efficient than opening the root file for each channel
-def oldFindMaxADC(rootFile, ch, verb):
+def oldFindMaxADC(rootFile, ch, verb=False):
     # Get Histogram from file
     F = TFile(rootFile)
     H = F.Get(ch)
@@ -111,27 +111,34 @@ def oldFindMaxADC(rootFile, ch, verb):
     return Bin - 1      # Return bin in 0 to 255 range
 
 # New Find Max that starts at ADC 256 and looks for bin with value > 1
-def findMaxADC(rootFile, ch, verb):
-    if verb:    print "file: %s channel: %s" % (rootFile, ch)
+def findMaxADC(rootFile, ch, verb=False):
+    if verb:
+        print "file: %s channel: %s" % (rootFile, ch)
     # Get Histogram from file
     F = TFile(rootFile)
     H = F.Get(ch)
     # Find Max ADC
-    Bin = 255    # Bin index 0 to 255
-    nonZero = 0  # number of consecutive non zero bins
-    required = 2 # required number of consecutive non zero bins
+    Bin = 255       # starting bin; bin index 0 to 255
+    passingBins = 0 # number of consecutive bins greater than cutoff
+    required = 2    # required number of consecutive bins greater than cutoff
+    cutoff = 1      # cutoff for accepting value in bin
     while Bin > 0:
         b = H.GetBinContent(Bin)
         if verb:
             print "Bin %-3i: %.3f" % (Bin, b)
-        if b > 1:
-            nonZero += 1
+        if b > cutoff:
+            passingBins += 1
         else:
-            nonZero = 0
-        if nonZero >= required:
+            passingBins = 0
+        if passingBins >= required:
             # return first nonzero bin
-            return Bin + nonZero - 1
+            maxBin = Bin + passingBins - 1
+            if verb:
+                print "Max Bin: %-3i" % maxBin
+            return maxBin
         Bin -= 1
+    if verb:
+        print "Max Bin: %-3i" % Bin
     return Bin  # Return Bin = 0
 
 def plotMax(runDir, dictionary):
@@ -354,7 +361,7 @@ def makeTable(runDir, tables, runList, stability=False):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--directory", "-d", default="passed_cu_data", help="directory containing directories with CU data")
+    parser.add_argument("--directory", "-d", default="Nov17-18_Final_CU_Data", help="directory containing directories with CU data")
     options = parser.parse_args()
     runDir = options.directory
     
@@ -369,4 +376,7 @@ if __name__ == "__main__":
     #tables = ["sipm", "pd"]
     #runList = list(i for i in xrange(2,7))
     #makeTable(runDir, tables, runList, stability=True)
+
+    #findMaxADC("CU_8/rbx0_shunt31_pd_1.root", "h0", True)
+    #findMaxADC("CU_8/rbx0_shunt31_pd_1.root", "h1", True)
 
