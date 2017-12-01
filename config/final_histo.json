@@ -11,27 +11,15 @@
         "setrange" : 1,
         "statloc" : 1
     },
-    "norm_sipm_pd0" : {
-        "name" : "norm_sipm_pd0",
-        "title" : "Normalized Max Charge for SiPM Channels using Pin-Diode 0",
-        "xtitle" : "Normalized SiPM Charge",
+    "norm_sipm" : {
+        "name" : "norm_sipm",
+        "title" : "Normalized Max Charge for SiPM Channels",
+        "xtitle" : "Normalized SiPM Charge (pC)",
         "ytitle" : "Number of Channels",
-        "units" : "",
-        "nbins" : 50,
-        "xrange" : [0, 2],
-        "yrange" : [0, 1000],
-        "setrange" : 1,
-        "statloc" : 1
-    },
-    "norm_sipm_pd1" : {
-        "name" : "norm_sipm_pd1",
-        "title" : "Normalized Max Charge for SiPM Channels using Pin-Diode 1",
-        "xtitle" : "Normalized SiPM Charge",
-        "ytitle" : "Number of Channels",
-        "units" : "",
-        "nbins" : 50,
-        "xrange" : [0, 2],
-        "yrange" : [0, 1000],
+        "units" : "pC",
+        "nbins" : 30,
+        "xrange" : [0, 3000],
+        "yrange" : [0, 2000],
         "setrange" : 1,
         "statloc" : 1
     },
@@ -155,10 +143,34 @@
         "setrange" : 1,
         "statloc" : 1
     },
+    "norm_pd0" : {
+        "name" : "norm_pd0",
+        "title" : "Normalized Max Charge for Quartz Fiber Pin-Diode Channel 0",
+        "xtitle" : "Normalized Maximum Charge (pC)",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 30,
+        "xrange" : [0, 800],
+        "yrange" : [0, 50],
+        "setrange" : 1,
+        "statloc" : 1
+    },
     "pd1" : {
         "name" : "pd1",
         "title" : "Max Charge for Quartz Fiber Pin-Diode Channel 1",
         "xtitle" : "Maximum Charge (pC)",
+        "ytitle" : "Number of Channels",
+        "units" : "pC",
+        "nbins" : 30,
+        "xrange" : [0, 800],
+        "yrange" : [0, 50],
+        "setrange" : 1,
+        "statloc" : 1
+    },
+    "norm_pd1" : {
+        "name" : "norm_pd1",
+        "title" : "Normalized Max Charge for Quartz Fiber Pin-Diode Channel 1",
+        "xtitle" : "Normalized Maximum Charge (pC)",
         "ytitle" : "Number of Channels",
         "units" : "pC",
         "nbins" : 30,

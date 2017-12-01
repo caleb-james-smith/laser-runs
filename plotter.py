@@ -77,10 +77,16 @@ class Plotter:
                         for rm in xrange(1,5):
                             data[cu_name]["rm%d" % rm] = []
                         data[cu_name]["sipm"] = []
-                        # 4 constants for RM 1-4 for each pd 0 and 1
+                        # constants for normalization
                         self.constants[cu_name] = {}
-                        self.constants[cu_name]["pd0"] = []
-                        self.constants[cu_name]["pd1"] = []
+                        # constants for pd0, pd1, and average of pd0 and pd1
+                        self.constants[cu_name]["pd0"] = 0.0
+                        self.constants[cu_name]["pd1"] = 0.0
+                        self.constants[cu_name]["pd_ave"] = 0.0
+                        # constants for RM SiPMs (4 constants for pd0, pd1, and average of pd0 and pd1)
+                        self.constants[cu_name]["sipm_pd0"] = []
+                        self.constants[cu_name]["sipm_pd1"] = []
+                        self.constants[cu_name]["sipm_ave"] = []
     
                     data["cu%d"%cu][element_name].append(d)
                     if tag == "sipm":
@@ -149,7 +155,7 @@ class Plotter:
         min_val = min(data_list)
         max_val = max(data_list)
         stat_string = "Num Entries = %d\n" % entries
-        stat_string += "Mean = %.4f %s\n" % (mean, units)
+        stat_string += "Mean = %.2f %s\n" % (mean, units)
         stat_string += "Std Dev = %.2f %s\n" % (std, units)
         stat_string += "Variation = %.2f %%\n" % var
         stat_string += "Min = %.2f %s\n" % (min_val, units)
@@ -199,7 +205,9 @@ class Plotter:
         deg = 1
         y_min = 10 ** 10
         y_max = -10 ** 10
-    
+  
+        sipm_mean = np.mean(self.data["sipm"])
+
         if len(ynames) != len(ydata):
             print "The length of the ynames list should be the same as the number of y data sets."
             return
@@ -258,12 +266,14 @@ class Plotter:
                     for cu in self.cu_list:
                         cu_name = "cu%d" % cu
                         if len(self.data[cu_name][pd_name]) != 1:
-                            print "There is not exactly one {0} value for {1}.".format(pd_name, cu_name)
+                            print "There is not exactly one {0} value for {1}!".format(pd_name, cu_name)
+                            return 
                         else: # there is only one value as expected
+                            # the correction factor is the sipm mean divided by the expected value from the log fit
                             pd_value = self.data[cu_name][pd_name][0]
-                            constant = self.logarithm(pd_value, *popt)
-                            self.constants[cu_name][pd_name].append(constant)
-                            print "CU {0} {1} {2}: pd_value = {3} : constant = {4}".format(cu, pd_name, yname, pd_value, constant)
+                            constant = sipm_mean / self.logarithm(pd_value, *popt)
+                            self.constants[cu_name]["sipm_%s" % pd_name].append(constant)
+                            print "CU {0} {1} {2}: pd_value = {3} : SiPM correction constant = {4}".format(cu, pd_name, yname, pd_value, constant)
             
             else:
                 ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
@@ -297,17 +307,40 @@ class Plotter:
 
     # should be used after making scatter plot, which calculates constants
     def normalize(self):
-        self.data["norm_sipm_pd0"] = []
-        self.data["norm_sipm_pd1"] = []
+        self.data["norm_pd0"] = []
+        self.data["norm_pd1"] = []
+        self.data["norm_sipm"] = []
         for cu in self.cu_list:
             cu_name = "cu%d" % cu
+            # pin-diode corrections
             for pd in xrange(2):
                 pd_name = "pd%d" % pd
-                print "CU {0} {1} constants : {2}".format(cu, pd_name, self.constants[cu_name][pd_name])
-                for rm in xrange(1,5):
-                    rm_name = "rm%d" % rm
-                    for d in self.data[cu_name][rm_name]:
-                        self.data["norm_sipm_%s" % pd_name].append(d / self.constants[cu_name][pd_name][rm-1])
+                if len(self.data[cu_name][pd_name]) != 1:
+                    print "There is not exactly one {0} value for {1}!".format(pd_name, cu_name)
+                    return 
+                else: # there is only one value as expected
+                    # the correction factor is the pd mean divided by the orivinal pd value
+                    pd_value = self.data[cu_name][pd_name][0]
+                    pd_mean = np.mean(self.data[pd_name])
+                    constant = pd_mean / pd_value
+                    self.constants[cu_name][pd_name] = constant
+            averagePindiodeCorrection = np.mean([self.constants[cu_name]["pd0"], self.constants[cu_name]["pd1"]])
+            self.constants[cu_name]["pd_ave"] = averagePindiodeCorrection
+            print "CU {0} pin-diode correction constant : {1}".format(cu, self.constants[cu_name]["pd_ave"])
+            for pd in xrange(2):
+                pd_name = "pd%d" % pd
+                pd_value = self.data[cu_name][pd_name][0]
+                averagePindiodeCorrection = self.constants[cu_name]["pd_ave"]
+                self.data["norm_%s" % pd_name].append(averagePindiodeCorrection * pd_value)
+            # sipm corrections
+            averageSipmCorrections = list(np.mean([self.constants[cu_name]["sipm_pd0"][i], self.constants[cu_name]["sipm_pd1"][i]]) for i in xrange(4))
+            self.constants[cu_name]["sipm_ave"] = averageSipmCorrections
+            print "CU {0} SiPM correction constants : {1}".format(cu, self.constants[cu_name]["sipm_ave"])
+            for rm in xrange(1,5):
+                rm_name = "rm%d" % rm
+                for d in self.data[cu_name][rm_name]:
+                    # the normalized value is the constant (sipm mean / expected value from log fit) times the original value
+                    self.data["norm_sipm"].append(self.constants[cu_name]["sipm_ave"][rm-1] * d)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -403,7 +436,5 @@ if __name__ == "__main__":
                 cu_number = key.split("cu")[-1]
                 cu_info["title"] = "SiPM Max Charge for CU {0}".format(cu_number)
                 p.plotHisto(p.data[key], cu_info, "%s_sipm" % key)
-
-
 
 
