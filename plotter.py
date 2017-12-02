@@ -244,7 +244,7 @@ class Plotter:
                 y_new = f(x_new)
                 
                 ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
-                ax.plot(x_new, y_new, '--', c=color, label=yname+" fit")
+                ax.plot(x_new, y_new, '--', c=color, label="%s fit" % yname)
             elif plotFit == 2:
                 # calculate fit function
                 popt, pcov = curve_fit(self.logarithm, x, y)
@@ -257,8 +257,8 @@ class Plotter:
                     f_string = "{0}: $f(x) = {1:.2f}\ \ln({2:.2f}\ x) {3:.2f}$".format(yname, popt[0], popt[1], popt[2]) 
                 print f_string
                 f_box += f_string + "\n"
-                ax.plot(x,y,'o',            c=color, label=yname, alpha=0.5)
-                ax.plot(x_new, y_new, '--', c=color, label=yname+" fit")
+                ax.plot(x,y,'o',            c=color, label="%s average" % yname, alpha=0.5)
+                ax.plot(x_new, y_new, '--', c=color, label="%s fit" % yname)
                 
                 # calculate correction constants from fit function
                 if name == "rm_pd0" or name == "rm_pd1":
