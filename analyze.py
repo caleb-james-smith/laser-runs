@@ -368,14 +368,14 @@ if __name__ == "__main__":
     # sipm: iterations 1, 2, 3
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     
-    tables = ["sipm", "pd"]
-    runList = [1,4,5,6,7]
-    makeTable(runDir, tables, runList)
+    #tables = ["sipm", "pd"]
+    #runList = [1,4,5,6,7]
+    #makeTable(runDir, tables, runList)
 
     # iterations for stability runs: iteration 1 is bad for CU6
-    #tables = ["sipm", "pd"]
-    #runList = list(i for i in xrange(2,7))
-    #makeTable(runDir, tables, runList, stability=True)
+    tables = ["sipm", "pd"]
+    runList = list(i for i in xrange(2,7))
+    makeTable(runDir, tables, runList, stability=True)
 
     #findMaxADC("CU_8/rbx0_shunt31_pd_1.root", "h0", True)
     #findMaxADC("CU_8/rbx0_shunt31_pd_1.root", "h1", True)
