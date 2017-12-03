@@ -24,6 +24,8 @@
 //{CU,RBX,Run,RM,sipm_ch,uhtr_ch,shunt,max_adc,max_fc,result}
 //#include "sipm_array_test.h"
 //#include "passed_cu_data/sipm_array.h"
+//Correction Factors
+#include "correctionFactors.h"
 
 TLatex* Entries(double x, double y, TH1* hist){
   char entries [100];
@@ -79,8 +81,18 @@ TH1F* Blank(const char* name,double num,double low,double high){
   blank->SetLineColor(0);  
   return blank;
 }
-
-void CU_Plots(){
+void fillMinMax(int CU, std::vector<double> v1,std::vector<double> v2,std::vector<double> v3,std::vector<double> v4, Double_t* x1,Double_t* x2,Double_t* x3,Double_t* x4, Double_t* y1, Double_t* y2, Double_t* y3, Double_t* y4){
+  int length=50;
+  auto b1 = std::max_element(std::begin(v1), std::end(v1)); auto s1 = std::min_element(std::begin(v1), std::end(v1));
+  x1[CU]=CU; y1[CU]=*b1; x1[CU+length]=CU; y1[CU+length]=*s1;
+  auto b2 = std::max_element(std::begin(v2), std::end(v2)); auto s2 = std::min_element(std::begin(v2), std::end(v2));
+  x2[CU]=CU; y2[CU]=*b2; x2[CU+length]=CU; y2[CU+length]=*s2;
+  auto b3 = std::max_element(std::begin(v3), std::end(v3)); auto s3 = std::min_element(std::begin(v3), std::end(v3));
+  x3[CU]=CU; y3[CU]=*b3; x3[CU+length]=CU; y3[CU+length]=*s3;
+  auto b4 = std::max_element(std::begin(v4), std::end(v4)); auto s4 = std::min_element(std::begin(v4), std::end(v4));
+  x4[CU]=CU; y4[CU]=*b4; x4[CU+length]=CU; y4[CU+length]=*s4;
+}
+void CU_Plots(int doCorr = 1){
   //----------------------------------------------------------------------
   //Setup
   //----------------------------------------------------------------------
@@ -142,6 +154,10 @@ void CU_Plots(){
   double rmDisMax = 225;
   double disMax = 250000;
   double disMaxPD = 100000;
+  if(doCorr == 1){
+    pinDisMax = 43;
+    rmDisMax = 410;
+  }
   std::cout<<"Number of Pin-Diode Channels:   "<<NumChanPD<<std::endl;
   std::cout<<"Number of RM Channels:          "<<NumChanRM<<std::endl;
   //----------------------------------------------------------------------
@@ -173,56 +189,77 @@ void CU_Plots(){
   std::cout<<"Running over Pin-Diode Channels"<<std::endl;
   char process[100];
   int channel1 = -1;
+  std::cout<<"Size of pinDiode0 = "<<pinDiode0.size()<<std::endl;
   while(tReader1.Next()){
     channel1+=1;
     sprintf(process,"Processing Channel: %i/%i",channel1,NumChanPD);
     if(channel1%10==0){std::cout<<process<<std::endl;}
+    double corr=1;
+    if(doCorr == 1){
+      for(int i = 0; i <= pinDiodeAvg.size(); i++){
+	//std::cout<<*pd_CU<<"   "<<pinDiode0[i][0]<<std::endl;
+	if(*pd_CU == pinDiodeAvg[i][0]){
+    	//std::cout<<"TRUE"<<std::endl;
+	  corr=pinDiodeAvg[i][1];
+	  break;
+	}	  
+      }
+    }
     if(*pd_ch == 0){
-      xPD0[channel1] = *pd_CU; yPD0[channel1] = *pd_max_pc; zPD0[channel1] = *pd_run;
-      profile_pd0->Fill(*pd_CU,*pd_max_pc);
-      profile_stab_pd0->Fill(*pd_run,*pd_max_pc);
-      PD0_dist->Fill(*pd_max_pc);
+      xPD0[channel1] = *pd_CU; yPD0[channel1] = corr*(*pd_max_pc); zPD0[channel1] = *pd_run;
+      profile_pd0->Fill(*pd_CU,corr*(*pd_max_pc));
+      profile_stab_pd0->Fill(*pd_run,corr*(*pd_max_pc));
+      PD0_dist->Fill(corr*(*pd_max_pc));
+      //std::cout<<"PD0: CU = "<<*pd_CU<<"  maxPC = "<<corr*(*pd_max_pc)<<std::endl;
+      //std::cout<<"PD0: CU = "<<*pd_CU<<"  maxADC = "<<*pd_max_adc<<std::endl;
     }
     else{xPD0[channel1] = -100;yPD0[channel1] = -100;zPD0[channel1] = -100;}
     if(*pd_ch == 1){
-      xPD1[channel1] = *pd_CU; yPD1[channel1] = *pd_max_pc; zPD1[channel1] = *pd_run;
-      profile_pd1->Fill(*pd_CU,*pd_max_pc);
-      profile_stab_pd1->Fill(*pd_run,*pd_max_pc);
-      PD1_dist->Fill(*pd_max_pc);
+      xPD1[channel1] = *pd_CU; yPD1[channel1] = corr*(*pd_max_pc); zPD1[channel1] = *pd_run;
+      profile_pd1->Fill(*pd_CU,corr*(*pd_max_pc));
+      profile_stab_pd1->Fill(*pd_run,corr*(*pd_max_pc));
+      PD1_dist->Fill(corr*(*pd_max_pc));
+      //std::cout<<"PD1: CU = "<<*pd_CU<<"  maxPC = "<<corr*(*pd_max_pc)<<std::endl;
+      //std::cout<<"PD1: CU = "<<*pd_CU<<"  maxADC = "<<*pd_max_adc<<std::endl;
     }
     else{xPD1[channel1] = -100;yPD1[channel1] = -100;zPD1[channel1] = -100;}
     if(*pd_ch == 2){
-      xPD2[channel1] = *pd_CU; yPD2[channel1] = *pd_max_pc; zPD2[channel1] = *pd_run;
-      profile_pd2->Fill(*pd_CU,*pd_max_pc);
-      profile_stab_pd2->Fill(*pd_run,*pd_max_pc);
-      PD2_dist->Fill(*pd_max_pc);
+      corr=1;
+      xPD2[channel1] = *pd_CU; yPD2[channel1] = corr*(*pd_max_pc); zPD2[channel1] = *pd_run;
+      profile_pd2->Fill(*pd_CU,corr*(*pd_max_pc));
+      profile_stab_pd2->Fill(*pd_run,corr*(*pd_max_pc));
+      PD2_dist->Fill(corr*(*pd_max_pc));
     }
     else{xPD2[channel1] = -100;yPD2[channel1] = -100;zPD2[channel1] = -100;}
     if(*pd_ch == 3){
-      xPD3[channel1] = *pd_CU; yPD3[channel1] = *pd_max_pc; zPD3[channel1] = *pd_run;
-      profile_pd3->Fill(*pd_CU,*pd_max_pc);
-      profile_stab_pd3->Fill(*pd_run,*pd_max_pc);
-      PD3_dist->Fill(*pd_max_pc);
+      corr=1;
+      xPD3[channel1] = *pd_CU; yPD3[channel1] = corr*(*pd_max_pc); zPD3[channel1] = *pd_run;
+      profile_pd3->Fill(*pd_CU,corr*(*pd_max_pc));
+      profile_stab_pd3->Fill(*pd_run,corr*(*pd_max_pc));
+      PD3_dist->Fill(corr*(*pd_max_pc));
     }
     else{xPD3[channel1] = -100;yPD3[channel1] = -100;zPD3[channel1] = -100;}
     if(*pd_ch == 4){
-      xPD4[channel1] = *pd_CU; yPD4[channel1] = *pd_max_pc; zPD4[channel1] = *pd_run;
-      profile_pd4->Fill(*pd_CU,*pd_max_pc);
-      profile_stab_pd4->Fill(*pd_run,*pd_max_pc);
-      PD4_dist->Fill(*pd_max_pc);
+      corr=1;
+      xPD4[channel1] = *pd_CU; yPD4[channel1] = corr*(*pd_max_pc); zPD4[channel1] = *pd_run;
+      profile_pd4->Fill(*pd_CU,corr*(*pd_max_pc));
+      profile_stab_pd4->Fill(*pd_run,corr*(*pd_max_pc));
+      PD4_dist->Fill(corr*(*pd_max_pc));
     }
     else{xPD4[channel1] = -100;yPD4[channel1] = -100;zPD4[channel1] = -100;}
     if(*pd_ch == 5){
-      xPD5[channel1] = *pd_CU; yPD5[channel1] = *pd_max_pc; zPD5[channel1] = *pd_run;
-      profile_pd5->Fill(*pd_CU,*pd_max_pc);
-      profile_stab_pd5->Fill(*pd_run,*pd_max_pc);
-      PD5_dist->Fill(*pd_max_pc);
+      corr=1;      
+      xPD5[channel1] = *pd_CU; yPD5[channel1] = corr*(*pd_max_pc); zPD5[channel1] = *pd_run;
+      profile_pd5->Fill(*pd_CU,corr*(*pd_max_pc));
+      profile_stab_pd5->Fill(*pd_run,corr*(*pd_max_pc));
+      PD5_dist->Fill(corr*(*pd_max_pc));
     }
     else{xPD5[channel1] = -100;yPD5[channel1] = -100;zPD5[channel1] = -100;}
     if((*pd_ch == 2 || *pd_ch == 3 || *pd_ch == 4 || *pd_ch == 5 )){
-      PD2_3_4_5_dist->Fill(*pd_max_pc);
-    }
-    allPD_dist->Fill(*pd_max_pc);
+      corr=1;      
+      PD2_3_4_5_dist->Fill(corr*(*pd_max_pc));
+    }    
+    allPD_dist->Fill(corr*(*pd_max_pc));
   }
   sprintf(process,"Done with Pin-Diode Channels: %i/%i",NumChanPD,NumChanPD);
   std::cout<<process<<std::endl;
@@ -264,7 +301,7 @@ void CU_Plots(){
   graph_pd3->SetMarkerStyle(kFullSquare);        graph_stab_pd3->SetMarkerStyle(kFullSquare);
   graph_pd4->SetMarkerStyle(kFullSquare);        graph_stab_pd4->SetMarkerStyle(kFullSquare);
   graph_pd5->SetMarkerStyle(kFullSquare);        graph_stab_pd5->SetMarkerStyle(kFullSquare);
-
+	  
   //----------------------------------------------------------------------
   //Make RM Plots
   //----------------------------------------------------------------------
@@ -285,45 +322,245 @@ void CU_Plots(){
   TH1F* RM3_dist   = new TH1F("RM3 Dist","RM3 Dist",62,0,350000/convert);
   TH1F* RM4_dist   = new TH1F("RM4 Dist","RM4 Dist",62,0,350000/convert);
   TH1F* RM1_dist_ch20   = new TH1F("RM1 Dist ch 20","RM1 Dist ch 20",62,0,350000/convert);
+  std::vector<double> RM1_CU2_Dist;  std::vector<double> RM2_CU2_Dist;  std::vector<double> RM3_CU2_Dist;  std::vector<double> RM4_CU2_Dist;
+  std::vector<double> RM1_CU3_Dist;  std::vector<double> RM2_CU3_Dist;  std::vector<double> RM3_CU3_Dist;  std::vector<double> RM4_CU3_Dist;
+  std::vector<double> RM1_CU4_Dist;  std::vector<double> RM2_CU4_Dist;  std::vector<double> RM3_CU4_Dist;  std::vector<double> RM4_CU4_Dist;
+  std::vector<double> RM1_CU5_Dist;  std::vector<double> RM2_CU5_Dist;  std::vector<double> RM3_CU5_Dist;  std::vector<double> RM4_CU5_Dist;
+  std::vector<double> RM1_CU6_Dist;  std::vector<double> RM2_CU6_Dist;  std::vector<double> RM3_CU6_Dist;  std::vector<double> RM4_CU6_Dist;
+  std::vector<double> RM1_CU7_Dist;  std::vector<double> RM2_CU7_Dist;  std::vector<double> RM3_CU7_Dist;  std::vector<double> RM4_CU7_Dist;
+  std::vector<double> RM1_CU8_Dist;  std::vector<double> RM2_CU8_Dist;  std::vector<double> RM3_CU8_Dist;  std::vector<double> RM4_CU8_Dist;
+  std::vector<double> RM1_CU9_Dist;  std::vector<double> RM2_CU9_Dist;  std::vector<double> RM3_CU9_Dist;  std::vector<double> RM4_CU9_Dist;
+  std::vector<double> RM1_CU10_Dist; std::vector<double> RM2_CU10_Dist; std::vector<double> RM3_CU10_Dist; std::vector<double> RM4_CU10_Dist;
+  std::vector<double> RM1_CU11_Dist; std::vector<double> RM2_CU11_Dist; std::vector<double> RM3_CU11_Dist; std::vector<double> RM4_CU11_Dist;
+  std::vector<double> RM1_CU12_Dist; std::vector<double> RM2_CU12_Dist; std::vector<double> RM3_CU12_Dist; std::vector<double> RM4_CU12_Dist;
+  std::vector<double> RM1_CU13_Dist; std::vector<double> RM2_CU13_Dist; std::vector<double> RM3_CU13_Dist; std::vector<double> RM4_CU13_Dist;
+  std::vector<double> RM1_CU14_Dist; std::vector<double> RM2_CU14_Dist; std::vector<double> RM3_CU14_Dist; std::vector<double> RM4_CU14_Dist;
+  std::vector<double> RM1_CU15_Dist; std::vector<double> RM2_CU15_Dist; std::vector<double> RM3_CU15_Dist; std::vector<double> RM4_CU15_Dist;
+  std::vector<double> RM1_CU16_Dist; std::vector<double> RM2_CU16_Dist; std::vector<double> RM3_CU16_Dist; std::vector<double> RM4_CU16_Dist;
+  std::vector<double> RM1_CU17_Dist; std::vector<double> RM2_CU17_Dist; std::vector<double> RM3_CU17_Dist; std::vector<double> RM4_CU17_Dist;
+  std::vector<double> RM1_CU18_Dist; std::vector<double> RM2_CU18_Dist; std::vector<double> RM3_CU18_Dist; std::vector<double> RM4_CU18_Dist;
+  std::vector<double> RM1_CU19_Dist; std::vector<double> RM2_CU19_Dist; std::vector<double> RM3_CU19_Dist; std::vector<double> RM4_CU19_Dist;
+  std::vector<double> RM1_CU20_Dist; std::vector<double> RM2_CU20_Dist; std::vector<double> RM3_CU20_Dist; std::vector<double> RM4_CU20_Dist;
+  std::vector<double> RM1_CU21_Dist; std::vector<double> RM2_CU21_Dist; std::vector<double> RM3_CU21_Dist; std::vector<double> RM4_CU21_Dist;
+  std::vector<double> RM1_CU22_Dist; std::vector<double> RM2_CU22_Dist; std::vector<double> RM3_CU22_Dist; std::vector<double> RM4_CU22_Dist;
+  std::vector<double> RM1_CU23_Dist; std::vector<double> RM2_CU23_Dist; std::vector<double> RM3_CU23_Dist; std::vector<double> RM4_CU23_Dist;
+  std::vector<double> RM1_CU24_Dist; std::vector<double> RM2_CU24_Dist; std::vector<double> RM3_CU24_Dist; std::vector<double> RM4_CU24_Dist;
+  std::vector<double> RM1_CU25_Dist; std::vector<double> RM2_CU25_Dist; std::vector<double> RM3_CU25_Dist; std::vector<double> RM4_CU25_Dist;
+  std::vector<double> RM1_CU26_Dist; std::vector<double> RM2_CU26_Dist; std::vector<double> RM3_CU26_Dist; std::vector<double> RM4_CU26_Dist;
+  std::vector<double> RM1_CU27_Dist; std::vector<double> RM2_CU27_Dist; std::vector<double> RM3_CU27_Dist; std::vector<double> RM4_CU27_Dist;
+  std::vector<double> RM1_CU29_Dist; std::vector<double> RM2_CU29_Dist; std::vector<double> RM3_CU29_Dist; std::vector<double> RM4_CU29_Dist;
+  std::vector<double> RM1_CU30_Dist; std::vector<double> RM2_CU30_Dist; std::vector<double> RM3_CU30_Dist; std::vector<double> RM4_CU30_Dist;
+  std::vector<double> RM1_CU31_Dist; std::vector<double> RM2_CU31_Dist; std::vector<double> RM3_CU31_Dist; std::vector<double> RM4_CU31_Dist;
+  std::vector<double> RM1_CU32_Dist; std::vector<double> RM2_CU32_Dist; std::vector<double> RM3_CU32_Dist; std::vector<double> RM4_CU32_Dist;
+  std::vector<double> RM1_CU33_Dist; std::vector<double> RM2_CU33_Dist; std::vector<double> RM3_CU33_Dist; std::vector<double> RM4_CU33_Dist;
+  std::vector<double> RM1_CU34_Dist; std::vector<double> RM2_CU34_Dist; std::vector<double> RM3_CU34_Dist; std::vector<double> RM4_CU34_Dist;
+  std::vector<double> RM1_CU35_Dist; std::vector<double> RM2_CU35_Dist; std::vector<double> RM3_CU35_Dist; std::vector<double> RM4_CU35_Dist;
+  std::vector<double> RM1_CU36_Dist; std::vector<double> RM2_CU36_Dist; std::vector<double> RM3_CU36_Dist; std::vector<double> RM4_CU36_Dist;
+  std::vector<double> RM1_CU37_Dist; std::vector<double> RM2_CU37_Dist; std::vector<double> RM3_CU37_Dist; std::vector<double> RM4_CU37_Dist;
+  std::vector<double> RM1_CU38_Dist; std::vector<double> RM2_CU38_Dist; std::vector<double> RM3_CU38_Dist; std::vector<double> RM4_CU38_Dist;
+  std::vector<double> RM1_CU39_Dist; std::vector<double> RM2_CU39_Dist; std::vector<double> RM3_CU39_Dist; std::vector<double> RM4_CU39_Dist;
+  std::vector<double> RM1_CU40_Dist; std::vector<double> RM2_CU40_Dist; std::vector<double> RM3_CU40_Dist; std::vector<double> RM4_CU40_Dist;
+  std::vector<double> RM1_CU41_Dist; std::vector<double> RM2_CU41_Dist; std::vector<double> RM3_CU41_Dist; std::vector<double> RM4_CU41_Dist;
+  std::vector<double> RM1_CU42_Dist; std::vector<double> RM2_CU42_Dist; std::vector<double> RM3_CU42_Dist; std::vector<double> RM4_CU42_Dist;
+  std::vector<double> RM1_CU43_Dist; std::vector<double> RM2_CU43_Dist; std::vector<double> RM3_CU43_Dist; std::vector<double> RM4_CU43_Dist;
+  std::vector<double> RM1_CU44_Dist; std::vector<double> RM2_CU44_Dist; std::vector<double> RM3_CU44_Dist; std::vector<double> RM4_CU44_Dist;
+  
   std::cout<<"Running over RM Channels"<<std::endl;
   int channel2 = -1;
   while(tReader2.Next()){    
     channel2+=1;
     sprintf(process,"Processing Channel: %i/%i",channel2,NumChanRM);
     if(channel2%500==0){std::cout<<process<<std::endl;}
+
+    double corr=1;
+    if(doCorr == 1){
+      for(int i = 0; i <= rm1Avg.size(); i++){
+	if(*sipm_CU == rm1Avg[i][0] && *sipm_rm == 1){
+	  corr=rm1Avg[i][1];
+	  break;
+	}	  
+	else if(*sipm_CU == rm2Avg[i][0] && *sipm_rm == 2){
+	  corr=rm2Avg[i][1];
+	  break;
+	}	  
+	else if(*sipm_CU == rm3Avg[i][0] && *sipm_rm == 3){
+	  corr=rm3Avg[i][1];
+	  break;
+	}	  
+	else if(*sipm_CU == rm4Avg[i][0] && *sipm_rm == 4){
+	  corr=rm4Avg[i][1];
+	  break;
+	}	  
+      }
+    }
     if(*sipm_rm == 1){
-      xRM1[channel2] = *sipm_CU; yRM1[channel2] = *sipm_max_pc; zRM1[channel2] = *sipm_run;
-      profile_rm1->Fill(*sipm_CU,*sipm_max_pc);
-      profile_stab_rm1->Fill(*sipm_run,*sipm_max_pc);
-      RM1_dist->Fill(*sipm_max_pc);
-      if(*sipm_ch == 20) RM1_dist_ch20->Fill(*sipm_max_pc);
+      xRM1[channel2] = *sipm_CU; yRM1[channel2] = corr*(*sipm_max_pc); zRM1[channel2] = *sipm_run;
+      profile_rm1->Fill(*sipm_CU,corr*(*sipm_max_pc));
+      profile_stab_rm1->Fill(*sipm_run,corr*(*sipm_max_pc));
+      RM1_dist->Fill(corr*(*sipm_max_pc));
+      if(*sipm_CU == 2)  RM1_CU2_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 3)  RM1_CU3_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 4)  RM1_CU4_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 5)  RM1_CU5_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 6)  RM1_CU6_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 7)  RM1_CU7_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 8)  RM1_CU8_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 9)  RM1_CU9_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 10) RM1_CU10_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 11) RM1_CU11_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 12) RM1_CU12_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 13) RM1_CU13_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 14) RM1_CU14_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 15) RM1_CU15_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 16) RM1_CU16_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 17) RM1_CU17_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 18) RM1_CU18_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 19) RM1_CU19_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 20) RM1_CU20_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 21) RM1_CU21_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 22) RM1_CU22_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 23) RM1_CU23_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 24) RM1_CU24_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 25) RM1_CU25_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 26) RM1_CU26_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 27) RM1_CU27_Dist.push_back(corr*(*sipm_max_pc));
+                                                               if(*sipm_CU == 29) RM1_CU29_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 30) RM1_CU30_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 31) RM1_CU31_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 32) RM1_CU32_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 33) RM1_CU33_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 34) RM1_CU34_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 35) RM1_CU35_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 36) RM1_CU36_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 37) RM1_CU37_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 38) RM1_CU38_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 39) RM1_CU39_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 40) RM1_CU40_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 41) RM1_CU41_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 42) RM1_CU42_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 43) RM1_CU43_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 44) RM1_CU44_Dist.push_back(corr*(*sipm_max_pc));      
+      if(*sipm_ch == 20) RM1_dist_ch20->Fill(corr*(*sipm_max_pc));
     }
     else{xRM1[channel2] = -100;yRM1[channel2] = -100;zRM1[channel2] = -100;}
     if(*sipm_rm == 2){
-      xRM2[channel2] = *sipm_CU; yRM2[channel2] = *sipm_max_pc; zRM2[channel2] = *sipm_run;
-      profile_rm2->Fill(*sipm_CU,*sipm_max_pc);
-      profile_stab_rm2->Fill(*sipm_run,*sipm_max_pc);
-      RM2_dist->Fill(*sipm_max_pc);
+      xRM2[channel2] = *sipm_CU; yRM2[channel2] = corr*(*sipm_max_pc); zRM2[channel2] = *sipm_run;
+      profile_rm2->Fill(*sipm_CU,corr*(*sipm_max_pc));
+      profile_stab_rm2->Fill(*sipm_run,corr*(*sipm_max_pc));
+      RM2_dist->Fill(corr*(*sipm_max_pc));
+      if(*sipm_CU == 2)  RM2_CU2_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 3)  RM2_CU3_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 4)  RM2_CU4_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 5)  RM2_CU5_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 6)  RM2_CU6_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 7)  RM2_CU7_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 8)  RM2_CU8_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 9)  RM2_CU9_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 10) RM2_CU10_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 11) RM2_CU11_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 12) RM2_CU12_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 13) RM2_CU13_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 14) RM2_CU14_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 15) RM2_CU15_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 16) RM2_CU16_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 17) RM2_CU17_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 18) RM2_CU18_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 19) RM2_CU19_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 20) RM2_CU20_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 21) RM2_CU21_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 22) RM2_CU22_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 23) RM2_CU23_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 24) RM2_CU24_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 25) RM2_CU25_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 26) RM2_CU26_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 27) RM2_CU27_Dist.push_back(corr*(*sipm_max_pc));
+                                                               if(*sipm_CU == 29) RM2_CU29_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 30) RM2_CU30_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 31) RM2_CU31_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 32) RM2_CU32_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 33) RM2_CU33_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 34) RM2_CU34_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 35) RM2_CU35_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 36) RM2_CU36_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 37) RM2_CU37_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 38) RM2_CU38_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 39) RM2_CU39_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 40) RM2_CU40_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 41) RM2_CU41_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 42) RM2_CU42_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 43) RM2_CU43_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 44) RM2_CU44_Dist.push_back(corr*(*sipm_max_pc));
     }
     else{xRM2[channel2] = -100;yRM2[channel2] = -100;zRM2[channel2] = -100;}
     if(*sipm_rm == 3){
-      xRM3[channel2] = *sipm_CU; yRM3[channel2] = *sipm_max_pc; zRM3[channel2] = *sipm_run;
-      profile_rm3->Fill(*sipm_CU,*sipm_max_pc);
-      profile_stab_rm3->Fill(*sipm_run,*sipm_max_pc);
-      RM3_dist->Fill(*sipm_max_pc);
+      xRM3[channel2] = *sipm_CU; yRM3[channel2] = corr*(*sipm_max_pc); zRM3[channel2] = *sipm_run;
+      profile_rm3->Fill(*sipm_CU,corr*(*sipm_max_pc));
+      profile_stab_rm3->Fill(*sipm_run,corr*(*sipm_max_pc));
+      RM3_dist->Fill(corr*(*sipm_max_pc));
+      if(*sipm_CU == 2)  RM3_CU2_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 3)  RM3_CU3_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 4)  RM3_CU4_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 5)  RM3_CU5_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 6)  RM3_CU6_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 7)  RM3_CU7_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 8)  RM3_CU8_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 9)  RM3_CU9_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 10) RM3_CU10_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 11) RM3_CU11_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 12) RM3_CU12_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 13) RM3_CU13_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 14) RM3_CU14_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 15) RM3_CU15_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 16) RM3_CU16_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 17) RM3_CU17_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 18) RM3_CU18_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 19) RM3_CU19_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 20) RM3_CU20_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 21) RM3_CU21_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 22) RM3_CU22_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 23) RM3_CU23_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 24) RM3_CU24_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 25) RM3_CU25_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 26) RM3_CU26_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 27) RM3_CU27_Dist.push_back(corr*(*sipm_max_pc));
+                                                               if(*sipm_CU == 29) RM3_CU29_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 30) RM3_CU30_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 31) RM3_CU31_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 32) RM3_CU32_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 33) RM3_CU33_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 34) RM3_CU34_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 35) RM3_CU35_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 36) RM3_CU36_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 37) RM3_CU37_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 38) RM3_CU38_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 39) RM3_CU39_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 40) RM3_CU40_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 41) RM3_CU41_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 42) RM3_CU42_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 43) RM3_CU43_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 44) RM3_CU44_Dist.push_back(corr*(*sipm_max_pc));
     }
     else{xRM3[channel2] = -100;yRM3[channel2] = -100;zRM3[channel2] = -100;}
     if(*sipm_rm == 4){
-      xRM4[channel2] = *sipm_CU; yRM4[channel2] = *sipm_max_pc; zRM4[channel2] = *sipm_run;
-      profile_rm4->Fill(*sipm_CU,*sipm_max_pc);
-      profile_stab_rm4->Fill(*sipm_run,*sipm_max_pc);
-      RM4_dist->Fill(*sipm_max_pc);
+      xRM4[channel2] = *sipm_CU; yRM4[channel2] = corr*(*sipm_max_pc); zRM4[channel2] = *sipm_run;
+      profile_rm4->Fill(*sipm_CU,corr*(*sipm_max_pc));
+      profile_stab_rm4->Fill(*sipm_run,corr*(*sipm_max_pc));
+      RM4_dist->Fill(corr*(*sipm_max_pc));
+      if(*sipm_CU == 2)  RM4_CU2_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 3)  RM4_CU3_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 4)  RM4_CU4_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 5)  RM4_CU5_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 6)  RM4_CU6_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 7)  RM4_CU7_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 8)  RM4_CU8_Dist.push_back(corr*(*sipm_max_pc)); if(*sipm_CU == 9)  RM4_CU9_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 10) RM4_CU10_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 11) RM4_CU11_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 12) RM4_CU12_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 13) RM4_CU13_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 14) RM4_CU14_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 15) RM4_CU15_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 16) RM4_CU16_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 17) RM4_CU17_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 18) RM4_CU18_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 19) RM4_CU19_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 20) RM4_CU20_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 21) RM4_CU21_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 22) RM4_CU22_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 23) RM4_CU23_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 24) RM4_CU24_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 25) RM4_CU25_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 26) RM4_CU26_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 27) RM4_CU27_Dist.push_back(corr*(*sipm_max_pc));
+                                                               if(*sipm_CU == 29) RM4_CU29_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 30) RM4_CU30_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 31) RM4_CU31_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 32) RM4_CU32_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 33) RM4_CU33_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 34) RM4_CU34_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 35) RM4_CU35_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 36) RM4_CU36_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 37) RM4_CU37_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 38) RM4_CU38_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 39) RM4_CU39_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 40) RM4_CU40_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 41) RM4_CU41_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 42) RM4_CU42_Dist.push_back(corr*(*sipm_max_pc));if(*sipm_CU == 43) RM4_CU43_Dist.push_back(corr*(*sipm_max_pc));
+      if(*sipm_CU == 44) RM4_CU44_Dist.push_back(corr*(*sipm_max_pc));
     }
     else{xRM4[channel2] = -100;yRM4[channel2] = -100;zRM4[channel2] = -100;}
-    allRM_dist->Fill(*sipm_max_pc);
+    allRM_dist->Fill(corr*(*sipm_max_pc));
   }
   sprintf(process,"Done with RM Channels: %i/%i",NumChanRM,NumChanRM);
   std::cout<<process<<std::endl;
+
+  int numMinMax = 100;
+  Double_t xRMMinMax1[numMinMax],xRMMinMax2[numMinMax],xRMMinMax3[numMinMax],xRMMinMax4[numMinMax];
+  Double_t yRMMinMax1[numMinMax],yRMMinMax2[numMinMax],yRMMinMax3[numMinMax],yRMMinMax4[numMinMax];
+  for(int i = 0; i<101; i++){
+    yRMMinMax1[i]=-100;yRMMinMax2[i]=-100;yRMMinMax3[i]=-100;yRMMinMax4[i]=-100;      
+  }
+  fillMinMax(2, RM1_CU2_Dist, RM2_CU2_Dist, RM3_CU2_Dist, RM4_CU2_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(3, RM1_CU3_Dist, RM2_CU3_Dist, RM3_CU3_Dist, RM4_CU3_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(5, RM1_CU5_Dist, RM2_CU5_Dist, RM3_CU5_Dist, RM4_CU5_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(6, RM1_CU6_Dist, RM2_CU6_Dist, RM3_CU6_Dist, RM4_CU6_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(7, RM1_CU7_Dist, RM2_CU7_Dist, RM3_CU7_Dist, RM4_CU7_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(8, RM1_CU8_Dist, RM2_CU8_Dist, RM3_CU8_Dist, RM4_CU8_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(9, RM1_CU9_Dist, RM2_CU9_Dist, RM3_CU9_Dist, RM4_CU9_Dist, xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(10,RM1_CU10_Dist,RM2_CU10_Dist,RM3_CU10_Dist,RM4_CU10_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(11,RM1_CU11_Dist,RM2_CU11_Dist,RM3_CU11_Dist,RM4_CU11_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(12,RM1_CU12_Dist,RM2_CU12_Dist,RM3_CU12_Dist,RM4_CU12_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(13,RM1_CU13_Dist,RM2_CU13_Dist,RM3_CU13_Dist,RM4_CU13_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(14,RM1_CU14_Dist,RM2_CU14_Dist,RM3_CU14_Dist,RM4_CU14_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(15,RM1_CU15_Dist,RM2_CU15_Dist,RM3_CU15_Dist,RM4_CU15_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(16,RM1_CU16_Dist,RM2_CU16_Dist,RM3_CU16_Dist,RM4_CU16_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(17,RM1_CU17_Dist,RM2_CU17_Dist,RM3_CU17_Dist,RM4_CU17_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(18,RM1_CU18_Dist,RM2_CU18_Dist,RM3_CU18_Dist,RM4_CU18_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(19,RM1_CU19_Dist,RM2_CU19_Dist,RM3_CU19_Dist,RM4_CU19_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(20,RM1_CU20_Dist,RM2_CU20_Dist,RM3_CU20_Dist,RM4_CU20_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(22,RM1_CU22_Dist,RM2_CU22_Dist,RM3_CU22_Dist,RM4_CU22_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(23,RM1_CU23_Dist,RM2_CU23_Dist,RM3_CU23_Dist,RM4_CU23_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(24,RM1_CU24_Dist,RM2_CU24_Dist,RM3_CU24_Dist,RM4_CU24_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(25,RM1_CU25_Dist,RM2_CU25_Dist,RM3_CU25_Dist,RM4_CU25_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(26,RM1_CU26_Dist,RM2_CU26_Dist,RM3_CU26_Dist,RM4_CU26_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(27,RM1_CU27_Dist,RM2_CU27_Dist,RM3_CU27_Dist,RM4_CU27_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(29,RM1_CU29_Dist,RM2_CU29_Dist,RM3_CU29_Dist,RM4_CU29_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(30,RM1_CU30_Dist,RM2_CU30_Dist,RM3_CU30_Dist,RM4_CU30_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(31,RM1_CU31_Dist,RM2_CU31_Dist,RM3_CU31_Dist,RM4_CU31_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(32,RM1_CU32_Dist,RM2_CU32_Dist,RM3_CU32_Dist,RM4_CU32_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(33,RM1_CU33_Dist,RM2_CU33_Dist,RM3_CU33_Dist,RM4_CU33_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(34,RM1_CU34_Dist,RM2_CU34_Dist,RM3_CU34_Dist,RM4_CU34_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(35,RM1_CU35_Dist,RM2_CU35_Dist,RM3_CU35_Dist,RM4_CU35_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(36,RM1_CU36_Dist,RM2_CU36_Dist,RM3_CU36_Dist,RM4_CU36_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(37,RM1_CU37_Dist,RM2_CU37_Dist,RM3_CU37_Dist,RM4_CU37_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(38,RM1_CU38_Dist,RM2_CU38_Dist,RM3_CU38_Dist,RM4_CU38_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(39,RM1_CU39_Dist,RM2_CU39_Dist,RM3_CU39_Dist,RM4_CU39_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(40,RM1_CU40_Dist,RM2_CU40_Dist,RM3_CU40_Dist,RM4_CU40_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(41,RM1_CU41_Dist,RM2_CU41_Dist,RM3_CU41_Dist,RM4_CU41_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(42,RM1_CU42_Dist,RM2_CU42_Dist,RM3_CU42_Dist,RM4_CU42_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(43,RM1_CU43_Dist,RM2_CU43_Dist,RM3_CU43_Dist,RM4_CU43_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
+  fillMinMax(44,RM1_CU44_Dist,RM2_CU44_Dist,RM3_CU44_Dist,RM4_CU44_Dist,xRMMinMax1,xRMMinMax2,xRMMinMax3,xRMMinMax4,yRMMinMax1,yRMMinMax2,yRMMinMax3,yRMMinMax4);
   TGraph* graph_rm1 = new TGraph(NumChanRM,xRM1,yRM1);
   TGraph* graph_rm2 = new TGraph(NumChanRM,xRM2,yRM2);
   TGraph* graph_rm3 = new TGraph(NumChanRM,xRM3,yRM3);
@@ -331,11 +568,15 @@ void CU_Plots(){
   TGraph* graph_stab_rm1 = new TGraph(NumChanRM,zRM1,yRM1);
   TGraph* graph_stab_rm2 = new TGraph(NumChanRM,zRM2,yRM2);
   TGraph* graph_stab_rm3 = new TGraph(NumChanRM,zRM3,yRM3);
-  TGraph* graph_stab_rm4 = new TGraph(NumChanRM,zRM4,yRM4);
-  graph_rm1->SetMarkerColor(kMagenta);          profile_rm1->SetLineColor(kMagenta);
-  graph_rm2->SetMarkerColor(kBlue);             profile_rm2->SetLineColor(kBlue);
-  graph_rm3->SetMarkerColor(kGray);            profile_rm3->SetLineColor(kGray);
-  graph_rm4->SetMarkerColor(kGreen+2);          profile_rm4->SetLineColor(kGreen+2);
+  TGraph* graph_stab_rm4 = new TGraph(NumChanRM,zRM4,yRM4);  
+  TGraph* graph_MinMax_rm1 = new TGraph(numMinMax,xRMMinMax1,yRMMinMax1);
+  TGraph* graph_MinMax_rm2 = new TGraph(numMinMax,xRMMinMax2,yRMMinMax2);
+  TGraph* graph_MinMax_rm3 = new TGraph(numMinMax,xRMMinMax3,yRMMinMax3);
+  TGraph* graph_MinMax_rm4 = new TGraph(numMinMax,xRMMinMax4,yRMMinMax4);
+  graph_rm1->SetMarkerColor(kMagenta);          profile_rm1->SetLineColor(kMagenta);           graph_MinMax_rm1->SetMarkerColor(kMagenta);
+  graph_rm2->SetMarkerColor(kBlue);             profile_rm2->SetLineColor(kBlue);              graph_MinMax_rm2->SetMarkerColor(kBlue);
+  graph_rm3->SetMarkerColor(kGray);             profile_rm3->SetLineColor(kGray);              graph_MinMax_rm3->SetMarkerColor(kGray);
+  graph_rm4->SetMarkerColor(kGreen+2);          profile_rm4->SetLineColor(kGreen+2);           graph_MinMax_rm4->SetMarkerColor(kGreen+2);
   graph_stab_rm1->SetMarkerColor(kMagenta);     profile_stab_rm1->SetLineColor(kMagenta);
   graph_stab_rm2->SetMarkerColor(kBlue);        profile_stab_rm2->SetLineColor(kBlue);
   graph_stab_rm3->SetMarkerColor(kBlack);       profile_stab_rm3->SetLineColor(kBlack);
@@ -346,23 +587,21 @@ void CU_Plots(){
   RM3_dist->SetLineColor(kBlack);  
   RM4_dist->SetLineColor(kBlack);  
   RM1_dist_ch20->SetLineColor(kBlack);
-  graph_rm1->SetMarkerStyle(kFullSquare);       graph_stab_rm1->SetMarkerStyle(kFullSquare);
-  graph_rm2->SetMarkerStyle(kFullSquare);       graph_stab_rm2->SetMarkerStyle(kFullSquare);
-  graph_rm3->SetMarkerStyle(kFullSquare);       graph_stab_rm3->SetMarkerStyle(kFullSquare);
-  graph_rm4->SetMarkerStyle(kFullSquare);       graph_stab_rm4->SetMarkerStyle(kFullSquare);
+  graph_rm1->SetMarkerStyle(kFullSquare);       graph_stab_rm1->SetMarkerStyle(kFullSquare);  graph_MinMax_rm1->SetMarkerStyle(kFullSquare);
+  graph_rm2->SetMarkerStyle(kFullSquare);       graph_stab_rm2->SetMarkerStyle(kFullSquare);  graph_MinMax_rm2->SetMarkerStyle(kFullSquare);
+  graph_rm3->SetMarkerStyle(kFullSquare);       graph_stab_rm3->SetMarkerStyle(kFullSquare);  graph_MinMax_rm3->SetMarkerStyle(kFullSquare);
+  graph_rm4->SetMarkerStyle(kFullSquare);       graph_stab_rm4->SetMarkerStyle(kFullSquare);  graph_MinMax_rm4->SetMarkerStyle(kFullSquare);
   
   //----------------------------------------------------------------------
   //Make TLatex
   //----------------------------------------------------------------------
   TLatex* CMSPrelim1 = new TLatex(0.14, 0.91, "CMS #scale[0.9]{#font[52]{Preliminary}}");
   CMSPrelim1->SetNDC();
-  CMSPrelim1->SetTextFont(62);
-  
+  CMSPrelim1->SetTextFont(62);  
   TLatex* burnIn = new TLatex(0.95, 0.91, "904 Burn-in 2017");
   burnIn->SetNDC();
   burnIn->SetTextFont(42);
-  burnIn->SetTextAlign(31);
-  
+  burnIn->SetTextAlign(31);  
   TLatex* PinDiode = new TLatex(0.14, 0.91, "Pin-Diodes");
   PinDiode->SetNDC();
   PinDiode->SetTextFont(42);
@@ -387,7 +626,6 @@ void CU_Plots(){
   TLatex* PinDiode2345 = new TLatex(0.14, 0.91, "Pin-Diode 2,3,4,5");
   PinDiode2345->SetNDC();
   PinDiode2345->SetTextFont(42);
-
   TLatex* RM = new TLatex(0.14, 0.91, "Silicon Photomultiplier");
   RM->SetNDC();
   RM->SetTextFont(42);
@@ -461,8 +699,8 @@ void CU_Plots(){
   catLeg0->SetFillStyle(0);
   catLeg0->SetTextSize(0.04);
   TH1F* h0blank = Blank("Blank0",125,0,70);
-  h0blank->SetMinimum(0.1);
-  h0blank->SetMaximum(800000/convert);
+  h0blank->SetMinimum(5);
+  h0blank->SetMaximum(80000/convert);
   h0blank->GetXaxis()->SetTitle("CU");
   h0blank->GetYaxis()->SetTitle("Max Charge [pC]");
   h0blank->Draw("hist");  
@@ -808,6 +1046,7 @@ void CU_Plots(){
   TH1F* h19blank = Blank("Blank19",125,0,disMax/convert);
   h19blank->SetMinimum(rmDisMin);
   h19blank->SetMaximum(rmDisMax/20);
+  if(doCorr == 1)h19blank->SetMaximum(rmDisMax/15);
   h19blank->GetXaxis()->SetTitle("Max Charge [pC]");
   h19blank->GetYaxis()->SetTitle("Channels");
   h19blank->Draw();
@@ -819,6 +1058,33 @@ void CU_Plots(){
   MeanRM1_ch20->Draw();
   StdDevRM1_ch20->Draw();
   RM1_ch20->Draw();
+
+  TCanvas *c20 = Canvas("Min Max: MaxpCvsCU 0,1, RM1-4",800,800);  
+  TLegend* catLeg20 = new TLegend(0.68,0.65,0.96,0.88);
+  catLeg20->SetBorderSize(0);
+  catLeg20->SetFillStyle(0);
+  catLeg20->SetTextSize(0.04);
+  TH1F* h20blank = Blank("Blank20",125,0,65);
+  h20blank->SetMinimum(0);
+  h20blank->SetMaximum((disMax-50000)/convert);
+  h20blank->GetXaxis()->SetTitle("CU");
+  h20blank->GetYaxis()->SetTitle("Max Charge [pC]");
+  h20blank->Draw("hist");  
+  graph_pd0->Draw("P same");
+  graph_pd1->Draw("P same");
+  graph_MinMax_rm1->Draw("P same");
+  graph_MinMax_rm2->Draw("P same");
+  graph_MinMax_rm3->Draw("P same");
+  graph_MinMax_rm4->Draw("P same");
+  //CMSPrelim1->Draw();
+  burnIn->Draw();
+  catLeg20->Draw();
+  catLeg20->AddEntry(graph_pd0,"Pin-Diode 0","P");
+  catLeg20->AddEntry(graph_pd1,"Pin-Diode 1","P");
+  catLeg20->AddEntry(graph_MinMax_rm1,"RM 1","P");
+  catLeg20->AddEntry(graph_MinMax_rm2,"RM 2","P");
+  catLeg20->AddEntry(graph_MinMax_rm3,"RM 3","P");
+  catLeg20->AddEntry(graph_MinMax_rm4,"RM 4","P");
 
   c0->SaveAs("PDAllvsCU2D.pdf");
   c1->SaveAs("PDAll_1D.pdf");
@@ -840,6 +1106,7 @@ void CU_Plots(){
   c17->SaveAs("stabilityVsiteration_graph.pdf");
   c18->SaveAs("stabilityVsiteration_profile.pdf");
   c19->SaveAs("RM1_1D_ch20.pdf");
+  c20->SaveAs("MinMax_RM_PDvsCU2D.pdf");  
 } 
 
 int main(){
