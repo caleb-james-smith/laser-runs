@@ -87,8 +87,10 @@ class Plotter:
                         self.constants[cu_name]["sipm_pd0"] = []
                         self.constants[cu_name]["sipm_pd1"] = []
                         self.constants[cu_name]["sipm_ave"] = []
-    
+
+                    # add elements per CU
                     data["cu%d"%cu][element_name].append(d)
+                    
                     if tag == "sipm":
                         data["%s_sipm%s" % (element_name, s[sipm_position])].append(d)
                         data[cu_name]["sipm"].append(d)
@@ -134,7 +136,7 @@ class Plotter:
             y_stat = y_max - (y_max - y_min) / 4.0
         return (x_stat, y_stat)
     
-    def plotHisto(self, data, info, fileName=""):
+    def plotHisto(self, data, info, fileName="", stacked=False):
         name = info["name"]
         title = info["title"]
         xtitle = info["xtitle"]
@@ -146,7 +148,22 @@ class Plotter:
         if setRange:
             x_range = info["xrange"]
             y_range = info["yrange"]
-        data_list = data[name]
+        # data array can be a 1D or 2D matrix
+        # data array is 2D for stacked histograms
+        data_array = data[name]
+        data_list = []
+        if stacked:
+            for x in data_array:
+                print x
+                for d in x:
+                    data_list.append(d)
+        else:
+            data_list = data_array
+        print "name = {0}".format(name)
+        #print "data_list = {0}".format(data_list)
+        if not data_list:
+            print "There is no data for {0}.".format(name)
+            return
         
         entries = len(data_list)
         mean = np.mean(data_list)
@@ -165,10 +182,16 @@ class Plotter:
             axes = plt.gca()
             axes.set_xlim(x_range)
             axes.set_ylim(y_range)
-            h_y, h_x, h = plt.hist(data_list, bins=nbins, range=x_range)
+            if stacked:
+                h_y, h_x, h = plt.hist(data_array, bins=nbins, range=x_range, stacked=stacked)
+            else:
+                h_y, h_x, h = plt.hist(data_list, bins=nbins, range=x_range)
             xstat, ystat = self.getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
         else:
-            h_y, h_x, h = plt.hist(data_list, bins=nbins)
+            if stacked:
+                h_y, h_x, h = plt.hist(data_array, bins=nbins, stacked=stacked)
+            else:
+                h_y, h_x, h = plt.hist(data_list, bins=nbins)
             xstat, ystat = self.getStat(min(h_x), max(h_x), min(h_y), max(h_y), statLocation)
         
         plt.text(xstat, ystat, stat_string)
@@ -366,8 +389,8 @@ if __name__ == "__main__":
    
     # choose which plots to create
     makeHistos = True
-    makeScatter = True
-    makeHistosPerCU = False
+    makeScatter = True 
+    makeHistosPerCU = True
 
 
     ###################### 
@@ -419,7 +442,7 @@ if __name__ == "__main__":
 
     if makeHistosPerCU:
         cu_info = {}
-        cu_info["name"] = "sipm"
+        cu_info["name"] = ""
         cu_info["title"] = ""
         cu_info["xtitle"] = "Max Charge (pC)"
         cu_info["ytitle"] = "Number of Channels"
@@ -434,7 +457,19 @@ if __name__ == "__main__":
             if "cu" in key:
                 print "Plot histogram for {0}".format(key)
                 cu_number = key.split("cu")[-1]
+                cu_info["name"] = "sipm"
                 cu_info["title"] = "SiPM Max Charge for CU {0}".format(cu_number)
                 p.plotHisto(p.data[key], cu_info, "%s_sipm" % key)
+                
+                # make stacked histograms per CU per RM
+                cu_info["name"] = "stacked_sipm"
+
+                # check ordering. may need to be a transposed np.array
+                cu_rm_data = {}
+                print "Make stacked histos for {0}".format(key)
+                for d in p.data[key]:
+                    print "{0} : {1}".format(key, d)
+                cu_rm_data["stacked_sipm"] = list(p.data[key]["rm%d" % rm] for rm in xrange(1,5))
+                p.plotHisto(cu_rm_data, cu_info, "%s_stacked_sipm" % key, stacked=True)
 
 
