@@ -13,6 +13,8 @@ class Plotter:
         self.data_dir = data_dir
         self.plot_dir = plot_dir
         self.data = self.getData(data_dir)
+        raw_colors = ["pinkish red","azure","bluish green","electric purple","tangerine","neon pink","dark sky blue","avocado"]
+        self.colors = list("xkcd:{0}".format(c) for c in raw_colors)
 
     def getData(self, data_dir):
         sipm_file = "sipm_table.txt"
@@ -152,18 +154,23 @@ class Plotter:
         # data array is 2D for stacked histograms
         data_array = data[name]
         data_list = []
+        stack_colors = []
         if stacked:
-            for x in data_array:
-                print x
+            for i, x in enumerate(data_array):
+                stack_colors.append(self.colors[i % len(self.colors)])
                 for d in x:
                     data_list.append(d)
         else:
             data_list = data_array
+        
+        stack_names = list("RM %d" % rm for rm in xrange(1,5))
         print "name = {0}".format(name)
         #print "data_list = {0}".format(data_list)
         if not data_list:
             print "There is no data for {0}.".format(name)
             return
+        
+        fig, ax = plt.subplots()
         
         entries = len(data_list)
         mean = np.mean(data_list)
@@ -183,17 +190,18 @@ class Plotter:
             axes.set_xlim(x_range)
             axes.set_ylim(y_range)
             if stacked:
-                h_y, h_x, h = plt.hist(data_array, bins=nbins, range=x_range, stacked=stacked)
+                h_y, h_x, h = plt.hist(data_array, bins=nbins, range=x_range, color=stack_colors, label=stack_names, stacked=stacked)
             else:
                 h_y, h_x, h = plt.hist(data_list, bins=nbins, range=x_range)
             xstat, ystat = self.getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
         else:
             if stacked:
-                h_y, h_x, h = plt.hist(data_array, bins=nbins, stacked=stacked)
+                h_y, h_x, h = plt.hist(data_array, bins=nbins, color=stack_colors, label=stack_names, stacked=stacked)
             else:
                 h_y, h_x, h = plt.hist(data_list, bins=nbins)
             xstat, ystat = self.getStat(min(h_x), max(h_x), min(h_y), max(h_y), statLocation)
         
+        legend = ax.legend(loc='upper left')
         plt.text(xstat, ystat, stat_string)
         plt.title(title)
         plt.xlabel(xtitle)
@@ -208,8 +216,6 @@ class Plotter:
     
     # makes scatter plots and calculates constants
     def plotScatter(self, info):
-        raw_colors = ["pinkish red","azure","bluish green","electric purple","tangerine","neon pink","dark sky blue","avocado"]
-        colors = list("xkcd:{0}".format(c) for c in raw_colors)
         name = info["name"]
         ynames = info["ynames"]
         x = info["xdata"]
@@ -248,7 +254,7 @@ class Plotter:
     
             plotFit = plotFitTypes[i]
             yname = ynames[i]
-            color = colors[i % len(colors)] # in case there are more y data sets than colors
+            color = self.colors[i % len(self.colors)] # in case there are more y data sets than colors
             
             print "number of y values for {0}: {1}".format(yname, len(y))
     
@@ -462,13 +468,11 @@ if __name__ == "__main__":
                 p.plotHisto(p.data[key], cu_info, "%s_sipm" % key)
                 
                 # make stacked histograms per CU per RM
+                print "Plot stacked histograms for {0}".format(key)
                 cu_info["name"] = "stacked_sipm"
 
                 # check ordering. may need to be a transposed np.array
                 cu_rm_data = {}
-                print "Make stacked histos for {0}".format(key)
-                for d in p.data[key]:
-                    print "{0} : {1}".format(key, d)
                 cu_rm_data["stacked_sipm"] = list(p.data[key]["rm%d" % rm] for rm in xrange(1,5))
                 p.plotHisto(cu_rm_data, cu_info, "%s_stacked_sipm" % key, stacked=True)
 
