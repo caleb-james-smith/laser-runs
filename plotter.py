@@ -362,13 +362,16 @@ class Plotter:
         fig, ax = plt.subplots()
         print "number of x values: {0}".format(len(x))
         for i, y in enumerate(ydata): 
-            print "number of y values: {0}".format(len(y))
+            print "number of y values for channel {0}: {1}".format(i, len(y))
             if not y:
-                print "no y values for channel"
+                print "no y values for channel {0}".format(i)
                 continue
             #yname = ynames[i]
             color = self.colors[i % len(self.colors)] # in case there are more y data sets than colors
-            ax.plot(x, y, '-o', c=color, alpha=0.5)
+            if connect:
+                ax.plot(x, y, '-o', c=color, alpha=0.5)
+            else:
+                ax.plot(x, y, 'o', c=color, alpha=0.5)
   
         if setRange:
             axes = plt.gca()

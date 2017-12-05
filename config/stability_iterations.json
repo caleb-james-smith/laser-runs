@@ -7,10 +7,10 @@
         "ytitle" : "Max Charge (pC)",
         "xstat" : 0,
         "ystat" : 0,
-        "xrange" : [0, 10],
-        "yrange" : [0, 3000],
-        "setrange" : 0,
+        "xrange" : [0, 8],
+        "yrange" : [0, 1500],
+        "setrange" : 1,
         "statloc" : 0,
-        "connect" : 0
+        "connect" : 1
     }
 }
