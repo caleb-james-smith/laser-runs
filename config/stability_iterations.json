@@ -1,0 +1,16 @@
+{
+    "rm_pd_stability" : {
+        "name" : "rm_pd_stability",
+        "ynames" : ["RM 1", "RM 2", "RM 3", "RM 4", "PD 0", "PD 1"],
+        "title" : "RM SiPMs and PIN Diode 0 and 1 Max Charge vs Iteration",
+        "xtitle" : "Iteration",
+        "ytitle" : "Max Charge (pC)",
+        "xstat" : 0,
+        "ystat" : 0,
+        "xrange" : [0, 10],
+        "yrange" : [0, 3000],
+        "setrange" : 0,
+        "statloc" : 0,
+        "connect" : 0
+    }
+}

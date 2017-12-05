@@ -29,6 +29,8 @@ class Plotter:
         
         data["pd_quartz"] = []
         data["pd_megatile"] = []
+
+        data["iteration"] = []
         
         for pd in xrange(6):
             element_name = "pd%d" % pd
@@ -46,6 +48,7 @@ class Plotter:
         self.cu_list = []
         charge_position = -2
         adc_position = -3
+        iteration_position = 2
         element_position = 3
         sipm_position = 4
         for dictionary in dictionaries:
@@ -63,11 +66,16 @@ class Plotter:
                         #continue
                     #d = int(s[adc_position])
                     d = float(s[charge_position])
+                    iteration = int(s[iteration_position])
                     element_index = int(s[element_position])
                     element_name = "%s%d" % (element, element_index)
                     data[tag].append(d)
                     data[element_name].append(d)
                     
+                    if iteration not in data["iteration"]:
+                        data["iteration"].append(iteration)
+
+
                     # data organized by CU
                     cu = int(s[0]) 
                     if cu not in self.cu_list:
@@ -334,6 +342,53 @@ class Plotter:
         plt.savefig(self.plot_dir + name + ".pdf")
         plt.clf()
 
+    # plot data vs iteration
+    def plotIterations(self, info):
+        name = info["name"]
+        ynames = info["ynames"]
+        x = info["xdata"]
+        ydata = info["ydata"]
+        title = info["title"]
+        xtitle = info["xtitle"]
+        ytitle = info["ytitle"]
+        setRange = info["setrange"] 
+        statLocation = info["statloc"]
+        connect = info["connect"]
+        
+        if setRange:
+            x_range = info["xrange"]
+            y_range = info["yrange"]
+        
+        fig, ax = plt.subplots()
+        print "number of x values: {0}".format(len(x))
+        for i, y in enumerate(ydata): 
+            print "number of y values: {0}".format(len(y))
+            if not y:
+                print "no y values for channel"
+                continue
+            #yname = ynames[i]
+            color = self.colors[i % len(self.colors)] # in case there are more y data sets than colors
+            ax.plot(x, y, '-o', c=color, alpha=0.5)
+  
+        if setRange:
+            axes = plt.gca()
+            axes.set_xlim(x_range)
+            axes.set_ylim(y_range)
+            xstat, ystat = self.getStat(x_range[0], x_range[1], y_range[0], y_range[1], statLocation)
+        
+        legend = ax.legend(loc='upper right')
+        ax.grid(True)
+        
+        plt.gcf().subplots_adjust(bottom=0.1)
+        plt.gcf().subplots_adjust(left=0.15)
+        
+        plt.title(title)
+        plt.xlabel(xtitle)
+        plt.ylabel(ytitle)
+        plt.savefig(self.plot_dir + name + ".png")
+        plt.savefig(self.plot_dir + name + ".pdf")
+        plt.clf()
+
     # should be used after making scatter plot, which calculates constants
     def normalize(self):
         self.data["norm_pd0"] = []
@@ -373,15 +428,17 @@ class Plotter:
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--histo_config",   "-c", default="config/final_histo.json",    help="json config file for histograms")
-    parser.add_argument("--scatter_config", "-s", default="config/final_scatter.json",  help="json config file for scatter plots")
-    parser.add_argument("--data_dir",       "-d", default="Nov17-18_Final_CU_Data",     help="directory containing data tables")
-    parser.add_argument("--plot_dir",       "-p", default="Nov17-18_Final_Plots",       help="directory to save plots")
+    parser.add_argument("--histo_config",       "-c", default="config/final_histo.json",            help="json config file for histograms")
+    parser.add_argument("--iteration_config",   "-i", default="config/stability_iterations.json",   help="json config file for iteration plots")
+    parser.add_argument("--scatter_config",     "-s", default="config/final_scatter.json",          help="json config file for scatter plots")
+    parser.add_argument("--data_dir",           "-d", default="Nov17-18_Final_CU_Data",             help="directory containing data tables")
+    parser.add_argument("--plot_dir",           "-p", default="Nov17-18_Final_Plots",               help="directory to save plots")
     
     options = parser.parse_args()
     plot_dir = options.plot_dir
     data_dir = options.data_dir
     histo_config = options.histo_config
+    iteration_config = options.iteration_config
     scatter_config = options.scatter_config
 
 
@@ -394,10 +451,10 @@ if __name__ == "__main__":
     p = Plotter(data_dir, plot_dir)
    
     # choose which plots to create
+    makeScatter = False
+    makeIterations = True
     makeHistos = True
-    makeScatter = True 
-    makeHistosPerCU = True
-
+    makeHistosPerCU = False
 
     ###################### 
     # make scatter plots #
@@ -430,6 +487,25 @@ if __name__ == "__main__":
 
         # important for normalized SiPM plots
         p.normalize()
+
+    ########################
+    # make iteration plots #
+    ########################
+    
+    if makeIterations:
+        iteration_data = p.data["iteration"]
+        pd0_data = p.data["pd0"]
+        pd1_data = p.data["pd1"]
+
+        with open(iteration_config) as json_file:
+            info = json.load(json_file)
+        sipm_data = list(p.data["rm%d_sipm%d" % (rm, sipm)] for sipm in xrange(48) for rm in xrange(1,5))
+        info["rm_pd_stability"]["xdata"] = iteration_data
+        info["rm_pd_stability"]["ydata"] = sipm_data + [pd0_data] + [pd1_data]
+        
+        for key in info:
+            p.plotIterations(info[key])
+
 
     ###################
     # make histograms #
