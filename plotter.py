@@ -3,7 +3,7 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-from argparse import ArgumentParser
+import argparse
 from scipy.optimize import curve_fit
 
 class Plotter:
@@ -13,7 +13,7 @@ class Plotter:
         self.data_dir = data_dir
         self.plot_dir = plot_dir
         self.data = self.getData(data_dir)
-        raw_colors = ["pinkish red","azure","bluish green","electric purple","tangerine","neon pink","dark sky blue","avocado"]
+        raw_colors = ["pinkish red","azure","electric purple","bluish green","tangerine","neon pink","dark sky blue","avocado"]
         self.colors = list("xkcd:{0}".format(c) for c in raw_colors)
 
     def getData(self, data_dir):
@@ -221,6 +221,7 @@ class Plotter:
             plt.savefig(self.plot_dir + name + ".png")
             plt.savefig(self.plot_dir + name + ".pdf")
         plt.clf()
+        plt.close()
     
     # makes scatter plots and calculates constants
     def plotScatter(self, info):
@@ -341,6 +342,7 @@ class Plotter:
         plt.savefig(self.plot_dir + name + ".png")
         plt.savefig(self.plot_dir + name + ".pdf")
         plt.clf()
+        plt.close()
 
     # plot data vs iteration
     def plotIterations(self, info):
@@ -391,6 +393,7 @@ class Plotter:
         plt.savefig(self.plot_dir + name + ".png")
         plt.savefig(self.plot_dir + name + ".pdf")
         plt.clf()
+        plt.close()
 
     # should be used after making scatter plot, which calculates constants
     def normalize(self):
@@ -430,7 +433,7 @@ class Plotter:
                     self.data["norm_sipm"].append(self.constants[cu_name]["sipm_ave"][rm-1] * d)
 
 if __name__ == "__main__":
-    parser = ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--histo_config",       "-c", default="config/final_histo.json",            help="json config file for histograms")
     parser.add_argument("--iteration_config",   "-i", default="config/stability_iterations.json",   help="json config file for iteration plots")
     parser.add_argument("--scatter_config",     "-s", default="config/final_scatter.json",          help="json config file for scatter plots")
@@ -454,10 +457,10 @@ if __name__ == "__main__":
     p = Plotter(data_dir, plot_dir)
    
     # choose which plots to create
-    makeScatter = False
-    makeIterations = True
+    makeScatter = True
+    makeIterations = False
     makeHistos = True
-    makeHistosPerCU = False
+    makeHistosPerCU = True
 
     ###################### 
     # make scatter plots #

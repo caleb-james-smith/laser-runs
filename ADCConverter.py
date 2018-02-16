@@ -130,7 +130,7 @@ class ADCConverter:
 if __name__ == "__main__":
     for s in xrange(32):
         ADCConverter(1, s)
-    converter = ADCConverter(1, 31)
+    converter = ADCConverter(0, 0) # unit, shunt
     xbins = converter.getBins()
     cleanBins = []
     print "ADC : pC : xbin"
