@@ -5,6 +5,10 @@ try:
     import matplotlib.pyplot as plt
 except:
     print "matplotlib.pyplot cannot be imported"
+try:
+    from adc2fc_point5_dqm import adc2fc
+except:
+    print "adc2fc cannot be imported from adc2fc_point5_dqm"
 
 class ADCConverter:
     # Bitmasks for 8-bit ADC input
@@ -50,7 +54,7 @@ class ADCConverter:
                 #fc[exp * 64 + man] = (inputCharge[exp * 5 + subrange] + ((man - adcBase[subrange])) * sensitivity) / gain;
                 self.fc[exp * 64 + man] = self.inputCharge[exp * 5 + subrange] + ((man - self.adcBase[subrange]) + .5) * sensitivity
 
-    def linearize(self, adc):
+    def linearize(self, adc, version=1):
         factors = list(10.0**k for k in xrange(0,9,3)) # fC, pC, nC
         if self.unit > len(factors) - 1:
             print "The unit is ouside the available range 0 to {0}.".format(len(factors)-1)
@@ -58,7 +62,12 @@ class ADCConverter:
         unitFactor = factors[self.unit]
         adc = int(adc) # in case of string
         if adc > 255: adc = 255
-        return self.shuntFactor * self.fc[int(adc)] / unitFactor
+        fc = 0.0
+        if version == 0:
+            fc = self.fc[adc]
+        elif version == 1:
+            fc = adc2fc[adc]
+        return self.shuntFactor * fc / unitFactor
     
     def getBins(self):
         xbins = []
