@@ -55,11 +55,13 @@ class ADCConverter:
                 self.fc[exp * 64 + man] = self.inputCharge[exp * 5 + subrange] + ((man - self.adcBase[subrange]) + .5) * sensitivity
 
     def linearize(self, adc, version=1):
-        factors = list(10.0**k for k in xrange(0,9,3)) # fC, pC, nC
-        if self.unit > len(factors) - 1:
-            print "The unit is ouside the available range 0 to {0}.".format(len(factors)-1)
+        units = {"fc" : 10.0 ** 0,
+                 "pc" : 10.0 ** 3,
+                 "nc" : 10.0 ** 6}
+        if self.unit not in units:
+            print "The unit {0} is not in the list {1}".format(self.unit, units)
             return -1
-        unitFactor = factors[self.unit]
+        unitFactor = units[self.unit]
         adc = int(adc) # in case of string
         if adc > 255: adc = 255
         fc = 0.0
@@ -138,7 +140,7 @@ class ADCConverter:
 
 if __name__ == "__main__":
     for s in xrange(32):
-        ADCConverter(1, s)
+        ADCConverter("pc", s)
     converter = ADCConverter("fc", 0) # unit, shunt
     xbins = converter.getBins()
     cleanBins = []
