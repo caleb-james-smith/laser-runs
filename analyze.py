@@ -195,7 +195,7 @@ def plotMax(runDir, dictionary):
     C1.SaveAs(runDir + 'max_adc_' + ch_type + '.pdf')
 
 # Table options are "sipm", "pd", and "pindiodes"
-def makeTable(runDir, tables, runList, stability=False):
+def makeTable(runDir, tables, runList, unit, stability=False):
     if runDir[-1] != "/":
         runDir += "/"
     cuList = []
@@ -207,7 +207,7 @@ def makeTable(runDir, tables, runList, stability=False):
     shuntList = [31]
     pdList = list(i for i in xrange(6))
     col_width = 10
-    adcConverter = ADCConverter(0, 31) # unit and shunt
+    adcConverter = ADCConverter(unit, 31) # unit and shunt
     for table in tables:
         cuBadChannels = {}
         total_channels = 0
@@ -319,7 +319,7 @@ def makeTable(runDir, tables, runList, stability=False):
                                         
                                         uhtr_ch = channel.split("h")[-1]
                                         max_adc = str(findMaxADC(f, channel, False))
-                                        max_pc  = "%.2f" % adcConverter.linearize(max_adc)
+                                        max_charge  = "%.2f" % adcConverter.linearize(max_adc)
                                         total_channels += 1 
                                         if int(max_adc) >= cutoff:
                                             result = "1"
@@ -328,9 +328,9 @@ def makeTable(runDir, tables, runList, stability=False):
                                             bad_channels += 1
                                             total_bad_channels += 1
                                         if table == "sipm":
-                                            row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_pc, result]
+                                            row = [cu, rbx, run, rm, rm_ch, uhtr_ch, shunt, max_adc, max_charge, result]
                                         if table == "pd":
-                                            row = [cu, rbx, run, pd_ch, uhtr_ch, shunt, max_adc, max_pc, result]
+                                            row = [cu, rbx, run, pd_ch, uhtr_ch, shunt, max_adc, max_charge, result]
                                         array_string += "{" + ", ".join(row) + "},\n"
                                         row_string =  "".join(entry.ljust(col_width) for entry in row)
                                         t.write(row_string + "\n") 
@@ -362,20 +362,22 @@ def makeTable(runDir, tables, runList, stability=False):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--directory", "-d", default="Nov17-18_Final_CU_Data", help="directory containing directories with CU data")
+    parser.add_argument("--unit", "-u", default="fc", help="Charge unit (fc, pc, nc).")
     options = parser.parse_args()
     runDir = options.directory
+    unit = options.unit
     
     # sipm: iterations 1, 2, 3
     # pd: iterations 1, 2, 3, 4, 5, 6, 7
     
     tables = ["sipm", "pd"]
     runList = [1,4,5,6,7]
-    makeTable(runDir, tables, runList)
+    makeTable(runDir, tables, runList, unit)
 
     # iterations for stability runs: iteration 1 is bad for CU6
     #tables = ["sipm", "pd"]
     #runList = list(i for i in xrange(2,7))
-    #makeTable(runDir, tables, runList, stability=True)
+    #makeTable(runDir, tables, runList, unit, stability=True)
 
     #findMaxADC("CU_8/rbx0_shunt31_pd_1.root", "h0", True)
     #findMaxADC("CU_8/rbx0_shunt31_pd_1.root", "h1", True)
