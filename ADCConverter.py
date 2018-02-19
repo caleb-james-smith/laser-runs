@@ -115,8 +115,8 @@ class ADCConverter:
             plt.title("ADC to {0} using Shunt Factor {1}".format(self.shuntFactor, self.unit))
             plt.xlabel("ADC")
             plt.ylabel(self.unit)
-            plt.savefig("ADC_to_pC_range{0}.png".format(i))
-            plt.savefig("ADC_to_pC_range{0}.pdf".format(i))
+            plt.savefig("ADC_to_{0}_range{1}.png".format(i, self.unit))
+            plt.savefig("ADC_to_{0}_range{1}.pdf".format(i, self.unit))
             plt.clf()
 
         # plot all ranges on one plot
@@ -134,8 +134,8 @@ class ADCConverter:
         plt.title("ADC to {0} using Shunt Factor {1}".format(self.shuntFactor, self.unit))
         plt.xlabel("ADC")
         plt.ylabel(self.unit)
-        plt.savefig("ADC_to_pC.png")
-        plt.savefig("ADC_to_pC.pdf")
+        plt.savefig("ADC_to_{0}.png".format(self.unit))
+        plt.savefig("ADC_to_{0}.pdf".format(self.unit))
         plt.clf()
 
 if __name__ == "__main__":
