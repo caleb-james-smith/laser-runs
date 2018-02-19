@@ -1,15 +1,20 @@
 import ROOT
 from array import array
 import re
+import json
 
-def makeNtuple(root_file):
-    print "making ntuple"
+def makeNtuple(data_dir, root_file):
     
-    infile = ROOT.TFile.Open(root_file)
-    outfile = ROOT.TFile("point5_laser_data.root", "recreate")
+    print "Creating ntuple in {0}".format(data_dir)
+    
+    with open("barcode.json", 'r') as b:
+        barcodes = json.load(b)
+
+    infile = ROOT.TFile.Open("{0}/{1}".format(data_dir, root_file))
+    outfile = ROOT.TFile("{0}/processed_{1}".format(data_dir, root_file), "recreate")
     tree = ROOT.TTree('t1', 't1')
     array_dict = {}
-    branches = ["rbx", "rm", "fiber", "channel", "energy"]
+    branches = ["rbx", "cu", "rm", "fiber", "channel", "energy"]
     for key in branches:
         array_dict[key] = array('f', [0.0])
         name = "{0}/F".format(key)
@@ -28,6 +33,7 @@ def makeNtuple(root_file):
         if "M" in rbxStem:
             rbxNum *= -1
         rbx_dict[rbxName] = rbxNum
+        cu = barcodes["{0}-calib".format(rbxName)]
 
         for rm in xrange(1,5):
             canvas = infile.Get("Energy/{0}/{1}-{2}-Energy".format(rbxName, rbxName, rm))
@@ -36,8 +42,9 @@ def makeNtuple(root_file):
                 for channel in xrange(6):
                     histo = canvas.GetPad(pad).GetPrimitive("ENERGY_{0}_RM{1}_fiber{2}_channel{3}".format(rbxName, rm, fiber, channel))
                     energy = histo.GetMean()
-                    print "{0}-{1} ({2}, {3}) : {4}".format(rbxName, rm, fiber, channel, energy)
+                    print "{0} CU{1} RM{2} ({3}, {4}) : {5}".format(rbxName, cu, rm, fiber, channel, energy)
                     array_dict["rbx"][0] = float(rbxNum)
+                    array_dict["cu"][0] = float(cu)
                     array_dict["rm"][0] = float(rm)
                     array_dict["fiber"][0] = float(fiber)
                     array_dict["channel"][0] = float(channel)
@@ -55,5 +62,9 @@ def makeNtuple(root_file):
 
 
 if __name__ == "__main__":
-    root_file = "~hcaldqm/xplotdqm/gui/runs/309738_Feb14_laser-HBHE-CU-Gsel0"
-    makeNtuple(root_file)
+    # Runs from ~hcaldqm/xplotdqm/gui/runs 
+    data_dir = "Point5_Data"
+    root_file = "309738_Feb14_laser-HBHE-CU-Gsel0.root"
+    makeNtuple(data_dir, root_file)
+
+
