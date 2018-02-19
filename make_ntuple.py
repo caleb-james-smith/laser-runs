@@ -14,7 +14,7 @@ def makeNtuple(data_dir, root_file):
     outfile = ROOT.TFile("{0}/processed_{1}".format(data_dir, root_file), "recreate")
     tree = ROOT.TTree('t1', 't1')
     array_dict = {}
-    branches = ["rbx", "cu", "rm", "fiber", "channel", "energy"]
+    branches = ["rbx", "cu", "rm", "sipm_ch", "fiber", "fib_ch", "energy"]
     for key in branches:
         array_dict[key] = array('f', [0.0])
         name = "{0}/F".format(key)
@@ -38,19 +38,22 @@ def makeNtuple(data_dir, root_file):
         for rm in xrange(1,5):
             canvas = infile.Get("Energy/{0}/{1}-{2}-Energy".format(rbxName, rbxName, rm))
             pad = 1
+            sipm_ch = 0
             for fiber in xrange(8):
-                for channel in xrange(6):
-                    histo = canvas.GetPad(pad).GetPrimitive("ENERGY_{0}_RM{1}_fiber{2}_channel{3}".format(rbxName, rm, fiber, channel))
+                for fib_ch in xrange(6):
+                    histo = canvas.GetPad(pad).GetPrimitive("ENERGY_{0}_RM{1}_fiber{2}_channel{3}".format(rbxName, rm, fiber, fib_ch))
                     energy = histo.GetMean()
-                    print "{0} CU{1} RM{2} ({3}, {4}) : {5}".format(rbxName, cu, rm, fiber, channel, energy)
+                    print "{0} CU{1} RM{2} SiPM{3} ({4}, {5}) : {6}".format(rbxName, cu, rm, sipm_ch, fiber, fib_ch, energy)
                     array_dict["rbx"][0] = float(rbxNum)
                     array_dict["cu"][0] = float(cu)
                     array_dict["rm"][0] = float(rm)
+                    array_dict["sipm_ch"][0] = float(sipm_ch)
                     array_dict["fiber"][0] = float(fiber)
-                    array_dict["channel"][0] = float(channel)
+                    array_dict["fib_ch"][0] = float(fib_ch)
                     array_dict["energy"][0] = float(energy)
                     tree.Fill()
                     pad += 1
+                    sipm_ch += 1
                     nchannels += 1
 
    
