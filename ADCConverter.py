@@ -112,11 +112,11 @@ class ADCConverter:
         
             legend = ax.legend(loc='upper left')
             ax.grid(True)
-            plt.title("ADC to {0} using Shunt Factor {1}".format(self.shuntFactor, self.unit))
+            plt.title("ADC to {0} using Shunt Factor {1}".format(self.unit, self.shuntFactor))
             plt.xlabel("ADC")
             plt.ylabel(self.unit)
-            plt.savefig("ADC_to_{0}_range{1}.png".format(i, self.unit))
-            plt.savefig("ADC_to_{0}_range{1}.pdf".format(i, self.unit))
+            plt.savefig("ADC_to_{0}_range{1}.png".format(self.unit, i))
+            plt.savefig("ADC_to_{0}_range{1}.pdf".format(self.unit, i))
             plt.clf()
 
         # plot all ranges on one plot
@@ -131,7 +131,7 @@ class ADCConverter:
         
         legend = ax.legend(loc='upper left')
         ax.grid(True)
-        plt.title("ADC to {0} using Shunt Factor {1}".format(self.shuntFactor, self.unit))
+        plt.title("ADC to {0} using Shunt Factor {1}".format(self.unit, self.shuntFactor))
         plt.xlabel("ADC")
         plt.ylabel(self.unit)
         plt.savefig("ADC_to_{0}.png".format(self.unit))
