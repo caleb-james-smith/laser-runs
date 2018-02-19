@@ -30,7 +30,7 @@ class ADCConverter:
     # A class to convert ADC to fC
     fc = {}
 
-    def __init__(self, unit=0, shunt=0):
+    def __init__(self, unit="fc", shunt=0):
         self.unit = unit
         self.shunt = shunt
         self.shuntFactor = self.getShuntFactor()
@@ -110,9 +110,9 @@ class ADCConverter:
         
             legend = ax.legend(loc='upper left')
             ax.grid(True)
-            plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
+            plt.title("ADC to {0} using Shunt Factor {1}".format(self.shuntFactor, self.unit))
             plt.xlabel("ADC")
-            plt.ylabel("pC")
+            plt.ylabel(self.unit)
             plt.savefig("ADC_to_pC_range{0}.png".format(i))
             plt.savefig("ADC_to_pC_range{0}.pdf".format(i))
             plt.clf()
@@ -129,9 +129,9 @@ class ADCConverter:
         
         legend = ax.legend(loc='upper left')
         ax.grid(True)
-        plt.title("ADC to Picocoulombs (pC) using Shunt Factor {0}".format(self.shuntFactor))
+        plt.title("ADC to {0} using Shunt Factor {1}".format(self.shuntFactor, self.unit))
         plt.xlabel("ADC")
-        plt.ylabel("pC")
+        plt.ylabel(self.unit)
         plt.savefig("ADC_to_pC.png")
         plt.savefig("ADC_to_pC.pdf")
         plt.clf()
@@ -139,7 +139,7 @@ class ADCConverter:
 if __name__ == "__main__":
     for s in xrange(32):
         ADCConverter(1, s)
-    converter = ADCConverter(0, 0) # unit, shunt
+    converter = ADCConverter("fc", 0) # unit, shunt
     xbins = converter.getBins()
     cleanBins = []
     print "ADC : pC : xbin"
