@@ -13,8 +13,8 @@ class Plotter:
         self.data_dir = data_dir
         self.plot_dir = plot_dir
         self.data = self.getData(data_dir)
-        raw_colors = ["pinkish red","azure","electric purple","bluish green","tangerine","neon pink","dark sky blue","avocado"]
-        self.colors = list("xkcd:{0}".format(c) for c in raw_colors)
+        xkcd_colors = ["pinkish red","azure","electric purple","bluish green","tangerine","neon pink","dark sky blue","avocado"]
+        self.colors = list("xkcd:{0}".format(c) for c in xkcd_colors)
 
     def getData(self, data_dir):
         sipm_file = "sipm_table.txt"
