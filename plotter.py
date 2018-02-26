@@ -4,15 +4,24 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
-from scipy.optimize import curve_fit
+try:
+    from scipy.optimize import curve_fit
+except:
+    print "Cannot import curve_fit from scipy.optimize"
 
 class Plotter:
 
-    def __init__(self, data_dir, plot_dir):
+    def __init__(self, data_dir, plot_dir, get_data=True):
+        if data_dir[-1] != "/":
+            data_dir += "/"
+        if plot_dir[-1] != "/":
+            plot_dir += "/"
+    
         self.constants = {}
         self.data_dir = data_dir
         self.plot_dir = plot_dir
-        self.data = self.getData(data_dir)
+        if get_data:
+            self.data = self.getData(data_dir)
         xkcd_colors = ["pinkish red","azure","electric purple","bluish green","tangerine","neon pink","dark sky blue","avocado"]
         self.colors = list("xkcd:{0}".format(c) for c in xkcd_colors)
 
@@ -224,7 +233,7 @@ class Plotter:
         plt.close()
     
     # makes scatter plots and calculates constants
-    def plotScatter(self, info):
+    def plotScatter(self, info, hackColors=False):
         name = info["name"]
         ynames = info["ynames"]
         x = info["xdata"]
@@ -245,6 +254,11 @@ class Plotter:
         y_max = -10 ** 10
   
         sipm_mean = np.mean(self.data["sipm"])
+        # XKCD Colors 
+        if hackColors:
+            pinkish_red = "#f10c45"
+            azure = "#069af3" 
+            self.colors = [pinkish_red, azure]
 
         if len(ynames) != len(ydata):
             print "The length of the ynames list should be the same as the number of y data sets."
@@ -448,11 +462,6 @@ if __name__ == "__main__":
     scatter_config = options.scatter_config
 
 
-    if data_dir[-1] != "/":
-        data_dir += "/"
-    if plot_dir[-1] != "/":
-        plot_dir += "/"
-    
     # calls getData to set self.data on initialization
     p = Plotter(data_dir, plot_dir)
    

@@ -1,6 +1,7 @@
 import ROOT
 import numpy as np
 import matplotlib.pyplot as plt
+from plotter import Plotter
 
 def scatter(file_1, file_2):
     print "Creating scatter plot."
@@ -96,43 +97,86 @@ def scatter(file_1, file_2):
     print "Number of HEM RBXs (P5): {0}".format(len(scatter["HEM_y"]))
     print "Number of HEP RBXs (904): {0}".format(len(scatter["HEP_x"]))
     print "Number of HEM RBXs (904): {0}".format(len(scatter["HEM_x"]))
-  
+
+    #info = {}
+    #info["name"] = "LaserToCU_Point5_vs_904_Scatter"
+    #info["ynames"] = ["HEP"]
+    #info["xdata"] = scatter["HEP_x"]
+    #info["ydata"] = [scatter["HEP_y"]]
+    #info["title"] = "Laser to CU: Point 5 vs 904"
+    #info["xtitle"] = "Max Charge (fC) from 904"
+    #info["ytitle"] = "Energy (fC) from Point 5"
+    #info["statloc"] = 1
+    #info["setrange"] = 0
+    #info["plotfit"] = [1]
+
+    #p = Plotter("Nov17-18_Final_CU_Data", "Nov17-18_Final_Plots", True)
+    #p.plotScatter(info, True)
+
     # create scatter plot
     fig, ax = plt.subplots()
     
-    plt.plot(scatter["HEP_x"], scatter["HEP_y"], 'o', c=pinkish_red, alpha=0.5, label="HEP RBXs")
-    plt.plot(scatter["HEM_x"], scatter["HEM_y"], 'o', c=azure, alpha=0.5, label="HEM RBXs")
+    ax.plot(scatter["HEP_x"], scatter["HEP_y"], 'o', c=pinkish_red, alpha=0.5, label="HEP RBXs")
+    ax.plot(scatter["HEM_x"], scatter["HEM_y"], 'o', c=azure, alpha=0.5, label="HEM RBXs")
 
     title = "Laser to CU Data: Energy (P5) vs. Max Charge (904) per RBX"
     xtitle = "Max Charge (fC) from 904"
     ytitle = "Energy (fC) from P5"
     name = "LaserToCU_Point5vs904"
         
-    legend = ax.legend(loc='lower right')
+    legend = ax.legend(loc='upper left')
     ax.grid(True)
+    axes = plt.gca()
+    axes.set_xlim([0, 2 * 10**6])
+    axes.set_ylim([0, 50 * 10**3])
     
     plt.title(title)
     plt.xlabel(xtitle)
     plt.ylabel(ytitle)
     plt.savefig(name + ".png")
     plt.savefig(name + ".pdf")
+  
+    info = []
+    entry = {}
+    entry["x"] = scatter["HEP_x"]
+    entry["y"] = scatter["HEP_y"]
+    entry["color"] = pinkish_red
+    entry["label"] = "HEP"
+    info.append(entry)
+    entry = {}
+    entry["x"] = scatter["HEM_x"]
+    entry["y"] = scatter["HEM_y"]
+    entry["color"] = azure
+    entry["label"] = "HEM"
+    info.append(entry)
+
+    f_box = ""
+    for key in info:
+        x = key["x"]
+        y = key["y"]
+        z = np.polyfit(x, y, 1)
+        f = np.poly1d(z)
+        f_string = str(f)
+        f_string = f_string.split("\n")[-1]
+        f_string = "{0} : f(x) = {1}".format(key["label"], f_string)
+        f_box += f_string + "\n"
+        print f_string
+        # calculate new x's and y's using fit function
+        x_new = np.linspace(min(x), max(x), 100)
+        y_new = f(x_new)
+        ax.plot(x_new, y_new, '--', c=key["color"], alpha=0.5, label=key["label"])
+
+    if f_box:
+        if f_box[-1] == "\n":
+            f_box = f_box[:-1]
+        ax.text(10**5, 25 * 10**3, f_box)
+        
+    plt.savefig(name + "_fit.png")
+    plt.savefig(name + "_fit.pdf")
     
     plt.show()
     plt.clf()
     plt.close()
-    
-    
-    #c1 = ROOT.TCanvas('c1', 'Charge for Laser Run', 0, 0, 100, 100)
-    #f1 = tfiles[0]
-    #t1 = f1.t1
-    #t1.Draw('max_charge')
-    
-    #f2 = tfiles[1]
-    #t2 = f2.t1
-    #t2.Draw('energy')
-
-    #c1.cd()
-    #c1.Update()
     
     ROOT.gBenchmark.Show('run time')
 
