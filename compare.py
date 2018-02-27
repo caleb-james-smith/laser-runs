@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from plotter import Plotter
 
-def scatter(file_1, file_2):
+def scatter(file_1, file_2, name):
     print "Creating scatter plot."
     print "First file: {0}".format(file_1)
     print "Second file: {0}".format(file_2)
@@ -122,7 +122,6 @@ def scatter(file_1, file_2):
     title = "Laser to CU Data: Energy (P5) vs. Max Charge (904) per RBX"
     xtitle = "Max Charge (fC) from 904"
     ytitle = "Energy (fC) from P5"
-    name = "LaserToCU_Point5vs904"
         
     legend = ax.legend(loc='upper left')
     ax.grid(True)
@@ -181,9 +180,23 @@ def scatter(file_1, file_2):
     ROOT.gBenchmark.Show('run time')
 
 if __name__ == "__main__":
-    file_1 = "Nov17-18_Final_CU_Data/sipm.root"
-    file_2 = "Point5_Data/processed_309738_Feb14_laser-HBHE-CU-Gsel0.root"
-    scatter(file_1, file_2)
+    file_904 = "Nov17-18_Final_CU_Data/sipm.root"
+    files_point5 = []
+    names = []
+    files_point5.append("Point5_Data/processed_309738_Feb14_laser-HBHE-CU-Gsel0.root")
+    #files_point5.append("Point5_Data/processed_310553_Feb27_laser-HBHE-CU-Gsel0.root")
+    #files_point5.append("Point5_Data/processed_310554_Feb27_laser-HBHE-CU-Gsel0.root")
+    files_point5.append("Point5_Data/processed_310600_Feb27_laser-HBHE-CU-Gsel0.root")
+    files_point5.append("Point5_Data/processed_310602_Feb27_laser-HBHE-CU-Gsel0.root")
+    files_point5.append("Point5_Data/processed_310603_Feb27_laser-HBHE-CU-Gsel0.root")
+    names.append("Point5_Plots/309738_Feb14_laser-HBHE-CU-Gsel0")
+    #names.append("Point5_Plots/310553_Feb27_laser-HBHE-CU-Gsel0")
+    #names.append("Point5_Plots/310554_Feb27_laser-HBHE-CU-Gsel0")
+    names.append("Point5_Plots/310600_Feb27_laser-HBHE-CU-Gsel0")
+    names.append("Point5_Plots/310602_Feb27_laser-HBHE-CU-Gsel0")
+    names.append("Point5_Plots/310603_Feb27_laser-HBHE-CU-Gsel0")
+    for i in xrange(len(names)):
+        scatter(file_904, files_point5[i], names[i])
 
 
 

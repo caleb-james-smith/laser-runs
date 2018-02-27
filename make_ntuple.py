@@ -2,6 +2,9 @@ import ROOT
 from array import array
 import re
 import json
+import os
+import subprocess
+import argparse
 
 def makeNtuple(data_dir, root_file):
     
@@ -43,7 +46,7 @@ def makeNtuple(data_dir, root_file):
                 for fib_ch in xrange(6):
                     histo = canvas.GetPad(pad).GetPrimitive("ENERGY_{0}_RM{1}_fiber{2}_channel{3}".format(rbxName, rm, fiber, fib_ch))
                     energy = histo.GetMean()
-                    print "{0} CU{1} RM{2} SiPM{3} ({4}, {5}) : {6}".format(rbxName, cu, rm, sipm_ch, fiber, fib_ch, energy)
+                    #print "{0} CU{1} RM{2} SiPM{3} ({4}, {5}) : {6}".format(rbxName, cu, rm, sipm_ch, fiber, fib_ch, energy)
                     array_dict["rbx"][0] = float(rbxNum)
                     array_dict["cu"][0] = float(cu)
                     array_dict["rm"][0] = float(rm)
@@ -64,10 +67,47 @@ def makeNtuple(data_dir, root_file):
     return
 
 
+def main():
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--run", "-r", default="", help="run number")
+    options = parser.parse_args()
+    run = options.run
+    
+    # DQM runs from ~hcaldqm/xplotdqm/gui/runs 
+    dqm_data_dir = "/nfshome0/hcaldqm/xplotdqm/gui/runs"
+    my_data_dir = "Point5_Data"
+    dqm_file = ""
+    my_file = ""
+
+    if run:
+        for f in os.listdir(dqm_data_dir):
+            if run in f:
+                print "Found DQM file: {0}".format(f)
+                dqm_file = f
+    else:
+        print "Please provide run number using -r option."
+        return
+    
+
+    my_file = dqm_file + ".root"
+    dqm_file = dqm_data_dir + "/" + dqm_file
+    print "Using DQM file: {0}".format(dqm_file)
+
+    subprocess.call(["rsync", "-avz", dqm_file, my_data_dir + "/" + my_file ])
+
+    makeNtuple(my_data_dir, my_file)
+
+    #root_files = []
+    #root_files.append("309738_Feb14_laser-HBHE-CU-Gsel0.root")
+    #root_files.append("310553_Feb27_laser-HBHE-CU-Gsel0.root")
+    #root_files.append("310554_Feb27_laser-HBHE-CU-Gsel0.root")
+    #root_files.append("310600_Feb27_laser-HBHE-CU-Gsel0.root")
+    #root_files.append("310602_Feb27_laser-HBHE-CU-Gsel0.root")
+    #root_files.append("310603_Feb27_laser-HBHE-CU-Gsel0.root")
+    #for root_file in root_files:
+    #    makeNtuple(data_dir, root_file)
+
 if __name__ == "__main__":
-    # Runs from ~hcaldqm/xplotdqm/gui/runs 
-    data_dir = "Point5_Data"
-    root_file = "309738_Feb14_laser-HBHE-CU-Gsel0.root"
-    makeNtuple(data_dir, root_file)
+    main()
 
 
