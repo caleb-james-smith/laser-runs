@@ -5,16 +5,19 @@ import json
 import os
 import subprocess
 import argparse
+from compare import scatter
 
 def makeNtuple(data_dir, root_file):
+    if data_dir[-1] != "/":
+        data_dir += "/"
     
     print "Creating ntuple in {0}".format(data_dir)
     
     with open("barcode.json", 'r') as b:
         barcodes = json.load(b)
 
-    infile = ROOT.TFile.Open("{0}/{1}".format(data_dir, root_file))
-    outfile = ROOT.TFile("{0}/processed_{1}".format(data_dir, root_file), "recreate")
+    infile = ROOT.TFile.Open("{0}{1}".format(data_dir, root_file))
+    outfile = ROOT.TFile("{0}processed_{1}".format(data_dir, root_file), "recreate")
     tree = ROOT.TTree('t1', 't1')
     array_dict = {}
     branches = ["rbx", "cu", "rm", "sipm_ch", "fiber", "fib_ch", "energy"]
@@ -76,8 +79,14 @@ def main():
     # DQM runs from ~hcaldqm/xplotdqm/gui/runs 
     dqm_data_dir = "/nfshome0/hcaldqm/xplotdqm/gui/runs"
     my_data_dir = "Point5_Data"
+    my_plot_dir = "Point5_Plots"
     dqm_file = ""
     my_file = ""
+   
+    if my_data_dir[-1] != "/":
+        my_data_dir += "/"
+    if my_plot_dir[-1] != "/":
+        my_plot_dir += "/"
 
     if run:
         for f in os.listdir(dqm_data_dir):
@@ -90,14 +99,27 @@ def main():
     
 
     my_file = dqm_file + ".root"
-    dqm_file = dqm_data_dir + "/" + dqm_file
-    print "Using DQM file: {0}".format(dqm_file)
+    full_dqm_file = dqm_data_dir + "/" + dqm_file
+    print "Using DQM file: {0}".format(full_dqm_file)
 
-    subprocess.call(["rsync", "-avz", dqm_file, my_data_dir + "/" + my_file ])
+    # rsync file from DQM directory to personal directory
+    subprocess.call(["rsync", "-avz", full_dqm_file, my_data_dir + my_file])
 
+    # process root file, output ntuple
     makeNtuple(my_data_dir, my_file)
+
+    # files for scatter plot
+    file_904 = "Nov17-18_Final_CU_Data/sipm.root"
+    file_point5 = my_data_dir + "processed_" + my_file
+    file_out = my_plot_dir + dqm_file
+    
+    # make scatter plot 
+    scatter(file_904, file_point5, file_out)
 
 if __name__ == "__main__":
     main()
+
+
+
 
 

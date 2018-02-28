@@ -1,7 +1,7 @@
 import ROOT
 import numpy as np
 import matplotlib.pyplot as plt
-from plotter import Plotter
+#from plotter import Plotter
 
 def scatter(file_1, file_2, name):
     print "Creating scatter plot."
