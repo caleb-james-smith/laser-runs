@@ -97,16 +97,6 @@ def main():
 
     makeNtuple(my_data_dir, my_file)
 
-    #root_files = []
-    #root_files.append("309738_Feb14_laser-HBHE-CU-Gsel0.root")
-    #root_files.append("310553_Feb27_laser-HBHE-CU-Gsel0.root")
-    #root_files.append("310554_Feb27_laser-HBHE-CU-Gsel0.root")
-    #root_files.append("310600_Feb27_laser-HBHE-CU-Gsel0.root")
-    #root_files.append("310602_Feb27_laser-HBHE-CU-Gsel0.root")
-    #root_files.append("310603_Feb27_laser-HBHE-CU-Gsel0.root")
-    #for root_file in root_files:
-    #    makeNtuple(data_dir, root_file)
-
 if __name__ == "__main__":
     main()
 
