@@ -7,17 +7,16 @@ import subprocess
 import argparse
 from compare import scatter
 
-def makeNtuple(data_dir, root_file):
-    if data_dir[-1] != "/":
-        data_dir += "/"
+def makeNtuple(file_in, file_out):
     
-    print "Creating ntuple in {0}".format(data_dir)
+    print "Input file: {0}".format(file_in)
+    print "Output file: {0}".format(file_out)
     
     with open("barcode.json", 'r') as b:
         barcodes = json.load(b)
 
-    infile = ROOT.TFile.Open("{0}{1}".format(data_dir, root_file))
-    outfile = ROOT.TFile("{0}processed_{1}".format(data_dir, root_file), "recreate")
+    infile = ROOT.TFile.Open(file_in)
+    outfile = ROOT.TFile(file_out, "recreate")
     tree = ROOT.TTree('t1', 't1')
     array_dict = {}
     branches = ["rbx", "cu", "rm", "sipm_ch", "fiber", "fib_ch", "energy"]
@@ -83,6 +82,8 @@ def main():
     dqm_file = ""
     my_file = ""
    
+    if dqm_data_dir[-1] != "/":
+        dqm_data_dir += "/"
     if my_data_dir[-1] != "/":
         my_data_dir += "/"
     if my_plot_dir[-1] != "/":
@@ -91,26 +92,29 @@ def main():
     if run:
         for f in os.listdir(dqm_data_dir):
             if run in f:
-                print "Found DQM file: {0}".format(f)
+                print "Found DQM file for run {0}: {1}".format(run, f)
                 dqm_file = f
     else:
         print "Please provide run number using -r option."
         return
     
+    if not dqm_file:
+        print "No DQM file found for run {0}".format(run)
+        return
 
-    my_file = dqm_file + ".root"
-    full_dqm_file = dqm_data_dir + "/" + dqm_file
+    my_file = my_data_dir + "processed_" + dqm_file + ".root"
+    full_dqm_file = dqm_data_dir + dqm_file
     print "Using DQM file: {0}".format(full_dqm_file)
 
     # rsync file from DQM directory to personal directory
-    subprocess.call(["rsync", "-avz", full_dqm_file, my_data_dir + my_file])
+    # subprocess.call(["rsync", "-avz", full_dqm_file, my_file])
 
-    # process root file, output ntuple
-    makeNtuple(my_data_dir, my_file)
+    # process root file, output ntuple: makeNtuple(file_in, file_out)
+    makeNtuple(full_dqm_file, my_file)
 
     # files for scatter plot
     file_904 = "Nov17-18_Final_CU_Data/sipm.root"
-    file_point5 = my_data_dir + "processed_" + my_file
+    file_point5 = my_file
     file_out = my_plot_dir + dqm_file
     
     # make scatter plot 

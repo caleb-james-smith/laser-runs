@@ -79,7 +79,7 @@ def scatter(file_1, file_2, name):
             # P5 maksed RM types 2 and 3 only (4 masked channels)
             # P5 masked Layer -1 channels (one per RM, 4 masked channels)
             if len(rbx_channels_904) != 184 - 2:
-                print "There are {0} channels for 904 instead of 192 - 6 - 4 = 182 expectedi.".format(len(rbx_channels_904), rbx)
+                print "There are {0} channels for 904 instead of 192 - 6 - 4 = 182 expected.".format(len(rbx_channels_904), rbx)
             else: # all channels for RBX
                 ave = np.mean(rbx_channels_904)
                 rbx_averages_904.append(ave)
@@ -122,12 +122,17 @@ def scatter(file_1, file_2, name):
     title = "Laser to CU Data: Energy (P5) vs. Max Charge (904) per RBX"
     xtitle = "Max Charge (fC) from 904"
     ytitle = "Energy (fC) from P5"
-        
+    
+    xmax = 2 * 10**6
+    ymax = 2 * 10**5
+    xstat = 10**5
+    ystat = 1.5 * 10**5
+
     legend = ax.legend(loc='upper left')
     ax.grid(True)
     axes = plt.gca()
-    axes.set_xlim([0, 2 * 10**6])
-    axes.set_ylim([0, 50 * 10**3])
+    axes.set_xlim([0, xmax])
+    axes.set_ylim([0, ymax])
     
     plt.title(title)
     plt.xlabel(xtitle)
@@ -168,7 +173,7 @@ def scatter(file_1, file_2, name):
     if f_box:
         if f_box[-1] == "\n":
             f_box = f_box[:-1]
-        ax.text(10**5, 25 * 10**3, f_box)
+        ax.text(xstat, ystat, f_box)
         
     plt.savefig(name + "_fit.png")
     plt.savefig(name + "_fit.pdf")
