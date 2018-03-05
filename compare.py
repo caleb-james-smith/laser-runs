@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 #from plotter import Plotter
 
-def scatter(file_1, file_2, name):
+def scatter(file_1, file_2, name, run):
     print "Creating scatter plot."
     print "First file: {0}".format(file_1)
     print "Second file: {0}".format(file_2)
@@ -119,14 +119,14 @@ def scatter(file_1, file_2, name):
     ax.plot(scatter["HEP_x"], scatter["HEP_y"], 'o', c=pinkish_red, alpha=0.5, label="HEP RBXs")
     ax.plot(scatter["HEM_x"], scatter["HEM_y"], 'o', c=azure, alpha=0.5, label="HEM RBXs")
 
-    title = "Laser to CU Data: Energy (P5) vs. Max Charge (904) per RBX"
+    title = "Laser to CU Run {0}\nAve. Energy (P5) vs. Max Charge (904) per RBX".format(run)
     xtitle = "Max Charge (fC) from 904"
     ytitle = "Energy (fC) from P5"
     
-    xmax = 2 * 10**6
-    ymax = 2 * 10**5
-    xstat = 10**5
-    ystat = 1.5 * 10**5
+    xmax = 2.0 * 10**6
+    ymax = 2.5 * 10**5
+    xstat = 1.0 * 10**5
+    ystat = 1.75 * 10**5
 
     legend = ax.legend(loc='upper left')
     ax.grid(True)

@@ -118,7 +118,7 @@ def main():
     file_out = my_plot_dir + dqm_file
     
     # make scatter plot 
-    scatter(file_904, file_point5, file_out)
+    scatter(file_904, file_point5, file_out, run)
 
 if __name__ == "__main__":
     main()
